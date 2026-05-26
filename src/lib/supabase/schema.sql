@@ -7,6 +7,9 @@ create table agents (
   tone text,
   language text,
   phone text,
+  twilio_account_sid text,
+  twilio_auth_token text,
+  facebook_page_id text,
   created_at timestamp with time zone default now()
 );
 
@@ -15,8 +18,10 @@ create table conversations (
   agent_id uuid references agents on delete cascade,
   contact_name text,
   contact_phone text,
+  contact_email text,
   last_message text,
-  status text,
+  role text default 'user',
+  status text default 'new',
   revenue numeric default 0,
   created_at timestamp with time zone default now()
 );

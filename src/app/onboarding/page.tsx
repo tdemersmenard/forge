@@ -23,6 +23,8 @@ type FormData = {
   language: string;
   openTime: string;
   closeTime: string;
+  twilioAccountSid: string;
+  twilioAuthToken: string;
   phone: string;
 };
 
@@ -41,6 +43,8 @@ export default function OnboardingPage() {
     language: "FR",
     openTime: "08:00",
     closeTime: "18:00",
+    twilioAccountSid: "",
+    twilioAuthToken: "",
     phone: "",
   });
 
@@ -78,6 +82,8 @@ export default function OnboardingPage() {
       services: form.services,
       tone: form.tone,
       language: form.language,
+      twilio_account_sid: form.twilioAccountSid || null,
+      twilio_auth_token: form.twilioAuthToken || null,
       phone: form.phone || null,
     });
 
@@ -297,26 +303,64 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-5">
               <div>
                 <h2 className="text-lg font-semibold text-white">
-                  Connect a phone number
+                  Connect your Twilio account
                 </h2>
                 <p className="mt-1 text-sm text-white/40">
-                  Your Twilio phone number. Your agent will use this to send
-                  and receive SMS messages.
+                  Your agent will send and receive SMS using your own Twilio
+                  number and credentials.
                 </p>
+                <a
+                  href="https://www.twilio.com/console"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1 text-xs text-white/30 underline underline-offset-2 hover:text-white/60 transition-colors"
+                >
+                  Find these at twilio.com/console
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 8L8 2M8 2H4M8 2v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
               </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-white/50">
-                  Twilio phone number
+                  Account SID
+                </label>
+                <input
+                  type="text"
+                  value={form.twilioAccountSid}
+                  onChange={(e) => set("twilioAccountSid", e.target.value)}
+                  placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 font-mono text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-white/50">
+                  Auth Token
+                </label>
+                <input
+                  type="password"
+                  value={form.twilioAuthToken}
+                  onChange={(e) => set("twilioAuthToken", e.target.value)}
+                  placeholder="Your Twilio Auth Token"
+                  className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 font-mono text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-white/50">
+                  Phone number
                 </label>
                 <input
                   type="tel"
                   value={form.phone}
                   onChange={(e) => set("phone", e.target.value)}
-                  placeholder="+15145550100"
+                  placeholder="+15551234567"
                   className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                 />
                 <p className="text-xs text-white/30">
-                  Optional — you can add this later in Settings.
+                  Format: +15551234567 — Optional, can be added later in Settings.
                 </p>
               </div>
 
