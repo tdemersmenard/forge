@@ -12,6 +12,7 @@ export type ConvRow = {
   role: string | null;
   status: string | null;
   revenue: number | null;
+  source: string | null;
   created_at: string;
 };
 

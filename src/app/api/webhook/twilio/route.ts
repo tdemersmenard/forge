@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAnthropicClient } from "@/lib/claude";
+import { sendNewLeadEmail, sendDealClosedEmail } from "@/lib/notifications";
 import twilio from "twilio";
 
 // Twilio sends application/x-www-form-urlencoded
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
   const { data: agents, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, business_name, sector, services, tone, language, phone, twilio_account_sid, twilio_auth_token"
+      "id, user_id, business_name, sector, services, tone, language, phone, twilio_account_sid, twilio_auth_token, notifications_prefs"
     )
     .eq("phone", to)
     .limit(1);
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
 
   const agent = agents[0] as {
     id: string;
+    user_id: string;
     business_name: string;
     sector: string;
     services: string;
@@ -46,6 +48,7 @@ export async function POST(request: Request) {
     phone: string;
     twilio_account_sid: string | null;
     twilio_auth_token: string | null;
+    notifications_prefs: { new_lead?: boolean; deal_closed?: boolean } | null;
   };
 
   // 2. Fetch last 10 messages from this contact for conversation context
@@ -124,10 +127,24 @@ Ne mentionne jamais que tu es une IA sauf si on te le demande directement.`;
     ) {
       return "in_progress";
     }
+    if (
+      lower.includes("accord") ||
+      lower.includes("confirmé") ||
+      lower.includes("confirmed") ||
+      lower.includes("booked") ||
+      lower.includes("réservé") ||
+      lower.includes("rendez-vous pris") ||
+      lower.includes("deal") ||
+      lower.includes("parfait")
+    ) {
+      return "closed";
+    }
     return null;
   }
 
   const newStatus = detectStatus(body) ?? "new";
+
+  const isNewLead = !history || history.length === 0;
 
   // 7. Save user message
   await supabase.from("conversations").insert({
@@ -136,6 +153,7 @@ Ne mentionne jamais que tu es une IA sauf si on te le demande directement.`;
     last_message: body,
     role: "user",
     status: newStatus,
+    source: "sms",
   });
 
   // 8. Save AI response
@@ -145,9 +163,42 @@ Ne mentionne jamais que tu es une IA sauf si on te le demande directement.`;
     last_message: aiResponse,
     role: "agent",
     status: newStatus,
+    source: "sms",
   });
 
-  // 9. Send reply via agent's OWN Twilio credentials
+  // 9. Trigger notification emails
+  try {
+    const prefs = agent.notifications_prefs;
+    if (agent.user_id) {
+      const { data: authUser } = await supabase.auth.admin.getUserById(
+        agent.user_id
+      );
+      const userEmail = authUser?.user?.email;
+      if (userEmail) {
+        if (isNewLead && prefs?.new_lead !== false) {
+          await sendNewLeadEmail({
+            to: userEmail,
+            businessName: agent.business_name,
+            contactName: null,
+            contactPhone: from,
+            source: "sms",
+          });
+        }
+        if (newStatus === "closed" && prefs?.deal_closed !== false) {
+          await sendDealClosedEmail({
+            to: userEmail,
+            businessName: agent.business_name,
+            contactName: null,
+            contactPhone: from,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Notification error:", err);
+  }
+
+  // 10. Send reply via agent's OWN Twilio credentials
   if (agent.twilio_account_sid && agent.twilio_auth_token) {
     try {
       const client = twilio(agent.twilio_account_sid, agent.twilio_auth_token);
@@ -161,7 +212,7 @@ Ne mentionne jamais que tu es une IA sauf si on te le demande directement.`;
     }
   }
 
-  // Return empty TwiML so Twilio doesn't send a duplicate message
+  // 11. Return empty TwiML so Twilio doesn't send a duplicate message
   return new Response("<Response/>", {
     status: 200,
     headers: { "Content-Type": "text/xml" },

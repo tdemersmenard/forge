@@ -11,6 +11,16 @@ type Thread = {
   lastMessage: ConvRow;
 };
 
+function sourceLabel(source: string | null) {
+  return source === "facebook" ? "Facebook Ad" : "SMS";
+}
+
+function sourceBadgeStyle(source: string | null) {
+  return source === "facebook"
+    ? "text-blue-400 bg-blue-400/10 border-blue-400/20"
+    : "text-white/30 bg-white/[0.04] border-white/[0.08]";
+}
+
 function statusStyle(status: string | null) {
   switch (status?.toLowerCase()) {
     case "closed":
@@ -205,11 +215,18 @@ export function ConversationsClient({ agentIds, initialConversations }: Props) {
                       <p className="truncate text-[11px] text-white/35">
                         {thread.lastMessage.last_message ?? "—"}
                       </p>
-                      <span
-                        className={`shrink-0 rounded-full border px-1.5 py-px text-[10px] font-medium ${statusStyle(latestStatus)}`}
-                      >
-                        {latestStatus ?? "new"}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <span
+                          className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${sourceBadgeStyle(thread.lastMessage.source)}`}
+                        >
+                          {sourceLabel(thread.lastMessage.source)}
+                        </span>
+                        <span
+                          className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${statusStyle(latestStatus)}`}
+                        >
+                          {latestStatus ?? "new"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </button>
@@ -233,13 +250,20 @@ export function ConversationsClient({ agentIds, initialConversations }: Props) {
                   <p className="text-xs text-white/30">{selectedThread.phone}</p>
                 )}
               </div>
-              <span
-                className={`rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyle(
-                  selectedThread.lastMessage.status
-                )}`}
-              >
-                {selectedThread.lastMessage.status ?? "new"}
-              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`rounded-full border px-2 py-0.5 text-xs font-medium ${sourceBadgeStyle(selectedThread.lastMessage.source)}`}
+                >
+                  {sourceLabel(selectedThread.lastMessage.source)}
+                </span>
+                <span
+                  className={`rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyle(
+                    selectedThread.lastMessage.status
+                  )}`}
+                >
+                  {selectedThread.lastMessage.status ?? "new"}
+                </span>
+              </div>
             </div>
 
             {/* Messages */}
