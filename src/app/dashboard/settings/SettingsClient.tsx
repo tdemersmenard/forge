@@ -52,6 +52,39 @@ function SaveButton({
   );
 }
 
+function CopyButton({
+  copied,
+  onClick,
+}: {
+  copied: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-10 items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-3 text-xs text-white/50 transition-colors hover:border-white/20 hover:text-white/80"
+    >
+      {copied ? (
+        <>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Copied
+        </>
+      ) : (
+        <>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M8 4V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h1" stroke="currentColor" strokeWidth="1.2" />
+          </svg>
+          Copy
+        </>
+      )}
+    </button>
+  );
+}
+
 function Toggle({
   checked,
   onChange,
@@ -124,6 +157,10 @@ export function SettingsClient({ agent, userEmail }: Props) {
   const [fbSaving, setFbSaving] = useState(false);
   const [fbSaved, setFbSaved] = useState(false);
   const [vtCopied, setVtCopied] = useState(false);
+  const [urlCopied, setUrlCopied] = useState(false);
+  const [showFbToken, setShowFbToken] = useState(false);
+
+  const WEBHOOK_URL = "https://forge-zeta-silk.vercel.app/api/webhook/facebook";
 
   // ── Notifications tab ──────────────────────────────────────────────────────
   const defaultPrefs = agent?.notifications_prefs ?? {
@@ -203,6 +240,12 @@ export function SettingsClient({ agent, userEmail }: Props) {
     await navigator.clipboard.writeText(fbForm.facebook_verify_token);
     setVtCopied(true);
     setTimeout(() => setVtCopied(false), 2000);
+  }
+
+  async function copyWebhookUrl() {
+    await navigator.clipboard.writeText(WEBHOOK_URL);
+    setUrlCopied(true);
+    setTimeout(() => setUrlCopied(false), 2000);
   }
 
   const tabs: { key: Tab; label: string }[] = [
@@ -442,11 +485,15 @@ export function SettingsClient({ agent, userEmail }: Props) {
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
             <div className="mb-5 flex items-center gap-2">
               <h2 className="text-sm font-semibold text-white">Facebook Lead Ads</h2>
-              {fbForm.facebook_page_id && (
-                <span className="rounded-full bg-blue-400/10 px-2 py-0.5 text-[11px] font-medium text-blue-400">
-                  Connected
-                </span>
-              )}
+              <span
+                className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                  fbForm.facebook_page_id
+                    ? "bg-emerald-400/10 text-emerald-400"
+                    : "bg-white/[0.06] text-white/30"
+                }`}
+              >
+                {fbForm.facebook_page_id ? "Connected" : "Not connected"}
+              </span>
             </div>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
@@ -461,18 +508,43 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 font-mono text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                 />
               </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-white/50">Page Access Token</label>
-                <input
-                  type="password"
-                  value={fbForm.facebook_access_token}
-                  onChange={(e) =>
-                    setFbForm((p) => ({ ...p, facebook_access_token: e.target.value }))
-                  }
-                  placeholder="EAAxxxxxxxx…"
-                  className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 font-mono text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type={showFbToken ? "text" : "password"}
+                    value={fbForm.facebook_access_token}
+                    onChange={(e) =>
+                      setFbForm((p) => ({ ...p, facebook_access_token: e.target.value }))
+                    }
+                    placeholder="EAAxxxxxxxx…"
+                    className="h-10 flex-1 rounded-md border border-white/10 bg-white/[0.04] px-3 font-mono text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowFbToken((v) => !v)}
+                    className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/40 transition-colors hover:border-white/20 hover:text-white/70"
+                  >
+                    {showFbToken ? (
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2"/>
+                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
+                        <path d="M2 2l10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                      </svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2"/>
+                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                <p className="text-[11px] text-white/30">
+                  Get this from Meta Business Suite → Settings → Page Access Tokens
+                </p>
               </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-white/50">
                   Verify Token
@@ -485,42 +557,34 @@ export function SettingsClient({ agent, userEmail }: Props) {
                     value={fbForm.facebook_verify_token}
                     className="h-10 flex-1 rounded-md border border-white/10 bg-white/[0.02] px-3 font-mono text-xs text-white/50 outline-none select-all"
                   />
-                  <button
-                    type="button"
-                    onClick={copyVerifyToken}
-                    className="flex h-10 items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-3 text-xs text-white/50 transition-colors hover:border-white/20 hover:text-white/80"
-                  >
-                    {vtCopied ? (
-                      <>
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                          <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        Copied
-                      </>
-                    ) : (
-                      <>
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                          <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.2"/>
-                          <path d="M8 4V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h1" stroke="currentColor" strokeWidth="1.2"/>
-                        </svg>
-                        Copy
-                      </>
-                    )}
-                  </button>
+                  <CopyButton copied={vtCopied} onClick={copyVerifyToken} />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-white/50">
+                  Webhook URL
+                  <span className="ml-1.5 font-normal text-white/25">(read-only)</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={WEBHOOK_URL}
+                    className="h-10 flex-1 rounded-md border border-white/10 bg-white/[0.02] px-3 font-mono text-xs text-white/50 outline-none select-all"
+                  />
+                  <CopyButton copied={urlCopied} onClick={copyWebhookUrl} />
                 </div>
               </div>
 
               {/* Instructions */}
               <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
-                <p className="mb-2 text-xs font-medium text-white/40">Webhook setup instructions</p>
-                <ol className="flex flex-col gap-2 text-xs text-white/35 leading-relaxed list-none">
+                <p className="mb-2 text-xs font-medium text-white/40">Webhook setup</p>
+                <ol className="flex flex-col gap-1.5 text-xs text-white/35 leading-relaxed list-none">
                   <li>1. Go to <span className="text-white/60">Meta for Developers → Your App → Webhooks</span></li>
-                  <li>2. Add callback URL:</li>
-                  <li className="font-mono text-white/50 bg-white/[0.03] rounded px-2 py-1">
-                    https://yourapp.vercel.app/api/webhook/facebook
-                  </li>
-                  <li>3. Use the Verify Token shown above</li>
-                  <li>4. Subscribe to the <span className="text-white/60">leadgen</span> field on the <span className="text-white/60">Page</span> object</li>
+                  <li>2. Add the Webhook URL above as callback URL</li>
+                  <li>3. Paste the Verify Token above</li>
+                  <li>4. Subscribe to <span className="text-white/60">leadgen</span> on the <span className="text-white/60">Page</span> object</li>
                 </ol>
               </div>
             </div>

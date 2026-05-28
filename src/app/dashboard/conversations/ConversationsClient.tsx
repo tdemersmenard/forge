@@ -17,7 +17,7 @@ function sourceLabel(source: string | null) {
 
 function sourceBadgeStyle(source: string | null) {
   return source === "facebook"
-    ? "text-blue-400 bg-blue-400/10 border-blue-400/20"
+    ? "text-orange-400 bg-orange-400/10 border-orange-400/20"
     : "text-white/30 bg-white/[0.04] border-white/[0.08]";
 }
 
