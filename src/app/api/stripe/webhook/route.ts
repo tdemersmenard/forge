@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
 import Stripe from "stripe";
 
@@ -27,7 +27,6 @@ export async function POST(request: Request) {
 
   console.log("[webhook] event type:", event.type, "id:", event.id);
 
-  const supabase = createAdminClient();
   const stripe = getStripe();
 
   switch (event.type) {
@@ -70,7 +69,7 @@ export async function POST(request: Request) {
         console.error("[webhook] failed to retrieve subscription:", err);
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from("agents")
         .update({
           stripe_customer_id: customerId,
@@ -91,7 +90,7 @@ export async function POST(request: Request) {
     case "customer.subscription.updated": {
       const sub = event.data.object as Stripe.Subscription;
       console.log("[webhook] customer.subscription.updated — sub id:", sub.id, "status:", sub.status);
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from("agents")
         .update({ plan_status: sub.status })
         .eq("stripe_subscription_id", sub.id);
@@ -102,7 +101,7 @@ export async function POST(request: Request) {
     case "customer.subscription.deleted": {
       const sub = event.data.object as Stripe.Subscription;
       console.log("[webhook] customer.subscription.deleted — sub id:", sub.id);
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from("agents")
         .update({ plan_status: "canceled" })
         .eq("stripe_subscription_id", sub.id);
