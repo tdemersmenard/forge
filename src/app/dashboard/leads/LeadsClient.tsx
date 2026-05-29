@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import type { ConvRow } from "../page";
 
 type Lead = {
@@ -78,11 +79,31 @@ interface Props {
   initialConversations: ConvRow[];
 }
 
+type AddLeadForm = {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  note: string;
+};
+
+const EMPTY_FORM: AddLeadForm = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  note: "",
+};
+
 export function LeadsClient({ agentIds, initialConversations }: Props) {
   const [conversations, setConversations] =
     useState<ConvRow[]>(initialConversations);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [search, setSearch] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState<AddLeadForm>(EMPTY_FORM);
+  const [submitting, setSubmitting] = useState(false);
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
   // Realtime subscription
   useEffect(() => {
@@ -117,6 +138,52 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
       supabase.removeChannel(channel);
     };
   }, [agentIds]);
+
+  // Focus first input when modal opens
+  useEffect(() => {
+    if (showModal) {
+      setTimeout(() => firstInputRef.current?.focus(), 50);
+    }
+  }, [showModal]);
+
+  function openModal() {
+    setForm(EMPTY_FORM);
+    setShowModal(true);
+  }
+
+  function closeModal() {
+    setShowModal(false);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.firstName.trim() || !form.phone.trim()) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim() || undefined,
+          phone: form.phone.trim(),
+          email: form.email.trim() || undefined,
+          note: form.note.trim() || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error ?? "Failed to add lead");
+      } else {
+        toast.success("Lead added — your agent will reach out shortly");
+        closeModal();
+      }
+    } catch {
+      toast.error("Network error — please try again");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   const leads = useMemo(
     () =>
@@ -170,11 +237,19 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
 
   return (
     <main className="flex-1 overflow-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-xl font-semibold text-white">Leads</h1>
-        <p className="mt-1 text-sm text-white/40">
-          All unique contacts your agent has engaged with.
-        </p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold text-white">Leads</h1>
+          <p className="mt-1 text-sm text-white/40">
+            All unique contacts your agent has engaged with.
+          </p>
+        </div>
+        <button
+          onClick={openModal}
+          className="shrink-0 rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
+        >
+          + Add lead
+        </button>
       </div>
 
       {/* Summary cards */}
@@ -370,6 +445,112 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
         <p className="mt-3 text-right text-xs text-white/25">
           Total pipeline revenue: ${totalRevenue.toLocaleString()}
         </p>
+      )}
+
+      {/* Add lead modal */}
+      {showModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeModal();
+          }}
+        >
+          <div className="w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#111] p-6 shadow-2xl">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-white">Add lead</h2>
+              <button
+                onClick={closeModal}
+                className="rounded-md p-1 text-white/30 transition-colors hover:text-white/70"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-xs text-white/50">
+                    First name <span className="text-white/30">*</span>
+                  </label>
+                  <input
+                    ref={firstInputRef}
+                    type="text"
+                    required
+                    value={form.firstName}
+                    onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
+                    placeholder="Jane"
+                    className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs text-white/50">Last name</label>
+                  <input
+                    type="text"
+                    value={form.lastName}
+                    onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
+                    placeholder="Doe"
+                    className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs text-white/50">
+                  Phone <span className="text-white/30">*</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  placeholder="+15141234567"
+                  className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-3 font-mono text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs text-white/50">Email</label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  placeholder="jane@example.com"
+                  className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs text-white/50">Note</label>
+                <textarea
+                  value={form.note}
+                  onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
+                  placeholder="Context about this lead…"
+                  rows={3}
+                  className="w-full resize-none rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-white/50 transition-colors hover:text-white/80"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting || !form.firstName.trim() || !form.phone.trim()}
+                  className="flex-1 rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-40"
+                >
+                  {submitting ? "Adding…" : "Add lead"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </main>
   );

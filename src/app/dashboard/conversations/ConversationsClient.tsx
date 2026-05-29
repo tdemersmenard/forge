@@ -12,13 +12,15 @@ type Thread = {
 };
 
 function sourceLabel(source: string | null) {
-  return source === "facebook" ? "Facebook Ad" : "SMS";
+  if (source === "facebook") return "Facebook Ad";
+  if (source === "manual") return "Manual";
+  return "SMS";
 }
 
 function sourceBadgeStyle(source: string | null) {
-  return source === "facebook"
-    ? "text-orange-400 bg-orange-400/10 border-orange-400/20"
-    : "text-white/30 bg-white/[0.04] border-white/[0.08]";
+  if (source === "facebook") return "text-orange-400 bg-orange-400/10 border-orange-400/20";
+  if (source === "manual") return "text-purple-400 bg-purple-400/10 border-purple-400/20";
+  return "text-white/30 bg-white/[0.04] border-white/[0.08]";
 }
 
 function statusStyle(status: string | null) {
