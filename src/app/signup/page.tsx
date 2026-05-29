@@ -25,7 +25,7 @@ export default function SignupPage() {
       return;
     }
 
-    router.push("/onboarding");
+    router.push("/onboarding/plan");
   }
 
   return (
