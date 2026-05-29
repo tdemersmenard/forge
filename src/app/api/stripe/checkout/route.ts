@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     payment_method_types: ["card"],
     line_items: [{ price: priceId, quantity: 1 }],
     subscription_data: { trial_period_days: 7 },
-    success_url: `${APP_URL}/onboarding?checkout=success`,
+    success_url: `${APP_URL}/dashboard`,
     cancel_url: `${APP_URL}/onboarding/plan`,
     allow_promotion_codes: true,
     metadata: { user_id: user.id, plan },

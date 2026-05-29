@@ -187,7 +187,7 @@ export default function PlanPage() {
       {/* Skip */}
       <button
         type="button"
-        onClick={() => router.push("/onboarding")}
+        onClick={() => router.push("/dashboard")}
         className="text-xs text-white/25 underline underline-offset-4 transition-colors hover:text-white/50"
       >
         Skip for now — explore the dashboard first

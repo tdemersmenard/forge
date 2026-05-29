@@ -110,7 +110,7 @@ export default function OnboardingPage() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push("/onboarding/plan");
   }
 
   async function copyVerifyToken() {
