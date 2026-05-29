@@ -1172,10 +1172,10 @@ export default function OnboardingPage() {
                     {twilioStatus === "loading" ? text.step6_testing : text.step6_testConnection}
                   </button>
                   {twilioStatus === "success" && (
-                    <span className="text-sm text-emerald-400">\u2713 {text.step6_connected}</span>
+                    <span className="text-sm text-emerald-400">✓ {text.step6_connected}</span>
                   )}
                   {twilioStatus === "error" && (
-                    <span className="text-sm text-red-400">\u2717 {twilioError}</span>
+                    <span className="text-sm text-red-400">✗ {twilioError}</span>
                   )}
                 </div>
               </div>
@@ -1216,7 +1216,7 @@ export default function OnboardingPage() {
                         i === deployLabels.length - 1 ? "text-white" : "text-emerald-400"
                       }`}
                     >
-                      \u2713
+                      ✓
                     </span>
                     <span
                       className={`text-sm ${
@@ -1246,7 +1246,7 @@ export default function OnboardingPage() {
                 onClick={() => setStep((s) => s - 1)}
                 className="rounded-lg border border-white/10 px-5 py-2 text-sm font-medium text-white/55 transition-colors hover:border-white/20 hover:text-white"
               >
-                \u2190 {text.back}
+                ← {text.back}
               </button>
             ) : (
               <div />
@@ -1257,7 +1257,7 @@ export default function OnboardingPage() {
               disabled={!canProceed()}
               className="rounded-lg bg-white px-6 py-2 text-sm font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-35"
             >
-              {text.next} \u2192
+              {text.next} →
             </button>
           </div>
         </footer>
