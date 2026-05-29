@@ -1,6 +1,38 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
+import { PLANS } from "@/lib/plans";
 import Stripe from "stripe";
+
+async function trackMetaPurchase(plan: string) {
+  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const accessToken = process.env.META_PIXEL_ACCESS_TOKEN;
+  if (!pixelId || !accessToken) return;
+
+  const planData = PLANS.find((p) => p.id === plan);
+  const value = planData?.price ?? 0;
+
+  try {
+    await fetch(
+      `https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data: [
+            {
+              event_name: "Purchase",
+              event_time: Math.floor(Date.now() / 1000),
+              action_source: "website",
+              custom_data: { currency: "USD", value },
+            },
+          ],
+        }),
+      }
+    );
+  } catch (err) {
+    console.error("[webhook] Meta Conversions API error:", err);
+  }
+}
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
@@ -83,6 +115,7 @@ export async function POST(request: Request) {
         console.error("[webhook] supabase update error:", updateError);
       } else {
         console.log("[webhook] agent updated successfully for user:", userId);
+        await trackMetaPurchase(plan);
       }
       break;
     }

@@ -58,6 +58,7 @@ export default function PlanPage() {
         setCheckoutLoading(null);
         return;
       }
+      (window as Window & { fbq?: (cmd: string, event: string) => void }).fbq?.("track", "StartTrial");
       window.location.href = data.url;
     } catch {
       setError(t("networkError"));

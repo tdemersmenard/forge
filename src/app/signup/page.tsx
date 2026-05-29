@@ -27,6 +27,7 @@ export default function SignupPage() {
       return;
     }
 
+    (window as Window & { fbq?: (cmd: string, event: string) => void }).fbq?.("track", "Lead");
     router.push("/onboarding");
   }
 
