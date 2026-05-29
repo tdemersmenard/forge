@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function CTASection() {
   return (
     <section className="px-6 py-24">
@@ -12,12 +14,12 @@ export default function CTASection() {
             Get live in 15 minutes. No code. No sales calls. Just a form and your first agent.
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <a
-              href="#"
+            <Link
+              href="/signup"
               className="inline-flex h-11 items-center justify-center rounded-md bg-white px-8 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
             >
               Start for free
-            </a>
+            </Link>
             <a
               href="#"
               className="inline-flex h-11 items-center justify-center text-sm text-white/40 transition-colors hover:text-white/70"

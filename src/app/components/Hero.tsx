@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Hero() {
   return (
     <section className="flex min-h-screen flex-col items-center justify-center px-6 pt-14 text-center">
@@ -24,12 +26,12 @@ export default function Hero() {
 
         {/* CTAs */}
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <a
-            href="#"
+          <Link
+            href="/signup"
             className="inline-flex h-11 items-center justify-center rounded-md bg-white px-6 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
           >
             Start for free
-          </a>
+          </Link>
           <a
             href="#"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-white/10 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/20 hover:text-white"

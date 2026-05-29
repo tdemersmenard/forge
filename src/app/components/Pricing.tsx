@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const plans = [
   {
     name: "Starter",
@@ -131,8 +133,8 @@ export default function Pricing() {
               </ul>
 
               {/* CTA */}
-              <a
-                href="#"
+              <Link
+                href="/signup"
                 className={`mt-auto block rounded-md py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90 ${
                   plan.highlighted
                     ? "bg-[#0a0a0a] text-white"
@@ -140,7 +142,7 @@ export default function Pricing() {
                 }`}
               >
                 {plan.cta}
-              </a>
+              </Link>
             </div>
           ))}
         </div>
