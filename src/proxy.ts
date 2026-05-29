@@ -41,14 +41,21 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isDashboard =
     pathname === "/dashboard" || pathname.startsWith("/dashboard/");
-  // /onboarding/plan and sub-paths require auth; /onboarding itself is public
+  const isSuccessCallback =
+    request.nextUrl.searchParams.get("success") === "true";
+  // /onboarding/plan requires auth, except when returning from Stripe (?success=true)
   const isPlanPage =
-    pathname === "/onboarding/plan" || pathname.startsWith("/onboarding/plan/");
+    (pathname === "/onboarding/plan" || pathname.startsWith("/onboarding/plan/")) &&
+    !isSuccessCallback;
 
   // /onboarding/plan → requires auth
   if (isPlanPage && !user) {
     return redirectTo("/signup", request);
   }
+
+  // Coming back from Stripe checkout (/dashboard?success=true) — always allow through
+  // so the page can show a success state even if the session expired during checkout
+  if (isDashboard && isSuccessCallback) return supabaseResponse;
 
   // 1. Not authenticated trying to reach /dashboard → /login
   if (!user && isDashboard) {
@@ -57,12 +64,6 @@ export async function proxy(request: NextRequest) {
 
   // 2. Authenticated + /dashboard → check agent + subscription
   if (user && isDashboard) {
-    // Coming back from Stripe checkout — webhook may not have fired yet,
-    // allow through so the success banner can show while DB catches up
-    const isSuccessCallback =
-      request.nextUrl.searchParams.get("success") === "true";
-    if (isSuccessCallback) return supabaseResponse;
-
     const { data: agents } = await supabase
       .from("agents")
       .select("id, stripe_subscription_id")

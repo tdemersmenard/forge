@@ -102,7 +102,17 @@ export default function SignupPage() {
       return;
     }
 
+    // Confirm session was created (email confirmation may be required)
+    const { data: { session } } = await supabase.auth.getSession();
+
     setTrackLead(true);
+
+    if (!session) {
+      // Email confirmation required — show message instead of redirecting
+      setError("Check your inbox to confirm your email, then sign in.");
+      setLoading(false);
+      return;
+    }
 
     if (onboardingData && authData.user) {
       try {

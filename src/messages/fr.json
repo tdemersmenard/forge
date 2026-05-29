@@ -93,13 +93,35 @@
     "startFree": "Commencer gratuitement",
     "talkHuman": "Parler à un humain à la place"
   },
+  "stats": {
+    "stat1": { "value": "15 min", "label": "De l'inscription à l'agent en ligne" },
+    "stat2": { "value": "95%", "label": "Conversations sans intervention humaine" },
+    "stat3": { "value": "24/7", "label": "Toujours actif" }
+  },
   "footer": {
     "tagline": "Agents IA pour les entreprises de services.",
     "copyright": "Forge, Inc. Tous droits réservés.",
     "product": "Produit",
     "developers": "Développeurs",
     "company": "Entreprise",
-    "legal": "Légal"
+    "legal": "Légal",
+    "links": {
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "changelog": "Journal des modifications",
+      "roadmap": "Feuille de route",
+      "docs": "Documentation",
+      "apiReference": "Référence API",
+      "status": "Statut",
+      "github": "GitHub",
+      "about": "À propos",
+      "blog": "Blog",
+      "careers": "Carrières",
+      "contact": "Contact",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "security": "Sécurité"
+    }
   },
   "login": {
     "title": "Bon retour",

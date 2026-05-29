@@ -29,6 +29,20 @@ export default function PlanPage() {
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [recommendedPlan, setRecommendedPlan] = useState<PlanId>("growth");
 
+  // Handle Stripe success redirect back to this page
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") !== "true") return;
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        router.replace("/dashboard?success=true");
+      } else {
+        router.replace("/login");
+      }
+    });
+  }, [router]);
+
   useEffect(() => {
     window.fbq?.("track", "InitiateCheckout");
   }, []);

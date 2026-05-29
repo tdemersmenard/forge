@@ -2,19 +2,19 @@
 
 import { useTranslations } from "next-intl";
 
-const footerLinks: Record<string, string[]> = {
-  Product: ["Features", "Pricing", "Changelog", "Roadmap"],
-  Developers: ["Docs", "API Reference", "Status", "GitHub"],
-  Company: ["About", "Blog", "Careers", "Contact"],
-  Legal: ["Privacy", "Terms", "Security"],
-};
+type CategoryKey = "product" | "developers" | "company" | "legal";
+type LinkKey =
+  | "features" | "pricing" | "changelog" | "roadmap"
+  | "docs" | "apiReference" | "status" | "github"
+  | "about" | "blog" | "careers" | "contact"
+  | "privacy" | "terms" | "security";
 
-const categoryKeys: Record<string, "product" | "developers" | "company" | "legal"> = {
-  Product: "product",
-  Developers: "developers",
-  Company: "company",
-  Legal: "legal",
-};
+const footerStructure: { category: CategoryKey; links: LinkKey[] }[] = [
+  { category: "product", links: ["features", "pricing", "changelog", "roadmap"] },
+  { category: "developers", links: ["docs", "apiReference", "status", "github"] },
+  { category: "company", links: ["about", "blog", "careers", "contact"] },
+  { category: "legal", links: ["privacy", "terms", "security"] },
+];
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -39,10 +39,10 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([category, links]) => (
+          {footerStructure.map(({ category, links }) => (
             <div key={category}>
               <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">
-                {t(categoryKeys[category])}
+                {t(category)}
               </p>
               <ul className="flex flex-col gap-2.5">
                 {links.map((link) => (
@@ -51,7 +51,7 @@ export default function Footer() {
                       href="#"
                       className="text-sm text-white/40 transition-colors hover:text-white/70"
                     >
-                      {link}
+                      {t(`links.${link}`)}
                     </a>
                   </li>
                 ))}

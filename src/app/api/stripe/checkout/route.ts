@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     payment_method_types: ["card"],
     line_items: [{ price: priceId, quantity: 1 }],
     subscription_data: { trial_period_days: 7 },
-    success_url: `${APP_URL}/dashboard?success=true`,
+    success_url: `${APP_URL}/onboarding/plan?success=true`,
     cancel_url: `${APP_URL}/onboarding/plan`,
     allow_promotion_codes: true,
     // user_id in both metadata and client_reference_id for webhook reliability

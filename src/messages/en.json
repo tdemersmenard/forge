@@ -93,13 +93,35 @@
     "startFree": "Start for free",
     "talkHuman": "Talk to a human instead"
   },
+  "stats": {
+    "stat1": { "value": "15 min", "label": "From signup to live agent" },
+    "stat2": { "value": "95%", "label": "Conversations without human" },
+    "stat3": { "value": "24/7", "label": "Always on" }
+  },
   "footer": {
     "tagline": "AI agents for service businesses.",
     "copyright": "Forge, Inc. All rights reserved.",
     "product": "Product",
     "developers": "Developers",
     "company": "Company",
-    "legal": "Legal"
+    "legal": "Legal",
+    "links": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "changelog": "Changelog",
+      "roadmap": "Roadmap",
+      "docs": "Docs",
+      "apiReference": "API Reference",
+      "status": "Status",
+      "github": "GitHub",
+      "about": "About",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "security": "Security"
+    }
   },
   "login": {
     "title": "Welcome back",
