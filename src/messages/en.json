@@ -1,0 +1,479 @@
+{
+  "navbar": {
+    "product": "Product",
+    "pricing": "Pricing",
+    "docs": "Docs",
+    "getStarted": "Get started"
+  },
+  "hero": {
+    "badge": "Now in beta",
+    "line1": "Ship AI agents.",
+    "line2": "Not chatbots.",
+    "subtitle": "Forge turns your service business into a 24/7 operation. Build agents that qualify leads, close deals, collect payments, and handle operations — all without writing code.",
+    "startFree": "Start for free",
+    "seeDemo": "See demo",
+    "trustedBy": "Trusted by",
+    "trustedCount": "1,200+",
+    "trustedSuffix": "service businesses",
+    "revenue": "$4.2M",
+    "revenueSuffix": "in automated revenue"
+  },
+  "features": {
+    "label": "Features",
+    "heading": "Everything your business needs to run on autopilot",
+    "leadQualification": {
+      "title": "Lead qualification",
+      "desc": "Your agent asks the right questions, scores every lead, and only escalates the ones worth your time."
+    },
+    "contractGeneration": {
+      "title": "Contract generation",
+      "desc": "Auto-generate, send, and track service contracts from conversation data — no copy-pasting required."
+    },
+    "paymentCollection": {
+      "title": "Payment collection",
+      "desc": "Send invoices, collect deposits, and process recurring payments — all handled conversationally."
+    },
+    "routeOptimization": {
+      "title": "Route optimization",
+      "desc": "Automatically schedule and route jobs to minimize drive time and maximize daily capacity."
+    },
+    "automatedReminders": {
+      "title": "Automated reminders",
+      "desc": "Appointment confirmations, follow-ups, and review requests sent at exactly the right moment."
+    },
+    "liveAnalytics": {
+      "title": "Live analytics",
+      "desc": "Real-time dashboards showing conversion rates, revenue per agent, and where deals are being lost."
+    }
+  },
+  "pricing": {
+    "label": "Pricing",
+    "heading": "Simple, predictable pricing",
+    "subtitle": "No per-conversation fees. No surprises. Cancel anytime.",
+    "mostPopular": "Most popular",
+    "perMonth": "/mo",
+    "starter": {
+      "name": "Starter",
+      "desc": "For solo operators getting their first agent live.",
+      "feat1": "1 AI agent",
+      "feat2": "Up to 500 conversations/mo",
+      "feat3": "Lead qualification",
+      "feat4": "Email notifications",
+      "feat5": "Basic analytics",
+      "feat6": "Email support",
+      "cta": "Get started"
+    },
+    "growth": {
+      "name": "Growth",
+      "desc": "For growing teams that need full automation.",
+      "feat1": "5 AI agents",
+      "feat2": "Unlimited conversations",
+      "feat3": "Contract generation",
+      "feat4": "Payment collection",
+      "feat5": "Route optimization",
+      "feat6": "Priority support",
+      "cta": "Get started"
+    },
+    "agency": {
+      "name": "Agency",
+      "desc": "For agencies managing multiple client accounts.",
+      "feat1": "Unlimited agents",
+      "feat2": "Unlimited conversations",
+      "feat3": "White-label branding",
+      "feat4": "Client dashboards",
+      "feat5": "API access",
+      "feat6": "Dedicated account manager",
+      "cta": "Contact sales"
+    }
+  },
+  "cta": {
+    "line1": "Your agent is ready.",
+    "line2": "Are you?",
+    "subtitle": "Get live in 15 minutes. No code. No sales calls. Just a form and your first agent.",
+    "startFree": "Start for free",
+    "talkHuman": "Talk to a human instead"
+  },
+  "footer": {
+    "tagline": "AI agents for service businesses.",
+    "copyright": "Forge, Inc. All rights reserved.",
+    "product": "Product",
+    "developers": "Developers",
+    "company": "Company",
+    "legal": "Legal"
+  },
+  "login": {
+    "title": "Welcome back",
+    "noAccount": "No account yet?",
+    "createOne": "Create one",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@company.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Your password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…"
+  },
+  "signup": {
+    "title": "Create your account",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@company.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Min. 8 characters",
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account…",
+    "terms": "By creating an account you agree to our Terms of Service."
+  },
+  "onboarding": {
+    "stepOf": "Step {step} of {total}",
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip for now",
+    "step1": {
+      "title": "First, let's name your agent.",
+      "subtitle": "Your agent will introduce itself by this name when texting your leads.",
+      "agentNameLabel": "Agent name",
+      "agentNamePlaceholder": "Max, Sophie, Alex...",
+      "businessNameLabel": "Business name",
+      "businessNamePlaceholder": "Pool Pro, GreenLawn...",
+      "sectorLabel": "Sector",
+      "sectors": {
+        "pool": "Pool & Spa",
+        "lawn": "Lawn & Landscaping",
+        "cleaning": "Cleaning",
+        "hvac": "HVAC",
+        "construction": "Construction & Renovation",
+        "other": "Other"
+      }
+    },
+    "step2": {
+      "title": "What do you offer, and at what price?",
+      "subtitle": "Your agent will know exactly what to pitch and how much to charge.",
+      "servicePlaceholder": "Full season maintenance",
+      "addService": "+ Add service",
+      "contractValueLabel": "Typical contract value"
+    },
+    "step3": {
+      "title": "What should your agent ask to qualify leads?",
+      "subtitle": "These questions determine if a lead is worth pursuing.",
+      "questionPlaceholder": "Ask a qualifying question...",
+      "addQuestion": "+ Add question",
+      "disqualLabel": "Disqualification criteria",
+      "disqualPlaceholder": "e.g. outside service area, budget under $200..."
+    },
+    "step4": {
+      "title": "How should your agent communicate?",
+      "subtitle": "Choose the tone that fits your brand.",
+      "professional": { "label": "Professional", "desc": "Formal, precise, builds trust fast.", "example": "Hello! I'm Max from Pool Pro. How can I help you today?" },
+      "friendly": { "label": "Friendly", "desc": "Warm, approachable, feels human.", "example": "Hey! I'm Max from Pool Pro 😊 Great to hear from you! How can I help?" },
+      "direct": { "label": "Direct", "desc": "Fast, no fluff, straight to the point.", "example": "Max here — Pool Pro. What do you need?" },
+      "languageLabel": "Agent language",
+      "bilingualLabel": "Bilingual (FR + EN)",
+      "hoursLabel": "Business hours",
+      "openLabel": "Opens",
+      "closesLabel": "Closes",
+      "days": {
+        "Mon": "Mon", "Tue": "Tue", "Wed": "Wed",
+        "Thu": "Thu", "Fri": "Fri", "Sat": "Sat", "Sun": "Sun"
+      }
+    },
+    "step5": {
+      "title": "Fine-tune your agent's knowledge.",
+      "subtitle": "The more context you give, the better your agent performs.",
+      "serviceAreaLabel": "Service area",
+      "serviceAreaPlaceholder": "e.g. Greater Montreal, Laval, Longueuil...",
+      "promotionsLabel": "Current promotions",
+      "promotionsPlaceholder": "e.g. 10% off first service...",
+      "neverSayLabel": "Never say",
+      "neverSayPlaceholder": "e.g. competitor names, specific pricing tiers...",
+      "escalationLabel": "Escalation criteria",
+      "escalationPlaceholder": "e.g. angry customer, complex legal question..."
+    },
+    "step6": {
+      "title": "Connect your Twilio number.",
+      "subtitle": "Your agent needs a phone number to send and receive SMS messages.",
+      "accountSidLabel": "Account SID",
+      "accountSidPlaceholder": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "authTokenLabel": "Auth token",
+      "phoneLabel": "Twilio phone number",
+      "phonePlaceholder": "+15141234567",
+      "testConnection": "Test connection",
+      "testing": "Testing…",
+      "connected": "Connected",
+      "webhookLabel": "Webhook URL",
+      "webhookInstructions": "Copy this URL into your Twilio number's Messaging webhook (A message comes in):",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "errorPrefix": "Error:"
+    },
+    "step7": {
+      "title": "Deploying your agent...",
+      "subtitle": "Sit tight — this takes just a moment.",
+      "profile": "Saving your business profile...",
+      "personality": "Generating agent personality...",
+      "services": "Loading your services and pricing...",
+      "questions": "Calibrating qualification questions...",
+      "ready": "Your agent is ready.",
+      "readyNamed": "Your agent {name} is ready."
+    },
+    "defaultQuestions": {
+      "pool": ["What size is your pool?", "Is your pool above or in-ground?", "What city are you located in?"],
+      "lawn": ["How large is your property?", "Do you need weekly or bi-weekly service?", "What city are you in?"],
+      "cleaning": ["How many rooms?", "Residential or commercial?", "How often do you need cleaning?"],
+      "hvac": ["What type of system do you have?", "When was your last maintenance?", "What city are you in?"],
+      "construction": ["What type of renovation are you planning?", "What is your approximate budget?", "What city are you in?"],
+      "other": ["What are you looking for?", "What city are you in?", "What is your budget?"]
+    },
+    "saveError": "Failed to save agent data. Please try again."
+  },
+  "plan": {
+    "chooseYourPlan": "Choose your plan",
+    "trialBadge": "Start your 7-day free trial",
+    "readyNamed": "{name} is ready to deploy.",
+    "ready": "Your agent is ready to deploy.",
+    "subtitle": "Choose a plan to activate it. 7-day free trial. Cancel anytime.",
+    "recommendedFor": "✦ Recommended for {name}",
+    "skipForNow": "Skip for now — explore the dashboard first",
+    "perMonth": "/mo",
+    "startTrialArrow": "Start free trial →",
+    "startTrialFlat": "Start free trial",
+    "redirecting": "Redirecting…",
+    "trustSsl": "256-bit SSL encryption",
+    "trustNoCard": "No credit card stored until trial ends",
+    "trustCancel": "Cancel anytime in 2 clicks",
+    "checkoutFailed": "Failed to start checkout. Please try again.",
+    "networkError": "Network error — please try again."
+  },
+  "sidebar": {
+    "overview": "Overview",
+    "conversations": "Conversations",
+    "leads": "Leads",
+    "settings": "Settings",
+    "billing": "Billing",
+    "agentStatus": "Agent status",
+    "live": "Live",
+    "idle": "Idle",
+    "agentConfigured": "{count} agent configured",
+    "agentsConfigured": "{count} agents configured",
+    "noAgents": "No agents yet",
+    "logout": "Log out"
+  },
+  "dashboard": {
+    "title": "Overview",
+    "welcomeBack": "Welcome back,",
+    "agentActive": "Your agent is now active!",
+    "agentActiveDesc": "Connect your Twilio number in Settings → Integrations to start receiving leads.",
+    "revenueThisMonth": "Revenue this month",
+    "leadsThisMonth": "Leads this month",
+    "autoClosed": "Auto-closed",
+    "recentActivity": "Recent activity",
+    "viewAll": "View all →",
+    "noActivity": "No activity yet",
+    "noActivityDesc": "Conversations will appear here in real time.",
+    "setupFirstAgent": "Set up your first agent",
+    "agentLabel": "Agent:",
+    "leadLabel": "Lead:",
+    "unknown": "Unknown"
+  },
+  "conversations": {
+    "title": "Conversations",
+    "subtitle": "Real-time SMS threads from your agent.",
+    "noConversations": "No conversations yet",
+    "noConversationsDesc": "Your agent hasn't had any conversations yet.",
+    "source": {
+      "facebook": "Facebook Ad",
+      "manual": "Manual",
+      "sms": "SMS"
+    },
+    "search": "Search by name or phone…",
+    "allThreads": "All threads",
+    "noThread": "Select a conversation",
+    "noThreadDesc": "Choose a thread from the list to view the messages."
+  },
+  "leads": {
+    "title": "Leads",
+    "subtitle": "All unique contacts your agent has engaged with.",
+    "addLead": "+ Add lead",
+    "totalLeads": "Total leads",
+    "conversionRate": "Conversion rate",
+    "revenueThisMonth": "Revenue this month",
+    "totalRevenue": "Total pipeline revenue:",
+    "all": "All",
+    "new": "New",
+    "qualifying": "Qualifying",
+    "inProgress": "In Progress",
+    "closed": "Closed",
+    "name": "Name",
+    "phone": "Phone",
+    "status": "Status",
+    "revenue": "Revenue",
+    "firstContact": "First contact",
+    "lastActivity": "Last activity",
+    "viewArrow": "View →",
+    "noLeads": "No leads yet",
+    "noResults": "No results found",
+    "noLeadsDesc": "Leads appear here once your agent starts engaging contacts.",
+    "noResultsDesc": "Try adjusting your filters or search query.",
+    "setupAgent": "Set up your agent",
+    "searchPlaceholder": "Search by name or phone…",
+    "leadCount": "{count} lead",
+    "leadsCount": "{count} leads",
+    "total": "· {count} total",
+    "modal": {
+      "title": "Add lead",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "email": "Email",
+      "note": "Note",
+      "firstNamePlaceholder": "Jane",
+      "lastNamePlaceholder": "Doe",
+      "phonePlaceholder": "+15141234567",
+      "emailPlaceholder": "jane@example.com",
+      "notePlaceholder": "Context about this lead…",
+      "required": "*",
+      "cancel": "Cancel",
+      "submit": "Add lead",
+      "submitting": "Adding…"
+    },
+    "toastSuccess": "Lead added — your agent will reach out shortly",
+    "toastError": "Failed to add lead",
+    "toastNetwork": "Network error — please try again"
+  },
+  "billing": {
+    "title": "Billing",
+    "currentPlan": "Current plan",
+    "freeTrial": "Free Trial",
+    "manageSubscription": "Manage subscription",
+    "opening": "Opening…",
+    "trialEndsIn": "Your free trial ends in {days} day",
+    "trialEndsInPlural": "Your free trial ends in {days} days",
+    "trialEnded": "Your free trial has ended",
+    "trialDesc": "Activate a plan below to keep your agent running.",
+    "activateNow": "Activate now →",
+    "usageThisMonth": "Usage this month",
+    "ofConversations": "of {limit} conversations",
+    "unlimitedConversations": "conversations · unlimited",
+    "billingDates": "View exact billing dates in the customer portal →",
+    "choosePlan": "Choose a plan",
+    "changePlan": "Change plan",
+    "currentPlanLabel": "Current plan",
+    "upgrade": "Upgrade",
+    "redirecting": "Redirecting…",
+    "billingHistory": "Billing history",
+    "date": "Date",
+    "amount": "Amount",
+    "status": "Status",
+    "download": "Download",
+    "perMonth": "/mo",
+    "checkoutFailed": "Checkout failed — try again.",
+    "portalFailed": "Could not open billing portal.",
+    "networkError": "Network error — please try again."
+  },
+  "settings": {
+    "title": "Settings",
+    "saveChanges": "Save changes",
+    "saveServices": "Save services",
+    "saving": "Saving…",
+    "saved": "Saved ✓",
+    "noAgent": "No agent configured",
+    "setupAgent": "Set up your agent",
+    "tabs": {
+      "identity": "Identity",
+      "services": "Services",
+      "qualification": "Qualification",
+      "personality": "Personality",
+      "instructions": "Instructions",
+      "integrations": "Integrations",
+      "notifications": "Notifications"
+    },
+    "identity": {
+      "sectionTitle": "Agent identity",
+      "agentName": "Agent name",
+      "businessName": "Business name",
+      "sector": "Sector",
+      "sectors": {
+        "pool": "Pool & Spa",
+        "lawn": "Lawn & Landscaping",
+        "cleaning": "Cleaning",
+        "hvac": "HVAC",
+        "construction": "Construction & Renovation",
+        "other": "Other"
+      }
+    },
+    "services": {
+      "sectionTitle": "Services & pricing",
+      "servicePlaceholder": "Service name",
+      "addService": "Add a service",
+      "contractValue": "Average contract value"
+    },
+    "qualification": {
+      "sectionTitle": "Lead qualification",
+      "questionsLabel": "Qualification questions",
+      "questionPlaceholder": "Question {n}",
+      "addQuestion": "Add a question",
+      "disqualLabel": "Disqualification criteria",
+      "disqualPlaceholder": "Leads who don't match these criteria will not be qualified..."
+    },
+    "personality": {
+      "sectionTitle": "Tone & personality",
+      "toneLabel": "Tone",
+      "tones": {
+        "professional": "Professional",
+        "friendly": "Friendly",
+        "direct": "Direct"
+      },
+      "languageLabel": "Agent language",
+      "bilingualLabel": "Bilingual",
+      "bilingualDesc": "Agent responds in both FR and EN",
+      "hoursLabel": "Business hours",
+      "openLabel": "Opens",
+      "closesLabel": "Closes",
+      "days": {
+        "Mon": "Mon", "Tue": "Tue", "Wed": "Wed",
+        "Thu": "Thu", "Fri": "Fri", "Sat": "Sat", "Sun": "Sun"
+      }
+    },
+    "instructions": {
+      "sectionTitle": "Instructions",
+      "serviceAreaLabel": "Service area",
+      "serviceAreaPlaceholder": "Greater Montreal, Laval, Longueuil...",
+      "promotionsLabel": "Current promotions",
+      "promotionsPlaceholder": "e.g. 10% off first service...",
+      "neverSayLabel": "Never say",
+      "neverSayPlaceholder": "e.g. competitor names...",
+      "escalationLabel": "Escalation criteria",
+      "escalationPlaceholder": "e.g. angry customer, legal question..."
+    },
+    "integrations": {
+      "twilioTitle": "Twilio",
+      "accountSid": "Account SID",
+      "authToken": "Auth token",
+      "phone": "Phone number",
+      "testConnection": "Test connection",
+      "testing": "Testing…",
+      "connected": "Connected",
+      "webhookLabel": "Webhook URL",
+      "copy": "Copy",
+      "copied": "Copied ✓",
+      "facebookTitle": "Facebook Messenger",
+      "pageId": "Page ID",
+      "accessToken": "Access token",
+      "verifyToken": "Verify token",
+      "verifyTokenDesc": "Copy this into your Facebook webhook verify token field.",
+      "webhookUrlDesc": "Set this as your Facebook Messenger webhook callback URL:",
+      "invalidCreds": "Invalid credentials.",
+      "networkError": "Network error — try again."
+    },
+    "notifications": {
+      "sectionTitle": "Email notifications",
+      "sentTo": "Notifications sent to",
+      "newLead": "New lead received",
+      "newLeadDesc": "Get notified when your agent captures a new lead via SMS or Facebook Ads.",
+      "dealClosed": "Deal closed",
+      "dealClosedDesc": "Get notified when a lead's status is updated to closed.",
+      "email": "Notification email",
+      "emailDesc": "Notifications are sent to your account email."
+    }
+  }
+}

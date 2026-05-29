@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { PLANS } from "@/lib/plans";
 import type { PlanId } from "@/lib/plans";
 
@@ -32,6 +33,7 @@ export function BillingClient({
   trialDaysRemaining,
   invoices,
 }: Props) {
+  const t = useTranslations("billing");
   const [checkoutLoading, setCheckoutLoading] = useState<PlanId | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,13 +53,13 @@ export function BillingClient({
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) {
-        setError(data.error ?? "Checkout failed — try again.");
+        setError(data.error ?? t("checkoutFailed"));
         setCheckoutLoading(null);
         return;
       }
       window.location.href = data.url;
     } catch {
-      setError("Network error — please try again.");
+      setError(t("networkError"));
       setCheckoutLoading(null);
     }
   }
@@ -69,13 +71,13 @@ export function BillingClient({
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) {
-        setError(data.error ?? "Could not open billing portal.");
+        setError(data.error ?? t("portalFailed"));
         setPortalLoading(false);
         return;
       }
       window.location.href = data.url;
     } catch {
-      setError("Network error — please try again.");
+      setError(t("networkError"));
       setPortalLoading(false);
     }
   }
@@ -98,11 +100,11 @@ export function BillingClient({
           <div>
             <p className="text-sm font-semibold text-amber-400">
               {trialDaysRemaining > 0
-                ? `Your free trial ends in ${trialDaysRemaining} day${trialDaysRemaining !== 1 ? "s" : ""}`
-                : "Your free trial has ended"}
+                ? (trialDaysRemaining === 1 ? t("trialEndsIn", { days: trialDaysRemaining }) : t("trialEndsInPlural", { days: trialDaysRemaining }))
+                : t("trialEnded")}
             </p>
             <p className="mt-0.5 text-xs text-amber-400/60">
-              Activate a plan below to keep your agent running.
+              {t("trialDesc")}
             </p>
           </div>
           <button
@@ -111,7 +113,7 @@ export function BillingClient({
             disabled={checkoutLoading !== null}
             className="ml-4 shrink-0 rounded-md bg-amber-400 px-4 py-2 text-xs font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            Activate now →
+            {t("activateNow")}
           </button>
         </div>
       )}
@@ -120,9 +122,9 @@ export function BillingClient({
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium text-white/40">Current plan</p>
+            <p className="text-xs font-medium text-white/40">{t("currentPlan")}</p>
             <p className="mt-1 text-xl font-semibold capitalize text-white">
-              {currentPlan === "trial" ? "Free Trial" : currentPlan}
+              {currentPlan === "trial" ? t("freeTrial") : currentPlan}
             </p>
             {subscription?.plan_status && (
               <span
@@ -148,7 +150,7 @@ export function BillingClient({
                 onClick={handlePortal}
                 className="rounded-md border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
               >
-                {portalLoading ? "Opening…" : "Manage subscription"}
+                {portalLoading ? t("opening") : t("manageSubscription")}
               </button>
             )}
           </div>
@@ -157,7 +159,7 @@ export function BillingClient({
         {/* Usage */}
         <div className="mt-5 border-t border-white/[0.05] pt-5">
           <p className="mb-3 text-xs font-medium text-white/40">
-            Usage this month
+            {t("usageThisMonth")}
           </p>
           <div className="flex items-end justify-between">
             <div>
@@ -165,7 +167,7 @@ export function BillingClient({
                 {conversationsThisMonth.toLocaleString()}
               </p>
               <p className="mt-0.5 text-xs text-white/35">
-                {limit ? `of ${limit.toLocaleString()} conversations` : "conversations · unlimited"}
+                {limit ? t("ofConversations", { limit: limit.toLocaleString() }) : t("unlimitedConversations")}
               </p>
             </div>
           </div>
@@ -183,7 +185,7 @@ export function BillingClient({
 
         {subscription?.stripe_customer_id && subscription.plan_status === "active" && (
           <p className="mt-4 text-xs text-white/25">
-            View exact billing dates in the customer portal →
+            {t("billingDates")}
           </p>
         )}
       </div>
@@ -191,7 +193,7 @@ export function BillingClient({
       {/* Plan cards */}
       <div>
         <h2 className="mb-4 text-sm font-semibold text-white">
-          {currentPlan === "trial" ? "Choose a plan" : "Change plan"}
+          {currentPlan === "trial" ? t("choosePlan") : t("changePlan")}
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {PLANS.map((plan) => {
@@ -218,7 +220,7 @@ export function BillingClient({
                   <span className="text-2xl font-bold text-white">
                     ${plan.price}
                   </span>
-                  <span className="text-xs text-white/40">/mo</span>
+                  <span className="text-xs text-white/40">{t("perMonth")}</span>
                 </div>
                 <ul className="mb-5 space-y-1.5">
                   {plan.features.map((f) => (
@@ -236,7 +238,7 @@ export function BillingClient({
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                       <path d="M2 6l2.5 2.5 5.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    Current plan
+                    {t("currentPlanLabel")}
                   </div>
                 ) : (
                   <button
@@ -249,7 +251,7 @@ export function BillingClient({
                         : "border border-white/10 bg-white/[0.06] text-white hover:bg-white/[0.10]"
                     }`}
                   >
-                    {isLoading ? "Redirecting…" : "Upgrade"}
+                    {isLoading ? t("redirecting") : t("upgrade")}
                   </button>
                 )}
               </div>
@@ -262,12 +264,12 @@ export function BillingClient({
       {invoices.length > 0 && (
         <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
           <h2 className="mb-4 text-sm font-semibold text-white">
-            Billing history
+            {t("billingHistory")}
           </h2>
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/[0.06]">
-                {["Date", "Amount", "Status", ""].map((col) => (
+                {[t("date"), t("amount"), t("status"), ""].map((col) => (
                   <th
                     key={col}
                     className="pb-3 text-left text-[11px] font-medium uppercase tracking-wider text-white/30"
@@ -309,7 +311,7 @@ export function BillingClient({
                         rel="noopener noreferrer"
                         className="text-xs text-white/30 transition-colors hover:text-white/60"
                       >
-                        PDF →
+                        {t("download")}
                       </a>
                     )}
                   </td>

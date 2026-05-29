@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 import type { ConvRow } from "./page";
 
 function formatTime(iso: string) {
@@ -36,6 +37,7 @@ interface Props {
 }
 
 export function RealtimeOverview({ agentIds, initialConversations }: Props) {
+  const t = useTranslations("dashboard");
   const [conversations, setConversations] =
     useState<ConvRow[]>(initialConversations);
 
@@ -127,15 +129,15 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[
           {
-            label: "Revenue this month",
+            label: t("revenueThisMonth"),
             value: `$${stats.revenue.toLocaleString()}`,
           },
           {
-            label: "Leads this month",
+            label: t("leadsThisMonth"),
             value: stats.totalLeads.toLocaleString(),
           },
           {
-            label: "Auto-closed",
+            label: t("autoClosed"),
             value: `${stats.autoClosedPct}%`,
           },
         ].map((stat) => (
@@ -152,12 +154,12 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
       {/* Recent activity */}
       <div className="rounded-xl border border-white/[0.08]">
         <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-          <h2 className="text-sm font-semibold text-white">Recent activity</h2>
+          <h2 className="text-sm font-semibold text-white">{t("recentActivity")}</h2>
           <a
             href="/dashboard/conversations"
             className="text-xs text-white/30 transition-colors hover:text-white/60"
           >
-            View all →
+            {t("viewAll")}
           </a>
         </div>
 
@@ -180,17 +182,17 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
               </svg>
             </div>
             <p className="mb-1 text-sm font-medium text-white/50">
-              No activity yet
+              {t("noActivity")}
             </p>
             <p className="text-xs text-white/25">
-              Conversations will appear here in real time.
+              {t("noActivityDesc")}
             </p>
             {agentIds.length === 0 && (
               <a
                 href="/onboarding"
                 className="mt-5 rounded-md bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
               >
-                Set up your first agent
+                {t("setupFirstAgent")}
               </a>
             )}
           </div>
@@ -215,10 +217,10 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-xs font-medium text-white/80">
-                      {c.contact_name ?? c.contact_phone ?? "Unknown"}
+                      {c.contact_name ?? c.contact_phone ?? t("unknown")}
                     </p>
                     <p className="truncate text-[11px] text-white/30">
-                      {c.role === "agent" ? "Agent: " : "Lead: "}
+                      {c.role === "agent" ? t("agentLabel") : t("leadLabel")}{" "}
                       {c.last_message ?? "—"}
                     </p>
                   </div>

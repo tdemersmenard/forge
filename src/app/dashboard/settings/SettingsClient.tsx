@@ -2,23 +2,24 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 import type { AgentRow } from "./page";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const SECTORS = [
-  { id: "pool", label: "Pool & Spa", emoji: "🏊" },
-  { id: "lawn", label: "Lawn & Landscaping", emoji: "🌿" },
-  { id: "cleaning", label: "Cleaning", emoji: "🏠" },
-  { id: "hvac", label: "HVAC", emoji: "🔧" },
-  { id: "construction", label: "Construction & Renovation", emoji: "🔨" },
-  { id: "other", label: "Other", emoji: "✨" },
+  { id: "pool", emoji: "🏊" },
+  { id: "lawn", emoji: "🌿" },
+  { id: "cleaning", emoji: "🏠" },
+  { id: "hvac", emoji: "🔧" },
+  { id: "construction", emoji: "🔨" },
+  { id: "other", emoji: "✨" },
 ];
 
 const TONES = [
-  { id: "professional", label: "Professional", emoji: "🎯" },
-  { id: "friendly", label: "Friendly", emoji: "😊" },
-  { id: "direct", label: "Direct", emoji: "⚡" },
+  { id: "professional", emoji: "🎯" },
+  { id: "friendly", emoji: "😊" },
+  { id: "direct", emoji: "⚡" },
 ];
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -48,13 +49,14 @@ function SaveButton({
   loading,
   saved,
   onClick,
-  label = "Save changes",
+  label,
 }: {
   loading: boolean;
   saved: boolean;
   onClick: () => void;
   label?: string;
 }) {
+  const t = useTranslations("settings");
   return (
     <button
       type="button"
@@ -62,19 +64,20 @@ function SaveButton({
       onClick={onClick}
       className="rounded-md bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-50"
     >
-      {loading ? "Saving…" : saved ? "Saved ✓" : label}
+      {loading ? t("saving") : saved ? t("saved") : (label ?? t("saveChanges"))}
     </button>
   );
 }
 
 function CopyButton({ copied, onClick }: { copied: boolean; onClick: () => void }) {
+  const t = useTranslations("settings");
   return (
     <button
       type="button"
       onClick={onClick}
       className="flex h-10 items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-3 text-xs text-white/50 transition-colors hover:border-white/20 hover:text-white/80"
     >
-      {copied ? "Copied ✓" : "Copy"}
+      {copied ? t("integrations.copied") : t("integrations.copy")}
     </button>
   );
 }
@@ -167,6 +170,7 @@ interface Props {
 }
 
 export function SettingsClient({ agent, userEmail }: Props) {
+  const t = useTranslations("settings");
   const supabase = createClient();
   const [tab, setTab] = useState<Tab>("identity");
 
@@ -375,11 +379,11 @@ export function SettingsClient({ agent, userEmail }: Props) {
         setTwilioTestStatus("success");
       } else {
         setTwilioTestStatus("error");
-        setTwilioTestError(data.error ?? "Invalid credentials.");
+        setTwilioTestError(data.error ?? t("integrations.invalidCreds"));
       }
     } catch {
       setTwilioTestStatus("error");
-      setTwilioTestError("Network error — try again.");
+      setTwilioTestError(t("integrations.networkError"));
     }
   }
 
@@ -443,26 +447,26 @@ export function SettingsClient({ agent, userEmail }: Props) {
   }
 
   const TABS: { key: Tab; label: string }[] = [
-    { key: "identity", label: "Identity" },
-    { key: "services", label: "Services" },
-    { key: "qualification", label: "Qualification" },
-    { key: "personality", label: "Personality" },
-    { key: "instructions", label: "Instructions" },
-    { key: "integrations", label: "Integrations" },
-    { key: "notifications", label: "Notifications" },
+    { key: "identity", label: t("tabs.identity") },
+    { key: "services", label: t("tabs.services") },
+    { key: "qualification", label: t("tabs.qualification") },
+    { key: "personality", label: t("tabs.personality") },
+    { key: "instructions", label: t("tabs.instructions") },
+    { key: "integrations", label: t("tabs.integrations") },
+    { key: "notifications", label: t("tabs.notifications") },
   ];
 
   if (!agent) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="mb-2 text-sm font-medium text-white/50">
-          No agent configured
+          {t("noAgent")}
         </p>
         <a
           href="/onboarding"
           className="rounded-md bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
         >
-          Set up your agent
+          {t("setupAgent")}
         </a>
       </div>
     );
@@ -472,26 +476,26 @@ export function SettingsClient({ agent, userEmail }: Props) {
     <div className="mx-auto max-w-2xl">
       {/* Tab bar */}
       <div className="mb-6 flex flex-wrap gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1 w-fit">
-        {TABS.map((t) => (
+        {TABS.map((tabItem) => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
+            key={tabItem.key}
+            onClick={() => setTab(tabItem.key)}
             className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              tab === t.key
+              tab === tabItem.key
                 ? "bg-white text-[#0a0a0a]"
                 : "text-white/40 hover:text-white/70"
             }`}
           >
-            {t.label}
+            {tabItem.label}
           </button>
         ))}
       </div>
 
       {/* ════════════════════════ IDENTITY ════════════════════════ */}
       {tab === "identity" && (
-        <SectionCard title="Agent identity">
+        <SectionCard title={t("identity.sectionTitle")}>
           <div className="flex flex-col gap-4">
-            <Field label="Agent name">
+            <Field label={t("identity.agentName")}>
               <input
                 type="text"
                 value={identityForm.agent_name}
@@ -502,7 +506,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                 className={inputCls}
               />
             </Field>
-            <Field label="Business name">
+            <Field label={t("identity.businessName")}>
               <input
                 type="text"
                 value={identityForm.business_name}
@@ -515,7 +519,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                 className={inputCls}
               />
             </Field>
-            <Field label="Sector">
+            <Field label={t("identity.sector")}>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {SECTORS.map((s) => (
                   <button
@@ -531,7 +535,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                     }`}
                   >
                     <span>{s.emoji}</span>
-                    {s.label}
+                    {t(`identity.sectors.${s.id}`)}
                   </button>
                 ))}
               </div>
@@ -549,7 +553,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
 
       {/* ════════════════════════ SERVICES ════════════════════════ */}
       {tab === "services" && (
-        <SectionCard title="Services & pricing">
+        <SectionCard title={t("services.sectionTitle")}>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               {servicesList.map((svc) => (
@@ -560,7 +564,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                     onChange={(e) =>
                       updateService(svc.id, "name", e.target.value)
                     }
-                    placeholder="Service name"
+                    placeholder={t("services.servicePlaceholder")}
                     className="h-10 flex-[3] rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                   />
                   <div className="flex items-center">
@@ -619,12 +623,12 @@ export function SettingsClient({ agent, userEmail }: Props) {
                       strokeLinecap="round"
                     />
                   </svg>
-                  Add a service
+                  {t("services.addService")}
                 </button>
               )}
             </div>
 
-            <Field label="Average contract value">
+            <Field label={t("services.contractValue")}>
               <div className="flex flex-wrap gap-2">
                 {CONTRACT_VALUES.map((v) => (
                   <button
@@ -648,7 +652,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
               loading={servicesSaving}
               saved={servicesSaved}
               onClick={saveServices}
-              label="Save services"
+              label={t("saveServices")}
             />
           </div>
         </SectionCard>
@@ -656,11 +660,11 @@ export function SettingsClient({ agent, userEmail }: Props) {
 
       {/* ════════════════════════ QUALIFICATION ════════════════════════ */}
       {tab === "qualification" && (
-        <SectionCard title="Lead qualification">
+        <SectionCard title={t("qualification.sectionTitle")}>
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-3">
               <label className="text-xs font-medium text-white/50">
-                Qualification questions
+                {t("qualification.questionsLabel")}
               </label>
               {questions.map((q, i) => (
                 <div key={i} className="flex items-center gap-2">
@@ -671,7 +675,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                     type="text"
                     value={q}
                     onChange={(e) => updateQuestion(i, e.target.value)}
-                    placeholder={`Question ${i + 1}`}
+                    placeholder={t("qualification.questionPlaceholder", { n: i + 1 })}
                     className="h-10 flex-1 rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                   />
                   {questions.length > 1 && (
@@ -711,17 +715,17 @@ export function SettingsClient({ agent, userEmail }: Props) {
                       strokeLinecap="round"
                     />
                   </svg>
-                  Add a question
+                  {t("qualification.addQuestion")}
                 </button>
               )}
             </div>
 
-            <Field label="When should your agent stop the conversation?">
+            <Field label={t("qualification.disqualLabel")}>
               <textarea
                 value={disqualification}
                 onChange={(e) => setDisqualification(e.target.value)}
                 rows={3}
-                placeholder="Ex: If client is outside our service area, or budget is under $500."
+                placeholder={t("qualification.disqualPlaceholder")}
                 className={textareaCls}
               />
             </Field>
@@ -731,7 +735,6 @@ export function SettingsClient({ agent, userEmail }: Props) {
               loading={qualSaving}
               saved={qualSaved}
               onClick={saveQualification}
-              label="Save qualification"
             />
           </div>
         </SectionCard>
@@ -739,31 +742,31 @@ export function SettingsClient({ agent, userEmail }: Props) {
 
       {/* ════════════════════════ PERSONALITY ════════════════════════ */}
       {tab === "personality" && (
-        <SectionCard title="Agent personality">
+        <SectionCard title={t("personality.sectionTitle")}>
           <div className="flex flex-col gap-6">
-            <Field label="Tone">
+            <Field label={t("personality.toneLabel")}>
               <div className="flex gap-2">
-                {TONES.map((t) => (
+                {TONES.map((tone) => (
                   <button
-                    key={t.id}
+                    key={tone.id}
                     type="button"
                     onClick={() =>
-                      setPersonalityForm((p) => ({ ...p, tone: t.id }))
+                      setPersonalityForm((p) => ({ ...p, tone: tone.id }))
                     }
                     className={`flex flex-1 items-center justify-center gap-2 rounded-lg border py-2.5 text-sm transition-colors ${
-                      personalityForm.tone === t.id
+                      personalityForm.tone === tone.id
                         ? "border-white bg-white/[0.06] text-white"
                         : "border-white/10 text-white/40 hover:border-white/20 hover:text-white/70"
                     }`}
                   >
-                    <span>{t.emoji}</span>
-                    {t.label}
+                    <span>{tone.emoji}</span>
+                    {t(`personality.tones.${tone.id}`)}
                   </button>
                 ))}
               </div>
             </Field>
 
-            <Field label="Language">
+            <Field label={t("personality.languageLabel")}>
               <div className="flex gap-2">
                 {["FR", "EN"].map((lang) => (
                   <button
@@ -797,17 +800,17 @@ export function SettingsClient({ agent, userEmail }: Props) {
                 className="h-4 w-4 rounded accent-white"
               />
               <span className="text-sm text-white/60">
-                Respond in both languages automatically
+                {t("personality.bilingualDesc")}
               </span>
             </label>
 
             <div className="flex flex-col gap-3">
               <label className="text-xs font-medium text-white/50">
-                Business hours
+                {t("personality.hoursLabel")}
               </label>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-white/35">Opens at</span>
+                  <span className="text-xs text-white/35">{t("personality.openLabel")}</span>
                   <input
                     type="time"
                     value={personalityForm.openTime}
@@ -821,7 +824,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-white/35">Closes at</span>
+                  <span className="text-xs text-white/35">{t("personality.closesLabel")}</span>
                   <input
                     type="time"
                     value={personalityForm.closeTime}
@@ -847,7 +850,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                         : "border-white/10 text-white/30 hover:border-white/20 hover:text-white/60"
                     }`}
                   >
-                    {d}
+                    {t(`personality.days.${d}`)}
                   </button>
                 ))}
               </div>
@@ -858,7 +861,6 @@ export function SettingsClient({ agent, userEmail }: Props) {
               loading={personalitySaving}
               saved={personalitySaved}
               onClick={savePersonality}
-              label="Save personality"
             />
           </div>
         </SectionCard>
@@ -866,9 +868,9 @@ export function SettingsClient({ agent, userEmail }: Props) {
 
       {/* ════════════════════════ INSTRUCTIONS ════════════════════════ */}
       {tab === "instructions" && (
-        <SectionCard title="Special instructions">
+        <SectionCard title={t("instructions.sectionTitle")}>
           <div className="flex flex-col gap-4">
-            <Field label="Cities or regions you serve">
+            <Field label={t("instructions.serviceAreaLabel")}>
               <input
                 type="text"
                 value={instructionsForm.service_area}
@@ -878,11 +880,11 @@ export function SettingsClient({ agent, userEmail }: Props) {
                     service_area: e.target.value,
                   }))
                 }
-                placeholder="Ex: Granby, Bromont, Waterloo"
+                placeholder={t("instructions.serviceAreaPlaceholder")}
                 className={inputCls}
               />
             </Field>
-            <Field label="Active promotions">
+            <Field label={t("instructions.promotionsLabel")}>
               <textarea
                 value={instructionsForm.promotions}
                 onChange={(e) =>
@@ -892,11 +894,11 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   }))
                 }
                 rows={2}
-                placeholder="Ex: 10% off pool opening before May 31st"
+                placeholder={t("instructions.promotionsPlaceholder")}
                 className={textareaCls}
               />
             </Field>
-            <Field label="Topics your agent should avoid">
+            <Field label={t("instructions.neverSayLabel")}>
               <textarea
                 value={instructionsForm.never_say}
                 onChange={(e) =>
@@ -906,11 +908,11 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   }))
                 }
                 rows={2}
-                placeholder="Ex: Never discuss competitor pricing."
+                placeholder={t("instructions.neverSayPlaceholder")}
                 className={textareaCls}
               />
             </Field>
-            <Field label="When should the agent flag a conversation for you?">
+            <Field label={t("instructions.escalationLabel")}>
               <textarea
                 value={instructionsForm.escalation_criteria}
                 onChange={(e) =>
@@ -920,7 +922,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   }))
                 }
                 rows={2}
-                placeholder="Ex: If client is angry, if deal is over $5,000."
+                placeholder={t("instructions.escalationPlaceholder")}
                 className={textareaCls}
               />
             </Field>
@@ -930,7 +932,6 @@ export function SettingsClient({ agent, userEmail }: Props) {
               loading={instructionsSaving}
               saved={instructionsSaved}
               onClick={saveInstructions}
-              label="Save instructions"
             />
           </div>
         </SectionCard>
@@ -940,9 +941,9 @@ export function SettingsClient({ agent, userEmail }: Props) {
       {tab === "integrations" && (
         <div className="flex flex-col gap-6">
           {/* Twilio */}
-          <SectionCard title="Twilio — SMS">
+          <SectionCard title={t("integrations.twilioTitle")}>
             <div className="flex flex-col gap-4">
-              <Field label="Phone number">
+              <Field label={t("integrations.phone")}>
                 <input
                   type="tel"
                   value={twilioForm.phone}
@@ -953,7 +954,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   className={inputCls}
                 />
               </Field>
-              <Field label="Account SID">
+              <Field label={t("integrations.accountSid")}>
                 <input
                   type="text"
                   value={twilioForm.twilio_account_sid}
@@ -967,7 +968,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   className={`${inputCls} font-mono`}
                 />
               </Field>
-              <Field label="Auth Token">
+              <Field label={t("integrations.authToken")}>
                 <div className="flex gap-2">
                   <input
                     type={showTwilioToken ? "text" : "password"}
@@ -987,50 +988,15 @@ export function SettingsClient({ agent, userEmail }: Props) {
                     className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/40 transition-colors hover:text-white/70"
                   >
                     {showTwilioToken ? (
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                      >
-                        <path
-                          d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                        />
-                        <circle
-                          cx="7"
-                          cy="7"
-                          r="1.5"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                        />
-                        <path
-                          d="M2 2l10 10"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                          strokeLinecap="round"
-                        />
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+                        <path d="M2 2l10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                       </svg>
                     ) : (
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                      >
-                        <path
-                          d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                        />
-                        <circle
-                          cx="7"
-                          cy="7"
-                          r="1.5"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                        />
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
                       </svg>
                     )}
                   </button>
@@ -1047,10 +1013,10 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   }
                   className="rounded-md border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:border-white/20 hover:text-white disabled:opacity-40"
                 >
-                  {twilioTestStatus === "loading" ? "Testing…" : "Test connection"}
+                  {twilioTestStatus === "loading" ? t("integrations.testing") : t("integrations.testConnection")}
                 </button>
                 {twilioTestStatus === "success" && (
-                  <span className="text-sm text-emerald-400">✓ Connected</span>
+                  <span className="text-sm text-emerald-400">✓ {t("integrations.connected")}</span>
                 )}
                 {twilioTestStatus === "error" && (
                   <span className="text-sm text-red-400">✗ {twilioTestError}</span>
@@ -1062,15 +1028,14 @@ export function SettingsClient({ agent, userEmail }: Props) {
                 loading={twilioSaving}
                 saved={twilioSaved}
                 onClick={saveTwilio}
-                label="Save Twilio"
               />
             </div>
           </SectionCard>
 
           {/* Facebook Lead Ads */}
-          <SectionCard title="Facebook Lead Ads">
+          <SectionCard title={t("integrations.facebookTitle")}>
             <div className="flex flex-col gap-4">
-              <Field label="Facebook Page ID">
+              <Field label={t("integrations.pageId")}>
                 <input
                   type="text"
                   value={fbForm.facebook_page_id}
@@ -1084,7 +1049,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   className={`${inputCls} font-mono`}
                 />
               </Field>
-              <Field label="Page Access Token">
+              <Field label={t("integrations.accessToken")}>
                 <div className="flex gap-2">
                   <input
                     type={showFbToken ? "text" : "password"}
@@ -1104,56 +1069,21 @@ export function SettingsClient({ agent, userEmail }: Props) {
                     className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/40 transition-colors hover:text-white/70"
                   >
                     {showFbToken ? (
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                      >
-                        <path
-                          d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                        />
-                        <circle
-                          cx="7"
-                          cy="7"
-                          r="1.5"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                        />
-                        <path
-                          d="M2 2l10 10"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                          strokeLinecap="round"
-                        />
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+                        <path d="M2 2l10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                       </svg>
                     ) : (
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                      >
-                        <path
-                          d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                        />
-                        <circle
-                          cx="7"
-                          cy="7"
-                          r="1.5"
-                          stroke="currentColor"
-                          strokeWidth="1.2"
-                        />
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
                       </svg>
                     )}
                   </button>
                 </div>
               </Field>
-              <Field label="Verify Token (read-only)">
+              <Field label={`${t("integrations.verifyToken")} (read-only)`}>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -1164,7 +1094,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   <CopyButton copied={vtCopied} onClick={copyVerifyToken} />
                 </div>
               </Field>
-              <Field label="Webhook URL (read-only)">
+              <Field label={`${t("integrations.webhookLabel")} (read-only)`}>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -1196,7 +1126,6 @@ export function SettingsClient({ agent, userEmail }: Props) {
                 loading={fbSaving}
                 saved={fbSaved}
                 onClick={saveFacebook}
-                label="Save Facebook"
               />
             </div>
           </SectionCard>
@@ -1205,17 +1134,17 @@ export function SettingsClient({ agent, userEmail }: Props) {
 
       {/* ════════════════════════ NOTIFICATIONS ════════════════════════ */}
       {tab === "notifications" && (
-        <SectionCard title="Email notifications">
+        <SectionCard title={t("notifications.sectionTitle")}>
           <p className="mb-5 text-xs text-white/40">
-            Notifications sent to{" "}
+            {t("notifications.sentTo")}{" "}
             <span className="text-white/70">{userEmail}</span>
           </p>
           <div className="flex flex-col gap-5">
             <Toggle
               checked={notifForm.new_lead}
               onChange={(v) => setNotifForm((p) => ({ ...p, new_lead: v }))}
-              label="New lead received"
-              description="Get notified when your agent captures a new lead via SMS or Facebook Ads"
+              label={t("notifications.newLead")}
+              description={t("notifications.newLeadDesc")}
             />
             <div className="border-t border-white/[0.05]" />
             <Toggle
@@ -1223,8 +1152,8 @@ export function SettingsClient({ agent, userEmail }: Props) {
               onChange={(v) =>
                 setNotifForm((p) => ({ ...p, deal_closed: v }))
               }
-              label="Deal closed"
-              description="Get notified when a lead's status is updated to closed"
+              label={t("notifications.dealClosed")}
+              description={t("notifications.dealClosedDesc")}
             />
           </div>
           <div className="mt-6 flex justify-end">

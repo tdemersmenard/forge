@@ -1,11 +1,24 @@
-const footerLinks = {
+"use client";
+
+import { useTranslations } from "next-intl";
+
+const footerLinks: Record<string, string[]> = {
   Product: ["Features", "Pricing", "Changelog", "Roadmap"],
   Developers: ["Docs", "API Reference", "Status", "GitHub"],
   Company: ["About", "Blog", "Careers", "Contact"],
   Legal: ["Privacy", "Terms", "Security"],
 };
 
+const categoryKeys: Record<string, "product" | "developers" | "company" | "legal"> = {
+  Product: "product",
+  Developers: "developers",
+  Company: "company",
+  Legal: "legal",
+};
+
 export default function Footer() {
+  const t = useTranslations("footer");
+
   return (
     <footer className="border-t border-white/[0.06] px-6 py-16">
       <div className="mx-auto max-w-6xl">
@@ -21,7 +34,7 @@ export default function Footer() {
               <span className="text-sm font-semibold text-white">Forge</span>
             </div>
             <p className="text-sm text-white/30 leading-relaxed">
-              AI agents for service businesses.
+              {t("tagline")}
             </p>
           </div>
 
@@ -29,7 +42,7 @@ export default function Footer() {
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
               <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">
-                {category}
+                {t(categoryKeys[category])}
               </p>
               <ul className="flex flex-col gap-2.5">
                 {links.map((link) => (
@@ -50,16 +63,14 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center">
           <p className="text-xs text-white/25">
-            &copy; {new Date().getFullYear()} Forge, Inc. All rights reserved.
+            &copy; {new Date().getFullYear()} {t("copyright")}
           </p>
           <div className="flex items-center gap-5">
-            {/* X/Twitter */}
             <a href="#" className="text-white/25 transition-colors hover:text-white/60" aria-label="Twitter">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M12.6 1.5h2.3L9.8 7.2 15.5 14.5H11L7.4 9.8 3.2 14.5H.9L6.2 8.4.5 1.5H5.1l3.3 4.3L12.6 1.5zm-.8 11.7h1.3L4.3 2.8H2.9L11.8 13.2z" fill="currentColor"/>
               </svg>
             </a>
-            {/* LinkedIn */}
             <a href="#" className="text-white/25 transition-colors hover:text-white/60" aria-label="LinkedIn">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M2 2.5C2 1.7 2.7 1 3.5 1S5 1.7 5 2.5 4.3 4 3.5 4 2 3.3 2 2.5zM2.5 5.5H4.5V14H2.5V5.5zM6 5.5H8V6.4C8.5 5.8 9.3 5.3 10.3 5.3 12.2 5.3 13.5 6.7 13.5 8.7V14H11.5V9C11.5 7.9 10.9 7.2 9.9 7.2 9 7.2 8.5 7.8 8 8.5V14H6V5.5z" fill="currentColor"/>

@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 export default function SignupPage() {
   const router = useRouter();
+  const t = useTranslations("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -48,19 +50,19 @@ export default function SignupPage() {
         </div>
 
         <h1 className="mb-2 text-xl font-semibold tracking-tight text-white">
-          Create your account
+          {t("title")}
         </h1>
         <p className="mb-8 text-sm text-white/40">
-          Already have an account?{" "}
+          {t("haveAccount")}{" "}
           <a href="/login" className="text-white/70 underline underline-offset-4 hover:text-white">
-            Sign in
+            {t("signIn")}
           </a>
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="email" className="text-xs font-medium text-white/50">
-              Email
+              {t("emailLabel")}
             </label>
             <input
               id="email"
@@ -69,14 +71,14 @@ export default function SignupPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
+              placeholder={t("emailPlaceholder")}
               className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 focus:ring-0 transition-colors"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="password" className="text-xs font-medium text-white/50">
-              Password
+              {t("passwordLabel")}
             </label>
             <input
               id="password"
@@ -86,7 +88,7 @@ export default function SignupPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min. 8 characters"
+              placeholder={t("passwordPlaceholder")}
               className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 focus:ring-0 transition-colors"
             />
           </div>
@@ -102,12 +104,12 @@ export default function SignupPage() {
             disabled={loading}
             className="mt-1 h-10 rounded-md bg-white text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? "Creating account…" : "Create account"}
+            {loading ? t("creatingAccount") : t("createAccount")}
           </button>
         </form>
 
         <p className="mt-6 text-xs text-white/20 text-center">
-          By creating an account you agree to our Terms of Service.
+          {t("terms")}
         </p>
       </div>
     </div>

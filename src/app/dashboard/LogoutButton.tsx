@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 export function LogoutButton() {
   const router = useRouter();
+  const t = useTranslations("sidebar");
 
   async function handleLogout() {
     const supabase = createClient();
@@ -26,7 +28,7 @@ export function LogoutButton() {
           strokeLinejoin="round"
         />
       </svg>
-      Log out
+      {t("logout")}
     </button>
   );
 }

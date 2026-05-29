@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -51,19 +53,19 @@ export default function LoginPage() {
         </div>
 
         <h1 className="mb-2 text-xl font-semibold tracking-tight text-white">
-          Welcome back
+          {t("title")}
         </h1>
         <p className="mb-8 text-sm text-white/40">
-          No account yet?{" "}
+          {t("noAccount")}{" "}
           <a href="/signup" className="text-white/70 underline underline-offset-4 hover:text-white">
-            Create one
+            {t("createOne")}
           </a>
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="email" className="text-xs font-medium text-white/50">
-              Email
+              {t("emailLabel")}
             </label>
             <input
               id="email"
@@ -72,14 +74,14 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
+              placeholder={t("emailPlaceholder")}
               className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 focus:ring-0 transition-colors"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="password" className="text-xs font-medium text-white/50">
-              Password
+              {t("passwordLabel")}
             </label>
             <input
               id="password"
@@ -88,7 +90,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Your password"
+              placeholder={t("passwordPlaceholder")}
               className="h-10 rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 focus:ring-0 transition-colors"
             />
           </div>
@@ -104,7 +106,7 @@ export default function LoginPage() {
             disabled={loading}
             className="mt-1 h-10 rounded-md bg-white text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? t("signingIn") : t("signIn")}
           </button>
         </form>
       </div>

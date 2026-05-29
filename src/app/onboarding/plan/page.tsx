@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { PLANS } from "@/lib/plans";
 import type { PlanId } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 function getRecommendedPlan(contractValue: string | null): PlanId {
   if (!contractValue) return "growth";
@@ -15,6 +16,7 @@ function getRecommendedPlan(contractValue: string | null): PlanId {
 
 export default function PlanPage() {
   const router = useRouter();
+  const t = useTranslations("plan");
   const [checkoutLoading, setCheckoutLoading] = useState<PlanId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
@@ -52,13 +54,13 @@ export default function PlanPage() {
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) {
-        setError(data.error ?? "Failed to start checkout. Please try again.");
+        setError(data.error ?? t("checkoutFailed"));
         setCheckoutLoading(null);
         return;
       }
       window.location.href = data.url;
     } catch {
-      setError("Network error — please try again.");
+      setError(t("networkError"));
       setCheckoutLoading(null);
     }
   }
@@ -84,15 +86,15 @@ export default function PlanPage() {
       {/* Hero */}
       <div className="mb-12 max-w-xl text-center">
         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/40">
-          Start your 7-day free trial
+          {t("trialBadge")}
         </p>
         <h1 className="mb-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
           {agentName
-            ? `${agentName} is ready to deploy.`
-            : "Your agent is ready to deploy."}
+            ? t("readyNamed", { name: agentName })
+            : t("ready")}
         </h1>
         <p className="text-base text-white/50">
-          Choose a plan to activate it. 7-day free trial. Cancel anytime.
+          {t("subtitle")}
         </p>
       </div>
 
@@ -118,7 +120,7 @@ export default function PlanPage() {
               >
                 {isRecommended && businessName && (
                   <div className="mb-3 inline-flex items-center gap-1 rounded-full bg-[#0a0a0a]/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#0a0a0a]">
-                    ✦ Recommended for {businessName}
+                    {t("recommendedFor", { name: businessName })}
                   </div>
                 )}
                 {plan.badge && !isRecommended && (
@@ -133,7 +135,7 @@ export default function PlanPage() {
                   <span className="text-3xl font-bold text-[#0a0a0a]">
                     ${plan.price}
                   </span>
-                  <span className="text-sm text-[#0a0a0a]/50">/mo</span>
+                  <span className="text-sm text-[#0a0a0a]/50">{t("perMonth")}</span>
                 </div>
                 <ul className="mb-6 mt-5 space-y-2.5">
                   {plan.features.map((f) => (
@@ -166,7 +168,7 @@ export default function PlanPage() {
                   onClick={() => selectPlan(plan.id)}
                   className="w-full rounded-lg bg-[#0a0a0a] py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
-                  {isLoading ? "Redirecting…" : "Start free trial →"}
+                  {isLoading ? t("redirecting") : t("startTrialArrow")}
                 </button>
               </div>
             );
@@ -179,7 +181,7 @@ export default function PlanPage() {
             >
               {isRecommended && businessName && (
                 <div className="mb-3 inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-0.5 text-[11px] font-semibold text-white/60">
-                  ✦ Recommended for {businessName}
+                  {t("recommendedFor", { name: businessName })}
                 </div>
               )}
               <h2 className="text-lg font-semibold text-white">{plan.name}</h2>
@@ -187,7 +189,7 @@ export default function PlanPage() {
                 <span className="text-3xl font-bold text-white">
                   ${plan.price}
                 </span>
-                <span className="text-sm text-white/40">/mo</span>
+                <span className="text-sm text-white/40">{t("perMonth")}</span>
               </div>
               <ul className="mb-6 mt-5 space-y-2.5">
                 {plan.features.map((f) => (
@@ -220,7 +222,7 @@ export default function PlanPage() {
                 onClick={() => selectPlan(plan.id)}
                 className="w-full rounded-lg border border-white/10 bg-white/[0.06] py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/[0.10] disabled:opacity-50"
               >
-                {isLoading ? "Redirecting…" : "Start free trial"}
+                {isLoading ? t("redirecting") : t("startTrialFlat")}
               </button>
             </div>
           );
@@ -230,16 +232,16 @@ export default function PlanPage() {
       {/* Trust row */}
       <div className="mb-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {[
-          { icon: "🔒", text: "256-bit SSL encryption" },
-          { icon: "💳", text: "No credit card stored until trial ends" },
-          { icon: "✕", text: "Cancel anytime in 2 clicks" },
+          { icon: "🔒", key: "trustSsl" },
+          { icon: "💳", key: "trustNoCard" },
+          { icon: "✕", key: "trustCancel" },
         ].map((item) => (
           <span
-            key={item.text}
+            key={item.key}
             className="flex items-center gap-1.5 text-xs text-white/30"
           >
             <span>{item.icon}</span>
-            {item.text}
+            {t(item.key)}
           </span>
         ))}
       </div>
@@ -250,7 +252,7 @@ export default function PlanPage() {
         onClick={() => router.push("/dashboard")}
         className="text-xs text-white/25 underline underline-offset-4 transition-colors hover:text-white/50"
       >
-        Skip for now — explore the dashboard first
+        {t("skipForNow")}
       </button>
     </div>
   );

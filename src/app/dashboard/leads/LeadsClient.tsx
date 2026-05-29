@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import type { ConvRow } from "../page";
 
 type Lead = {
@@ -18,13 +19,7 @@ type Lead = {
 
 type StatusFilter = "all" | "new" | "qualifying" | "in_progress" | "closed";
 
-const STATUS_TABS: { key: StatusFilter; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "new", label: "New" },
-  { key: "qualifying", label: "Qualifying" },
-  { key: "in_progress", label: "In Progress" },
-  { key: "closed", label: "Closed" },
-];
+const STATUS_FILTER_KEYS: StatusFilter[] = ["all", "new", "qualifying", "in_progress", "closed"];
 
 function statusStyle(status: string | null) {
   switch (status?.toLowerCase()) {
@@ -96,6 +91,7 @@ const EMPTY_FORM: AddLeadForm = {
 };
 
 export function LeadsClient({ agentIds, initialConversations }: Props) {
+  const t = useTranslations("leads");
   const [conversations, setConversations] =
     useState<ConvRow[]>(initialConversations);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -173,13 +169,13 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error ?? "Failed to add lead");
+        toast.error(data.error ?? t("toastError"));
       } else {
-        toast.success("Lead added — your agent will reach out shortly");
+        toast.success(t("toastSuccess"));
         closeModal();
       }
     } catch {
-      toast.error("Network error — please try again");
+      toast.error(t("toastNetwork"));
     } finally {
       setSubmitting(false);
     }
@@ -239,16 +235,14 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
     <main className="flex-1 overflow-auto px-6 py-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-white">Leads</h1>
-          <p className="mt-1 text-sm text-white/40">
-            All unique contacts your agent has engaged with.
-          </p>
+          <h1 className="text-xl font-semibold text-white">{t("title")}</h1>
+          <p className="mt-1 text-sm text-white/40">{t("subtitle")}</p>
         </div>
         <button
           onClick={openModal}
           className="shrink-0 rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
         >
-          + Add lead
+          {t("addLead")}
         </button>
       </div>
 
@@ -256,15 +250,15 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[
           {
-            label: "Total leads",
+            label: t("totalLeads"),
             value: leads.length.toLocaleString(),
           },
           {
-            label: "Conversion rate",
+            label: t("conversionRate"),
             value: `${conversionRate}%`,
           },
           {
-            label: "Revenue this month",
+            label: t("revenueThisMonth"),
             value: `$${leadsThisMonth
               .reduce((sum, l) => sum + l.revenue, 0)
               .toLocaleString()}`,
@@ -284,17 +278,17 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {/* Status tabs */}
         <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1">
-          {STATUS_TABS.map((tab) => (
+          {STATUS_FILTER_KEYS.map((key) => (
             <button
-              key={tab.key}
-              onClick={() => setStatusFilter(tab.key)}
+              key={key}
+              onClick={() => setStatusFilter(key)}
               className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                statusFilter === tab.key
+                statusFilter === key
                   ? "bg-white text-[#0a0a0a]"
                   : "text-white/40 hover:text-white/70"
               }`}
             >
-              {tab.label}
+              {t(key === "in_progress" ? "inProgress" : key)}
             </button>
           ))}
         </div>
@@ -315,7 +309,7 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or phone…"
+            placeholder={t("searchPlaceholder")}
             className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] pl-8 pr-3 text-xs text-white placeholder:text-white/25 outline-none focus:border-white/25 transition-colors sm:w-64"
           />
         </div>
@@ -326,19 +320,17 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
             <p className="mb-1 text-sm font-medium text-white/50">
-              {leads.length === 0 ? "No leads yet" : "No results found"}
+              {leads.length === 0 ? t("noLeads") : t("noResults")}
             </p>
             <p className="text-xs text-white/25">
-              {leads.length === 0
-                ? "Leads appear here once your agent starts engaging contacts."
-                : "Try adjusting your filters or search query."}
+              {leads.length === 0 ? t("noLeadsDesc") : t("noResultsDesc")}
             </p>
             {leads.length === 0 && agentIds.length === 0 && (
               <a
                 href="/onboarding"
                 className="mt-5 rounded-md bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
               >
-                Set up your agent
+                {t("setupAgent")}
               </a>
             )}
           </div>
@@ -348,12 +340,12 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
               <thead>
                 <tr className="border-b border-white/[0.06]">
                   {[
-                    "Name",
-                    "Phone",
-                    "Status",
-                    "Revenue",
-                    "First contact",
-                    "Last activity",
+                    t("name"),
+                    t("phone"),
+                    t("status"),
+                    t("revenue"),
+                    t("firstContact"),
+                    t("lastActivity"),
                   ].map((col) => (
                     <th
                       key={col}
@@ -421,7 +413,7 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
                           href="/dashboard/conversations"
                           className="ml-3 hidden rounded px-2 py-1 text-[11px] text-white/30 transition-colors hover:bg-white/[0.06] hover:text-white/70 group-hover:block"
                         >
-                          View →
+                          {t("viewArrow")}
                         </a>
                       </div>
                     </td>
@@ -431,10 +423,8 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
             </table>
             <div className="border-t border-white/[0.04] px-5 py-3">
               <p className="text-xs text-white/25">
-                {filtered.length} lead{filtered.length !== 1 ? "s" : ""}
-                {statusFilter !== "all" || search
-                  ? ` · ${leads.length} total`
-                  : ""}
+                {filtered.length === 1 ? t("leadCount", { count: filtered.length }) : t("leadsCount", { count: filtered.length })}
+                {(statusFilter !== "all" || search) ? ` ${t("total", { count: leads.length })}` : ""}
               </p>
             </div>
           </div>
@@ -443,7 +433,7 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
 
       {totalRevenue > 0 && (
         <p className="mt-3 text-right text-xs text-white/25">
-          Total pipeline revenue: ${totalRevenue.toLocaleString()}
+          {t("totalRevenue")} ${totalRevenue.toLocaleString()}
         </p>
       )}
 
@@ -457,7 +447,7 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
         >
           <div className="w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#111] p-6 shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-white">Add lead</h2>
+              <h2 className="text-base font-semibold text-white">{t("modal.title")}</h2>
               <button
                 onClick={closeModal}
                 className="rounded-md p-1 text-white/30 transition-colors hover:text-white/70"
@@ -472,7 +462,7 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1.5 block text-xs text-white/50">
-                    First name <span className="text-white/30">*</span>
+                    {t("modal.firstName")} <span className="text-white/30">{t("modal.required")}</span>
                   </label>
                   <input
                     ref={firstInputRef}
@@ -480,17 +470,17 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
                     required
                     value={form.firstName}
                     onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-                    placeholder="Jane"
+                    placeholder={t("modal.firstNamePlaceholder")}
                     className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs text-white/50">Last name</label>
+                  <label className="mb-1.5 block text-xs text-white/50">{t("modal.lastName")}</label>
                   <input
                     type="text"
                     value={form.lastName}
                     onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-                    placeholder="Doe"
+                    placeholder={t("modal.lastNamePlaceholder")}
                     className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                   />
                 </div>
@@ -498,35 +488,35 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
 
               <div>
                 <label className="mb-1.5 block text-xs text-white/50">
-                  Phone <span className="text-white/30">*</span>
+                  {t("modal.phone")} <span className="text-white/30">{t("modal.required")}</span>
                 </label>
                 <input
                   type="tel"
                   required
                   value={form.phone}
                   onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                  placeholder="+15141234567"
+                  placeholder={t("modal.phonePlaceholder")}
                   className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-3 font-mono text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs text-white/50">Email</label>
+                <label className="mb-1.5 block text-xs text-white/50">{t("modal.email")}</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  placeholder="jane@example.com"
+                  placeholder={t("modal.emailPlaceholder")}
                   className="h-9 w-full rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs text-white/50">Note</label>
+                <label className="mb-1.5 block text-xs text-white/50">{t("modal.note")}</label>
                 <textarea
                   value={form.note}
                   onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
-                  placeholder="Context about this lead…"
+                  placeholder={t("modal.notePlaceholder")}
                   rows={3}
                   className="w-full resize-none rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                 />
@@ -538,14 +528,14 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
                   onClick={closeModal}
                   className="flex-1 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-white/50 transition-colors hover:text-white/80"
                 >
-                  Cancel
+                  {t("modal.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || !form.firstName.trim() || !form.phone.trim()}
                   className="flex-1 rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-40"
                 >
-                  {submitting ? "Adding…" : "Add lead"}
+                  {submitting ? t("modal.submitting") : t("modal.submit")}
                 </button>
               </div>
             </form>

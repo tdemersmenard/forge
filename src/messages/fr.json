@@ -1,0 +1,479 @@
+{
+  "navbar": {
+    "product": "Produit",
+    "pricing": "Tarifs",
+    "docs": "Docs",
+    "getStarted": "Commencer"
+  },
+  "hero": {
+    "badge": "Maintenant en bêta",
+    "line1": "Déployez des agents IA.",
+    "line2": "Pas des chatbots.",
+    "subtitle": "Forge transforme votre entreprise de services en une opération 24h/24. Créez des agents qui qualifient les leads, concluent des ventes, collectent des paiements et gèrent les opérations — sans écrire une seule ligne de code.",
+    "startFree": "Commencer gratuitement",
+    "seeDemo": "Voir la démo",
+    "trustedBy": "Utilisé par",
+    "trustedCount": "1 200+",
+    "trustedSuffix": "entreprises de services",
+    "revenue": "4,2 M$",
+    "revenueSuffix": "de revenus automatisés"
+  },
+  "features": {
+    "label": "Fonctionnalités",
+    "heading": "Tout ce dont votre entreprise a besoin pour fonctionner en pilote automatique",
+    "leadQualification": {
+      "title": "Qualification de leads",
+      "desc": "Votre agent pose les bonnes questions, évalue chaque lead et n'escalade que ceux qui valent votre temps."
+    },
+    "contractGeneration": {
+      "title": "Génération de contrats",
+      "desc": "Générez, envoyez et suivez automatiquement les contrats de service à partir des données de conversation — sans copier-coller."
+    },
+    "paymentCollection": {
+      "title": "Collecte de paiements",
+      "desc": "Envoyez des factures, collectez des acomptes et traitez des paiements récurrents — tout par conversation."
+    },
+    "routeOptimization": {
+      "title": "Optimisation des tournées",
+      "desc": "Planifiez et organisez automatiquement les interventions pour minimiser les trajets et maximiser la capacité journalière."
+    },
+    "automatedReminders": {
+      "title": "Rappels automatiques",
+      "desc": "Confirmations de rendez-vous, suivis et demandes d'avis envoyés au bon moment."
+    },
+    "liveAnalytics": {
+      "title": "Analyses en temps réel",
+      "desc": "Tableaux de bord en temps réel montrant les taux de conversion, le revenu par agent et où les opportunités sont perdues."
+    }
+  },
+  "pricing": {
+    "label": "Tarifs",
+    "heading": "Des tarifs simples et prévisibles",
+    "subtitle": "Pas de frais par conversation. Pas de surprises. Annulez à tout moment.",
+    "mostPopular": "Plus populaire",
+    "perMonth": "/mois",
+    "starter": {
+      "name": "Starter",
+      "desc": "Pour les indépendants qui déploient leur premier agent.",
+      "feat1": "1 agent IA",
+      "feat2": "Jusqu'à 500 conversations/mois",
+      "feat3": "Qualification de leads",
+      "feat4": "Notifications par e-mail",
+      "feat5": "Analyses de base",
+      "feat6": "Support par e-mail",
+      "cta": "Commencer"
+    },
+    "growth": {
+      "name": "Growth",
+      "desc": "Pour les équipes en croissance qui ont besoin d'une automatisation complète.",
+      "feat1": "5 agents IA",
+      "feat2": "Conversations illimitées",
+      "feat3": "Génération de contrats",
+      "feat4": "Collecte de paiements",
+      "feat5": "Optimisation des tournées",
+      "feat6": "Support prioritaire",
+      "cta": "Commencer"
+    },
+    "agency": {
+      "name": "Agency",
+      "desc": "Pour les agences gérant plusieurs comptes clients.",
+      "feat1": "Agents illimités",
+      "feat2": "Conversations illimitées",
+      "feat3": "Marque blanche",
+      "feat4": "Tableaux de bord clients",
+      "feat5": "Accès API",
+      "feat6": "Gestionnaire de compte dédié",
+      "cta": "Contacter les ventes"
+    }
+  },
+  "cta": {
+    "line1": "Votre agent est prêt.",
+    "line2": "Et vous?",
+    "subtitle": "Soyez en ligne en 15 minutes. Pas de code. Pas d'appel commercial. Juste un formulaire et votre premier agent.",
+    "startFree": "Commencer gratuitement",
+    "talkHuman": "Parler à un humain à la place"
+  },
+  "footer": {
+    "tagline": "Agents IA pour les entreprises de services.",
+    "copyright": "Forge, Inc. Tous droits réservés.",
+    "product": "Produit",
+    "developers": "Développeurs",
+    "company": "Entreprise",
+    "legal": "Légal"
+  },
+  "login": {
+    "title": "Bon retour",
+    "noAccount": "Pas encore de compte?",
+    "createOne": "Créer un compte",
+    "emailLabel": "Courriel",
+    "emailPlaceholder": "vous@entreprise.com",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Votre mot de passe",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion…"
+  },
+  "signup": {
+    "title": "Créer votre compte",
+    "haveAccount": "Vous avez déjà un compte?",
+    "signIn": "Se connecter",
+    "emailLabel": "Courriel",
+    "emailPlaceholder": "vous@entreprise.com",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Min. 8 caractères",
+    "createAccount": "Créer un compte",
+    "creatingAccount": "Création du compte…",
+    "terms": "En créant un compte, vous acceptez nos Conditions d'utilisation."
+  },
+  "onboarding": {
+    "stepOf": "Étape {step} sur {total}",
+    "next": "Suivant",
+    "back": "Retour",
+    "skip": "Passer pour l'instant",
+    "step1": {
+      "title": "Commençons par nommer votre agent.",
+      "subtitle": "Votre agent se présentera par ce nom lorsqu'il enverra des SMS à vos leads.",
+      "agentNameLabel": "Nom de l'agent",
+      "agentNamePlaceholder": "Max, Sophie, Alex...",
+      "businessNameLabel": "Nom de l'entreprise",
+      "businessNamePlaceholder": "Piscine Pro, GreenLawn...",
+      "sectorLabel": "Secteur",
+      "sectors": {
+        "pool": "Piscine & Spa",
+        "lawn": "Gazon & Aménagement",
+        "cleaning": "Nettoyage",
+        "hvac": "CVC",
+        "construction": "Construction & Rénovation",
+        "other": "Autre"
+      }
+    },
+    "step2": {
+      "title": "Qu'offrez-vous et à quel prix?",
+      "subtitle": "Votre agent saura exactement quoi proposer et combien facturer.",
+      "servicePlaceholder": "Entretien complet saison",
+      "addService": "+ Ajouter un service",
+      "contractValueLabel": "Valeur de contrat typique"
+    },
+    "step3": {
+      "title": "Que doit demander votre agent pour qualifier les leads?",
+      "subtitle": "Ces questions permettent de déterminer si un lead vaut la peine d'être poursuivi.",
+      "questionPlaceholder": "Posez une question de qualification...",
+      "addQuestion": "+ Ajouter une question",
+      "disqualLabel": "Critères de disqualification",
+      "disqualPlaceholder": "ex. hors zone de service, budget inférieur à 200$..."
+    },
+    "step4": {
+      "title": "Comment votre agent doit-il communiquer?",
+      "subtitle": "Choisissez le ton qui correspond à votre marque.",
+      "professional": { "label": "Professionnel", "desc": "Formel, précis, inspire confiance rapidement.", "example": "Bonjour! Je suis Max, assistant de Piscine Pro. Comment puis-je vous aider aujourd'hui?" },
+      "friendly": { "label": "Chaleureux", "desc": "Warm, accessible, semble humain.", "example": "Salut! Moi c'est Max de Piscine Pro 😊 Super content de vous entendre! Comment je peux vous aider?" },
+      "direct": { "label": "Direct", "desc": "Rapide, sans fioritures, droit au but.", "example": "Max ici — Piscine Pro. C'est quoi votre besoin?" },
+      "languageLabel": "Langue de l'agent",
+      "bilingualLabel": "Bilingue (FR + EN)",
+      "hoursLabel": "Heures d'ouverture",
+      "openLabel": "Ouvre",
+      "closesLabel": "Ferme",
+      "days": {
+        "Mon": "Lun", "Tue": "Mar", "Wed": "Mer",
+        "Thu": "Jeu", "Fri": "Ven", "Sat": "Sam", "Sun": "Dim"
+      }
+    },
+    "step5": {
+      "title": "Affinez les connaissances de votre agent.",
+      "subtitle": "Plus vous donnez de contexte, meilleures seront les performances de votre agent.",
+      "serviceAreaLabel": "Zone de service",
+      "serviceAreaPlaceholder": "ex. Grand Montréal, Laval, Longueuil...",
+      "promotionsLabel": "Promotions en cours",
+      "promotionsPlaceholder": "ex. 10% de rabais sur le premier service...",
+      "neverSayLabel": "Ne jamais dire",
+      "neverSayPlaceholder": "ex. noms de concurrents, paliers de prix spécifiques...",
+      "escalationLabel": "Critères d'escalade",
+      "escalationPlaceholder": "ex. client mécontent, question juridique complexe..."
+    },
+    "step6": {
+      "title": "Connectez votre numéro Twilio.",
+      "subtitle": "Votre agent a besoin d'un numéro de téléphone pour envoyer et recevoir des SMS.",
+      "accountSidLabel": "Account SID",
+      "accountSidPlaceholder": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "authTokenLabel": "Auth token",
+      "phoneLabel": "Numéro Twilio",
+      "phonePlaceholder": "+15141234567",
+      "testConnection": "Tester la connexion",
+      "testing": "Test en cours…",
+      "connected": "Connecté",
+      "webhookLabel": "URL du webhook",
+      "webhookInstructions": "Copiez cette URL dans le webhook de messagerie de votre numéro Twilio (A message comes in):",
+      "copy": "Copier",
+      "copied": "Copié!",
+      "errorPrefix": "Erreur:"
+    },
+    "step7": {
+      "title": "Déploiement de votre agent...",
+      "subtitle": "Patientez — cela ne prend qu'un moment.",
+      "profile": "Sauvegarde du profil d'entreprise...",
+      "personality": "Génération de la personnalité de l'agent...",
+      "services": "Chargement des services et tarifs...",
+      "questions": "Calibration des questions de qualification...",
+      "ready": "Votre agent est prêt.",
+      "readyNamed": "Votre agent {name} est prêt."
+    },
+    "defaultQuestions": {
+      "pool": ["Quelle est la taille de votre piscine?", "Votre piscine est-elle hors-terre ou creusée?", "Dans quelle ville êtes-vous?"],
+      "lawn": ["Quelle est la superficie de votre terrain?", "Souhaitez-vous un entretien hebdomadaire ou bimensuel?", "Dans quelle ville êtes-vous?"],
+      "cleaning": ["Combien de pièces y a-t-il?", "Résidentiel ou commercial?", "À quelle fréquence avez-vous besoin du service?"],
+      "hvac": ["Quel type de système avez-vous?", "Quand a eu lieu votre dernier entretien?", "Dans quelle ville êtes-vous?"],
+      "construction": ["Quel type de rénovation planifiez-vous?", "Quel est votre budget approximatif?", "Dans quelle ville êtes-vous?"],
+      "other": ["Que recherchez-vous?", "Dans quelle ville êtes-vous?", "Quel est votre budget?"]
+    },
+    "saveError": "Échec de la sauvegarde. Veuillez réessayer."
+  },
+  "plan": {
+    "chooseYourPlan": "Choisissez votre forfait",
+    "trialBadge": "Commencez votre essai gratuit de 7 jours",
+    "readyNamed": "{name} est prêt à déployer.",
+    "ready": "Votre agent est prêt à déployer.",
+    "subtitle": "Choisissez un forfait pour l'activer. 7 jours d'essai. Annulez à tout moment.",
+    "recommendedFor": "✦ Recommandé pour {name}",
+    "skipForNow": "Passer pour l'instant — explorer le tableau de bord",
+    "perMonth": "/mois",
+    "startTrialArrow": "Commencer l'essai gratuit →",
+    "startTrialFlat": "Commencer l'essai gratuit",
+    "redirecting": "Redirection…",
+    "trustSsl": "Chiffrement SSL 256 bits",
+    "trustNoCard": "Aucune carte de crédit avant la fin de l'essai",
+    "trustCancel": "Annulez à tout moment en 2 clics",
+    "checkoutFailed": "Échec du paiement — réessayez.",
+    "networkError": "Erreur réseau — veuillez réessayer."
+  },
+  "sidebar": {
+    "overview": "Aperçu",
+    "conversations": "Conversations",
+    "leads": "Leads",
+    "settings": "Paramètres",
+    "billing": "Facturation",
+    "agentStatus": "Statut de l'agent",
+    "live": "Actif",
+    "idle": "Inactif",
+    "agentConfigured": "{count} agent configuré",
+    "agentsConfigured": "{count} agents configurés",
+    "noAgents": "Aucun agent",
+    "logout": "Se déconnecter"
+  },
+  "dashboard": {
+    "title": "Aperçu",
+    "welcomeBack": "Bon retour,",
+    "agentActive": "Votre agent est maintenant actif!",
+    "agentActiveDesc": "Connectez votre numéro Twilio dans Paramètres → Intégrations pour commencer à recevoir des leads.",
+    "revenueThisMonth": "Revenus ce mois-ci",
+    "leadsThisMonth": "Leads ce mois-ci",
+    "autoClosed": "Fermés automatiquement",
+    "recentActivity": "Activité récente",
+    "viewAll": "Tout voir →",
+    "noActivity": "Aucune activité",
+    "noActivityDesc": "Les conversations apparaîtront ici en temps réel.",
+    "setupFirstAgent": "Configurer votre premier agent",
+    "agentLabel": "Agent:",
+    "leadLabel": "Lead:",
+    "unknown": "Inconnu"
+  },
+  "conversations": {
+    "title": "Conversations",
+    "subtitle": "Fils SMS en temps réel de votre agent.",
+    "noConversations": "Aucune conversation",
+    "noConversationsDesc": "Votre agent n'a pas encore eu de conversations.",
+    "source": {
+      "facebook": "Pub Facebook",
+      "manual": "Manuel",
+      "sms": "SMS"
+    },
+    "search": "Rechercher par nom ou téléphone…",
+    "allThreads": "Tous les fils",
+    "noThread": "Sélectionnez une conversation",
+    "noThreadDesc": "Choisissez un fil dans la liste pour voir les messages."
+  },
+  "leads": {
+    "title": "Leads",
+    "subtitle": "Tous les contacts uniques engagés par votre agent.",
+    "addLead": "+ Ajouter un lead",
+    "totalLeads": "Total des leads",
+    "conversionRate": "Taux de conversion",
+    "revenueThisMonth": "Revenus ce mois-ci",
+    "totalRevenue": "Revenu total du pipeline:",
+    "all": "Tous",
+    "new": "Nouveau",
+    "qualifying": "En qualification",
+    "inProgress": "En cours",
+    "closed": "Fermé",
+    "name": "Nom",
+    "phone": "Téléphone",
+    "status": "Statut",
+    "revenue": "Revenu",
+    "firstContact": "Premier contact",
+    "lastActivity": "Dernière activité",
+    "viewArrow": "Voir →",
+    "noLeads": "Aucun lead",
+    "noResults": "Aucun résultat",
+    "noLeadsDesc": "Les leads apparaîtront ici une fois que votre agent commencera à engager des contacts.",
+    "noResultsDesc": "Essayez d'ajuster vos filtres ou votre recherche.",
+    "setupAgent": "Configurer votre agent",
+    "searchPlaceholder": "Rechercher par nom ou téléphone…",
+    "leadCount": "{count} lead",
+    "leadsCount": "{count} leads",
+    "total": "· {count} au total",
+    "modal": {
+      "title": "Ajouter un lead",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "phone": "Téléphone",
+      "email": "Courriel",
+      "note": "Note",
+      "firstNamePlaceholder": "Marie",
+      "lastNamePlaceholder": "Tremblay",
+      "phonePlaceholder": "+15141234567",
+      "emailPlaceholder": "marie@example.com",
+      "notePlaceholder": "Contexte sur ce lead…",
+      "required": "*",
+      "cancel": "Annuler",
+      "submit": "Ajouter",
+      "submitting": "Ajout…"
+    },
+    "toastSuccess": "Lead ajouté — votre agent va prendre contact",
+    "toastError": "Échec de l'ajout du lead",
+    "toastNetwork": "Erreur réseau — veuillez réessayer"
+  },
+  "billing": {
+    "title": "Facturation",
+    "currentPlan": "Forfait actuel",
+    "freeTrial": "Essai gratuit",
+    "manageSubscription": "Gérer l'abonnement",
+    "opening": "Ouverture…",
+    "trialEndsIn": "Votre essai gratuit se termine dans {days} jour",
+    "trialEndsInPlural": "Votre essai gratuit se termine dans {days} jours",
+    "trialEnded": "Votre essai gratuit est terminé",
+    "trialDesc": "Activez un forfait ci-dessous pour garder votre agent actif.",
+    "activateNow": "Activer maintenant →",
+    "usageThisMonth": "Utilisation ce mois-ci",
+    "ofConversations": "sur {limit} conversations",
+    "unlimitedConversations": "conversations · illimitées",
+    "billingDates": "Consultez les dates de facturation exactes dans le portail client →",
+    "choosePlan": "Choisir un forfait",
+    "changePlan": "Changer de forfait",
+    "currentPlanLabel": "Forfait actuel",
+    "upgrade": "Mettre à niveau",
+    "redirecting": "Redirection…",
+    "billingHistory": "Historique de facturation",
+    "date": "Date",
+    "amount": "Montant",
+    "status": "Statut",
+    "download": "Télécharger",
+    "perMonth": "/mois",
+    "checkoutFailed": "Échec du paiement — réessayez.",
+    "portalFailed": "Impossible d'ouvrir le portail de facturation.",
+    "networkError": "Erreur réseau — veuillez réessayer."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "saveChanges": "Sauvegarder",
+    "saveServices": "Sauvegarder les services",
+    "saving": "Sauvegarde…",
+    "saved": "Sauvegardé ✓",
+    "noAgent": "Aucun agent configuré",
+    "setupAgent": "Configurer votre agent",
+    "tabs": {
+      "identity": "Identité",
+      "services": "Services",
+      "qualification": "Qualification",
+      "personality": "Personnalité",
+      "instructions": "Instructions",
+      "integrations": "Intégrations",
+      "notifications": "Notifications"
+    },
+    "identity": {
+      "sectionTitle": "Identité de l'agent",
+      "agentName": "Nom de l'agent",
+      "businessName": "Nom de l'entreprise",
+      "sector": "Secteur",
+      "sectors": {
+        "pool": "Piscine & Spa",
+        "lawn": "Gazon & Aménagement",
+        "cleaning": "Nettoyage",
+        "hvac": "CVC",
+        "construction": "Construction & Rénovation",
+        "other": "Autre"
+      }
+    },
+    "services": {
+      "sectionTitle": "Services & tarification",
+      "servicePlaceholder": "Nom du service",
+      "addService": "Ajouter un service",
+      "contractValue": "Valeur de contrat moyenne"
+    },
+    "qualification": {
+      "sectionTitle": "Qualification des leads",
+      "questionsLabel": "Questions de qualification",
+      "questionPlaceholder": "Question {n}",
+      "addQuestion": "Ajouter une question",
+      "disqualLabel": "Critères de disqualification",
+      "disqualPlaceholder": "Les leads qui ne correspondent pas à ces critères ne seront pas qualifiés..."
+    },
+    "personality": {
+      "sectionTitle": "Ton & personnalité",
+      "toneLabel": "Ton",
+      "tones": {
+        "professional": "Professionnel",
+        "friendly": "Chaleureux",
+        "direct": "Direct"
+      },
+      "languageLabel": "Langue de l'agent",
+      "bilingualLabel": "Bilingue",
+      "bilingualDesc": "L'agent répond en FR et EN",
+      "hoursLabel": "Heures d'ouverture",
+      "openLabel": "Ouvre",
+      "closesLabel": "Ferme",
+      "days": {
+        "Mon": "Lun", "Tue": "Mar", "Wed": "Mer",
+        "Thu": "Jeu", "Fri": "Ven", "Sat": "Sam", "Sun": "Dim"
+      }
+    },
+    "instructions": {
+      "sectionTitle": "Instructions",
+      "serviceAreaLabel": "Zone de service",
+      "serviceAreaPlaceholder": "Grand Montréal, Laval, Longueuil...",
+      "promotionsLabel": "Promotions en cours",
+      "promotionsPlaceholder": "ex. 10% de rabais sur le premier service...",
+      "neverSayLabel": "Ne jamais dire",
+      "neverSayPlaceholder": "ex. noms de concurrents...",
+      "escalationLabel": "Critères d'escalade",
+      "escalationPlaceholder": "ex. client mécontent, question juridique..."
+    },
+    "integrations": {
+      "twilioTitle": "Twilio",
+      "accountSid": "Account SID",
+      "authToken": "Auth token",
+      "phone": "Numéro de téléphone",
+      "testConnection": "Tester la connexion",
+      "testing": "Test en cours…",
+      "connected": "Connecté",
+      "webhookLabel": "URL du webhook",
+      "copy": "Copier",
+      "copied": "Copié ✓",
+      "facebookTitle": "Facebook Messenger",
+      "pageId": "ID de la page",
+      "accessToken": "Jeton d'accès",
+      "verifyToken": "Jeton de vérification",
+      "verifyTokenDesc": "Copiez ceci dans le champ de jeton de vérification de votre webhook Facebook.",
+      "webhookUrlDesc": "Utilisez cette URL comme callback de votre webhook Facebook Messenger:",
+      "invalidCreds": "Identifiants invalides.",
+      "networkError": "Erreur réseau — réessayez."
+    },
+    "notifications": {
+      "sectionTitle": "Notifications par courriel",
+      "sentTo": "Notifications envoyées à",
+      "newLead": "Nouveau lead reçu",
+      "newLeadDesc": "Soyez notifié lorsque votre agent capte un nouveau lead par SMS ou pub Facebook.",
+      "dealClosed": "Affaire conclue",
+      "dealClosedDesc": "Soyez notifié lorsqu'un lead est marqué comme conclu.",
+      "email": "Courriel de notification",
+      "emailDesc": "Les notifications sont envoyées à votre courriel de compte."
+    }
+  }
+}

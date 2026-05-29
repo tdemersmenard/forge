@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 import type { ConvRow } from "../page";
 
 type Thread = {
@@ -11,10 +12,10 @@ type Thread = {
   lastMessage: ConvRow;
 };
 
-function sourceLabel(source: string | null) {
-  if (source === "facebook") return "Facebook Ad";
-  if (source === "manual") return "Manual";
-  return "SMS";
+function getSourceLabel(source: string | null, t: (k: string) => string) {
+  if (source === "facebook") return t("source.facebook");
+  if (source === "manual") return t("source.manual");
+  return t("source.sms");
 }
 
 function sourceBadgeStyle(source: string | null) {
@@ -75,6 +76,7 @@ interface Props {
 }
 
 export function ConversationsClient({ agentIds, initialConversations }: Props) {
+  const t = useTranslations("conversations");
   const [conversations, setConversations] =
     useState<ConvRow[]>(initialConversations);
   const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
@@ -221,7 +223,7 @@ export function ConversationsClient({ agentIds, initialConversations }: Props) {
                         <span
                           className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${sourceBadgeStyle(thread.lastMessage.source)}`}
                         >
-                          {sourceLabel(thread.lastMessage.source)}
+                          {getSourceLabel(thread.lastMessage.source, t)}
                         </span>
                         <span
                           className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${statusStyle(latestStatus)}`}
@@ -256,7 +258,7 @@ export function ConversationsClient({ agentIds, initialConversations }: Props) {
                 <span
                   className={`rounded-full border px-2 py-0.5 text-xs font-medium ${sourceBadgeStyle(selectedThread.lastMessage.source)}`}
                 >
-                  {sourceLabel(selectedThread.lastMessage.source)}
+                  {getSourceLabel(selectedThread.lastMessage.source, t)}
                 </span>
                 <span
                   className={`rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyle(

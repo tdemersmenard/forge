@@ -3,84 +3,32 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const SECTORS = [
-  { id: "pool", label: "Pool & Spa", emoji: "🏊" },
-  { id: "lawn", label: "Lawn & Landscaping", emoji: "🌿" },
-  { id: "cleaning", label: "Cleaning", emoji: "🏠" },
-  { id: "hvac", label: "HVAC", emoji: "🔧" },
-  { id: "construction", label: "Construction & Renovation", emoji: "🔨" },
-  { id: "other", label: "Other", emoji: "✨" },
+  { id: "pool", emoji: "🏊" },
+  { id: "lawn", emoji: "🌿" },
+  { id: "cleaning", emoji: "🏠" },
+  { id: "hvac", emoji: "🔧" },
+  { id: "construction", emoji: "🔨" },
+  { id: "other", emoji: "✨" },
 ];
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const DEFAULT_QUESTIONS: Record<string, string[]> = {
-  pool: [
-    "What size is your pool?",
-    "Is your pool above or in-ground?",
-    "What city are you located in?",
-  ],
-  lawn: [
-    "How large is your property?",
-    "Do you need weekly or bi-weekly service?",
-    "What city are you in?",
-  ],
-  cleaning: [
-    "How many rooms?",
-    "Residential or commercial?",
-    "How often do you need cleaning?",
-  ],
-  hvac: [
-    "What type of system do you have?",
-    "When was your last maintenance?",
-    "What city are you in?",
-  ],
-  construction: [
-    "What type of renovation are you planning?",
-    "What is your approximate budget?",
-    "What city are you in?",
-  ],
-  other: [
-    "What are you looking for?",
-    "What city are you in?",
-    "What is your budget?",
-  ],
-};
+const TONES = [
+  { id: "professional", emoji: "🎯" },
+  { id: "friendly", emoji: "😊" },
+  { id: "direct", emoji: "⚡" },
+];
 
 const CONTRACT_VALUES = [
   "Under $500",
   "$500–$2,000",
   "$2,000–$5,000",
   "$5,000+",
-];
-
-const TONES = [
-  {
-    id: "professional",
-    label: "Professional",
-    emoji: "🎯",
-    desc: "Formal, precise, builds trust fast.",
-    example:
-      "Bonjour! Je suis Max, assistant de Piscine Pro. Comment puis-je vous aider aujourd'hui?",
-  },
-  {
-    id: "friendly",
-    label: "Friendly",
-    emoji: "😊",
-    desc: "Warm, approachable, feels human.",
-    example:
-      "Salut! Moi c'est Max de Piscine Pro 😊 Super content de vous entendre! Comment je peux vous aider?",
-  },
-  {
-    id: "direct",
-    label: "Direct",
-    emoji: "⚡",
-    desc: "Fast, no fluff, straight to the point.",
-    example: "Max ici — Piscine Pro. C'est quoi votre besoin?",
-  },
 ];
 
 const UNITS = ["fixed", "per visit", "per sqft", "custom"];
@@ -131,6 +79,7 @@ function newService(): ServiceItem {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const t = useTranslations("onboarding");
   const [step, setStep] = useState(1);
   const [visible, setVisible] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -172,14 +121,15 @@ export default function OnboardingPage() {
   // Step entry animation
   useEffect(() => {
     setVisible(false);
-    const t = setTimeout(() => setVisible(true), 40);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setVisible(true), 40);
+    return () => clearTimeout(timer);
   }, [step]);
 
   // Auto-populate qualification questions when sector changes
   useEffect(() => {
     if (!form.sector) return;
-    const qs = DEFAULT_QUESTIONS[form.sector] ?? DEFAULT_QUESTIONS.other;
+    const defaultQs = t.raw("defaultQuestions") as Record<string, string[]>;
+    const qs = defaultQs[form.sector] ?? defaultQs.other ?? [];
     setForm((prev) => ({ ...prev, qualificationQuestions: qs }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.sector]);
@@ -191,35 +141,31 @@ export default function OnboardingPage() {
     setDeployIndex(-1);
     setError(null);
 
-    const agentName = form.agentName;
     const labels = [
-      "Saving your business profile...",
-      "Generating agent personality...",
-      "Loading your services and pricing...",
-      "Calibrating qualification questions...",
-      agentName
-        ? `Your agent ${agentName} is ready.`
-        : "Your agent is ready.",
+      t("step7.profile"),
+      t("step7.personality"),
+      t("step7.services"),
+      t("step7.questions"),
+      form.agentName
+        ? t("step7.readyNamed", { name: form.agentName })
+        : t("step7.ready"),
     ];
 
     const timers: ReturnType<typeof setTimeout>[] = [];
 
-    // Show checklist items with staggered delays
     labels.forEach((_, i) => {
       timers.push(setTimeout(() => setDeployIndex(i), 400 + i * 600));
     });
 
-    // Save data concurrently with animation
     timers.push(
       setTimeout(() => {
         saveAgent().catch((e) => {
           console.error("Save error:", e);
-          setError("Failed to save agent data. Please try again.");
+          setError(t("saveError"));
         });
       }, 200)
     );
 
-    // Redirect after animation completes
     const totalDuration = 400 + labels.length * 600 + 700;
     timers.push(
       setTimeout(() => {
@@ -250,7 +196,7 @@ export default function OnboardingPage() {
     if (step === 3)
       return form.qualificationQuestions.some((q) => q.trim() !== "");
     if (step === 4) return form.tone !== "";
-    return true; // steps 5, 6 optional; step 7 is automated
+    return true;
   }
 
   async function saveAgent() {
@@ -393,13 +339,13 @@ export default function OnboardingPage() {
   }
 
   const deployLabels = [
-    "Saving your business profile...",
-    "Generating agent personality...",
-    "Loading your services and pricing...",
-    "Calibrating qualification questions...",
+    t("step7.profile"),
+    t("step7.personality"),
+    t("step7.services"),
+    t("step7.questions"),
     form.agentName
-      ? `Your agent ${form.agentName} is ready.`
-      : "Your agent is ready.",
+      ? t("step7.readyNamed", { name: form.agentName })
+      : t("step7.ready"),
   ];
 
   const inputCls =
@@ -427,7 +373,7 @@ export default function OnboardingPage() {
         </div>
         {step < TOTAL_STEPS && (
           <span className="text-xs text-white/35">
-            Step {step} of {TOTAL_STEPS}
+            {t("stepOf", { step, total: TOTAL_STEPS })}
           </span>
         )}
       </header>
@@ -463,41 +409,40 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  First, let&apos;s name your agent.
+                  {t("step1.title")}
                 </h1>
                 <p className="mt-2 text-base text-white/50">
-                  Your agent will introduce itself by this name when texting
-                  your leads.
+                  {t("step1.subtitle")}
                 </p>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    Agent name
+                    {t("step1.agentNameLabel")}
                   </label>
                   <input
                     type="text"
                     value={form.agentName}
                     onChange={(e) => set("agentName", e.target.value)}
-                    placeholder="Max, Sophie, Alex..."
+                    placeholder={t("step1.agentNamePlaceholder")}
                     className={inputCls}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    Business name
+                    {t("step1.businessNameLabel")}
                   </label>
                   <input
                     type="text"
                     value={form.businessName}
                     onChange={(e) => set("businessName", e.target.value)}
-                    placeholder="Piscine Pro, GreenLawn..."
+                    placeholder={t("step1.businessNamePlaceholder")}
                     className={inputCls}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-medium text-white/50">
-                    Sector
+                    {t("step1.sectorLabel")}
                   </label>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     {SECTORS.map((s) => (
@@ -513,7 +458,7 @@ export default function OnboardingPage() {
                       >
                         <span className="text-xl">{s.emoji}</span>
                         <span className="text-xs font-medium leading-snug">
-                          {s.label}
+                          {t(`step1.sectors.${s.id}`)}
                         </span>
                       </button>
                     ))}
@@ -530,11 +475,10 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  What do you offer, and at what price?
+                  {t("step2.title")}
                 </h1>
                 <p className="mt-2 text-base text-white/50">
-                  Your agent will know exactly what to pitch and how much to
-                  charge.
+                  {t("step2.subtitle")}
                 </p>
               </div>
               <div className="flex flex-col gap-3">
@@ -546,7 +490,7 @@ export default function OnboardingPage() {
                       onChange={(e) =>
                         updateService(svc.id, "name", e.target.value)
                       }
-                      placeholder="Full season maintenance"
+                      placeholder={t("step2.servicePlaceholder")}
                       className="h-10 flex-[3] rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                     />
                     <div className="flex items-center">
@@ -580,12 +524,7 @@ export default function OnboardingPage() {
                       disabled={form.servicesList.length <= 1}
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] text-white/25 transition-colors hover:border-red-500/30 hover:text-red-400 disabled:opacity-25"
                     >
-                      <svg
-                        width="13"
-                        height="13"
-                        viewBox="0 0 13 13"
-                        fill="none"
-                      >
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
                         <path
                           d="M2.5 4.5h8M5 4.5V3h3v1.5M5.5 6.5v3M7.5 6.5v3M3 4.5l.5 6.5h6L10 4.5"
                           stroke="currentColor"
@@ -603,12 +542,7 @@ export default function OnboardingPage() {
                     onClick={addService}
                     className="flex w-fit items-center gap-1.5 text-xs text-white/35 transition-colors hover:text-white/70"
                   >
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                    >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                       <path
                         d="M6 2v8M2 6h8"
                         stroke="currentColor"
@@ -616,13 +550,13 @@ export default function OnboardingPage() {
                         strokeLinecap="round"
                       />
                     </svg>
-                    Add a service
+                    {t("step2.addService")}
                   </button>
                 )}
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium text-white/50">
-                  Average contract value
+                  {t("step2.contractValueLabel")}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {CONTRACT_VALUES.map((v) => (
@@ -651,11 +585,10 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  What should your agent ask leads?
+                  {t("step3.title")}
                 </h1>
                 <p className="mt-2 text-base text-white/50">
-                  These questions help your agent qualify and prioritize the
-                  right clients.
+                  {t("step3.subtitle")}
                 </p>
               </div>
               <div className="flex flex-col gap-3">
@@ -668,7 +601,7 @@ export default function OnboardingPage() {
                       type="text"
                       value={q}
                       onChange={(e) => updateQuestion(i, e.target.value)}
-                      placeholder={`Question ${i + 1}`}
+                      placeholder={t("step3.questionPlaceholder")}
                       className="h-10 flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                     />
                     {form.qualificationQuestions.length > 1 && (
@@ -677,12 +610,7 @@ export default function OnboardingPage() {
                         onClick={() => removeQuestion(i)}
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] text-white/25 transition-colors hover:border-red-500/30 hover:text-red-400"
                       >
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 12 12"
-                          fill="none"
-                        >
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                           <path
                             d="M2 6h8"
                             stroke="currentColor"
@@ -700,12 +628,7 @@ export default function OnboardingPage() {
                     onClick={addQuestion}
                     className="ml-7 flex w-fit items-center gap-1.5 text-xs text-white/35 transition-colors hover:text-white/70"
                   >
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                    >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                       <path
                         d="M6 2v8M2 6h8"
                         stroke="currentColor"
@@ -713,13 +636,13 @@ export default function OnboardingPage() {
                         strokeLinecap="round"
                       />
                     </svg>
-                    Add a question
+                    {t("step3.addQuestion")}
                   </button>
                 )}
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-white/50">
-                  When should your agent stop the conversation?
+                  {t("step3.disqualLabel")}
                 </label>
                 <textarea
                   value={form.disqualificationCriteria}
@@ -727,7 +650,7 @@ export default function OnboardingPage() {
                     set("disqualificationCriteria", e.target.value)
                   }
                   rows={3}
-                  placeholder="Ex: If client is outside our service area, or budget is under $500, or looking for services we don't offer."
+                  placeholder={t("step3.disqualPlaceholder")}
                   className={textareaCls}
                 />
               </div>
@@ -741,28 +664,30 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  How should your agent communicate?
+                  {t("step4.title")}
                 </h1>
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                {TONES.map((t) => (
+                {TONES.map((tone) => (
                   <button
-                    key={t.id}
+                    key={tone.id}
                     type="button"
-                    onClick={() => set("tone", t.id)}
+                    onClick={() => set("tone", tone.id)}
                     className={`rounded-xl border p-5 text-left transition-colors ${
-                      form.tone === t.id
+                      form.tone === tone.id
                         ? "border-white bg-white/[0.06]"
                         : "border-white/[0.07] bg-white/[0.02] hover:border-white/20"
                     }`}
                   >
-                    <div className="mb-2 text-2xl">{t.emoji}</div>
+                    <div className="mb-2 text-2xl">{tone.emoji}</div>
                     <div className="mb-1 text-sm font-semibold text-white">
-                      {t.label}
+                      {t(`step4.${tone.id}.label`)}
                     </div>
-                    <div className="mb-3 text-xs text-white/40">{t.desc}</div>
+                    <div className="mb-3 text-xs text-white/40">
+                      {t(`step4.${tone.id}.desc`)}
+                    </div>
                     <div className="rounded-lg border border-white/[0.06] bg-white/[0.03] p-2.5 text-xs italic leading-relaxed text-white/45">
-                      &ldquo;{t.example}&rdquo;
+                      &ldquo;{t(`step4.${tone.id}.example`)}&rdquo;
                     </div>
                   </button>
                 ))}
@@ -770,7 +695,7 @@ export default function OnboardingPage() {
               <div className="flex flex-col gap-5">
                 <div>
                   <label className="mb-2 block text-xs font-medium text-white/50">
-                    Language
+                    {t("step4.languageLabel")}
                   </label>
                   <div className="flex gap-2">
                     {["FR", "EN"].map((lang) => (
@@ -797,16 +722,16 @@ export default function OnboardingPage() {
                     className="h-4 w-4 rounded accent-white"
                   />
                   <span className="text-sm text-white/55">
-                    Respond in both languages automatically
+                    {t("step4.bilingualLabel")}
                   </span>
                 </label>
                 <div>
                   <label className="mb-2 block text-xs font-medium text-white/50">
-                    Business hours
+                    {t("step4.hoursLabel")}
                   </label>
                   <div className="mb-3 flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-white/35">Opens at</span>
+                      <span className="text-xs text-white/35">{t("step4.openLabel")}</span>
                       <input
                         type="time"
                         value={form.openTime}
@@ -815,7 +740,7 @@ export default function OnboardingPage() {
                       />
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-white/35">Closes at</span>
+                      <span className="text-xs text-white/35">{t("step4.closesLabel")}</span>
                       <input
                         type="time"
                         value={form.closeTime}
@@ -836,14 +761,10 @@ export default function OnboardingPage() {
                             : "border-white/10 text-white/30 hover:border-white/20 hover:text-white/60"
                         }`}
                       >
-                        {d}
+                        {t(`step4.days.${d}`)}
                       </button>
                     ))}
                   </div>
-                  <p className="mt-2 text-xs text-white/25">
-                    Outside hours, your agent will let leads know you&apos;ll
-                    follow up soon.
-                  </p>
                 </div>
               </div>
             </div>
@@ -856,55 +777,58 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  Anything else your agent should know?
+                  {t("step5.title")}
                 </h1>
+                <p className="mt-2 text-base text-white/50">
+                  {t("step5.subtitle")}
+                </p>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    Cities or regions you serve
+                    {t("step5.serviceAreaLabel")}
                   </label>
                   <input
                     type="text"
                     value={form.serviceArea}
                     onChange={(e) => set("serviceArea", e.target.value)}
-                    placeholder="Ex: Granby, Bromont, Waterloo, Cowansville"
+                    placeholder={t("step5.serviceAreaPlaceholder")}
                     className={inputCls}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    Any active promotions?
+                    {t("step5.promotionsLabel")}
                   </label>
                   <textarea
                     value={form.promotions}
                     onChange={(e) => set("promotions", e.target.value)}
                     rows={2}
-                    placeholder="Ex: 10% off pool opening before May 31st"
+                    placeholder={t("step5.promotionsPlaceholder")}
                     className={textareaCls}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    Topics your agent should avoid
+                    {t("step5.neverSayLabel")}
                   </label>
                   <textarea
                     value={form.neverSay}
                     onChange={(e) => set("neverSay", e.target.value)}
                     rows={2}
-                    placeholder="Ex: Never discuss competitor pricing. Never promise same-day service."
+                    placeholder={t("step5.neverSayPlaceholder")}
                     className={textareaCls}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    When should the agent flag a conversation for you?
+                    {t("step5.escalationLabel")}
                   </label>
                   <textarea
                     value={form.escalationCriteria}
                     onChange={(e) => set("escalationCriteria", e.target.value)}
                     rows={2}
-                    placeholder="Ex: If client is angry, if deal is over $5,000, if client asks to speak to a human."
+                    placeholder={t("step5.escalationPlaceholder")}
                     className={textareaCls}
                   />
                 </div>
@@ -919,10 +843,10 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-7">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  Activate your agent.
+                  {t("step6.title")}
                 </h1>
                 <p className="mt-2 text-base text-white/50">
-                  Your agent needs a phone number to text your leads.
+                  {t("step6.subtitle")}
                 </p>
               </div>
 
@@ -963,7 +887,7 @@ export default function OnboardingPage() {
                     ) : (
                       <div className="flex flex-1 flex-wrap items-center gap-2 pt-0.5">
                         <p className="text-sm text-white/45">
-                          Set the webhook URL to:
+                          {t("step6.webhookInstructions")}
                         </p>
                         <div className="flex items-center gap-1.5">
                           <code className="rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-xs text-white/60">
@@ -974,7 +898,7 @@ export default function OnboardingPage() {
                             onClick={copyWebhookUrl}
                             className="rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs text-white/40 transition-colors hover:text-white/70"
                           >
-                            {urlCopied ? "Copied!" : "Copy"}
+                            {urlCopied ? t("step6.copied") : t("step6.copy")}
                           </button>
                         </div>
                       </div>
@@ -987,7 +911,7 @@ export default function OnboardingPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    Twilio Account SID
+                    {t("step6.accountSidLabel")}
                   </label>
                   <input
                     type="text"
@@ -996,13 +920,13 @@ export default function OnboardingPage() {
                       set("twilioAccountSid", e.target.value);
                       setTwilioStatus("idle");
                     }}
-                    placeholder="ACxxxxxxxxxxxxxxxx"
+                    placeholder={t("step6.accountSidPlaceholder")}
                     className="h-11 rounded-lg border border-white/10 bg-white/[0.04] px-3 font-mono text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    Twilio Auth Token
+                    {t("step6.authTokenLabel")}
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -1021,50 +945,15 @@ export default function OnboardingPage() {
                       className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-white/35 transition-colors hover:text-white/70"
                     >
                       {showTwilioToken ? (
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 14 14"
-                          fill="none"
-                        >
-                          <path
-                            d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"
-                            stroke="currentColor"
-                            strokeWidth="1.2"
-                          />
-                          <circle
-                            cx="7"
-                            cy="7"
-                            r="1.5"
-                            stroke="currentColor"
-                            strokeWidth="1.2"
-                          />
-                          <path
-                            d="M2 2l10 10"
-                            stroke="currentColor"
-                            strokeWidth="1.2"
-                            strokeLinecap="round"
-                          />
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                          <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+                          <path d="M2 2l10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                         </svg>
                       ) : (
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 14 14"
-                          fill="none"
-                        >
-                          <path
-                            d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"
-                            stroke="currentColor"
-                            strokeWidth="1.2"
-                          />
-                          <circle
-                            cx="7"
-                            cy="7"
-                            r="1.5"
-                            stroke="currentColor"
-                            strokeWidth="1.2"
-                          />
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                          <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
                         </svg>
                       )}
                     </button>
@@ -1072,7 +961,7 @@ export default function OnboardingPage() {
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
-                    Your Twilio phone number
+                    {t("step6.phoneLabel")}
                   </label>
                   <input
                     type="tel"
@@ -1081,7 +970,7 @@ export default function OnboardingPage() {
                       set("phone", e.target.value);
                       setTwilioStatus("idle");
                     }}
-                    placeholder="+15141234567"
+                    placeholder={t("step6.phonePlaceholder")}
                     className={inputCls}
                   />
                 </div>
@@ -1097,11 +986,11 @@ export default function OnboardingPage() {
                     }
                     className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:border-white/20 hover:text-white disabled:opacity-40"
                   >
-                    {twilioStatus === "loading" ? "Testing…" : "Test connection"}
+                    {twilioStatus === "loading" ? t("step6.testing") : t("step6.testConnection")}
                   </button>
                   {twilioStatus === "success" && (
                     <span className="text-sm text-emerald-400">
-                      ✓ Connected
+                      ✓ {t("step6.connected")}
                     </span>
                   )}
                   {twilioStatus === "error" && (
@@ -1117,7 +1006,7 @@ export default function OnboardingPage() {
                 onClick={() => setStep(7)}
                 className="w-fit text-xs text-white/25 underline underline-offset-4 transition-colors hover:text-white/50"
               >
-                I&apos;ll set this up later from my dashboard
+                {t("skip")}
               </button>
             </div>
           )}
@@ -1129,7 +1018,7 @@ export default function OnboardingPage() {
             <div className="flex flex-col items-center gap-10 py-8">
               <div className="text-center">
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  Forge is building your agent.
+                  {t("step7.title")}
                 </h1>
               </div>
               <div className="flex w-full max-w-sm flex-col gap-4">
@@ -1183,7 +1072,7 @@ export default function OnboardingPage() {
                 onClick={() => setStep((s) => s - 1)}
                 className="rounded-lg border border-white/10 px-5 py-2 text-sm font-medium text-white/55 transition-colors hover:border-white/20 hover:text-white"
               >
-                ← Back
+                ← {t("back")}
               </button>
             ) : (
               <div />
@@ -1194,7 +1083,7 @@ export default function OnboardingPage() {
               disabled={!canProceed()}
               className="rounded-lg bg-white px-6 py-2 text-sm font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-35"
             >
-              {step === 6 ? "Deploy my agent →" : "Continue →"}
+              {step === 6 ? `${t("next")} →` : `${t("next")} →`}
             </button>
           </div>
         </footer>
