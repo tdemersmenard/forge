@@ -1,5 +1,6 @@
 import twilio from "twilio";
 import { createClient } from "@/lib/supabase/server";
+import { TwilioTestSchema } from "@/lib/schemas/agent";
 
 // In-memory rate limit: max 10 requests per user per hour
 const rateLimitMap = new Map<string, number[]>();
@@ -32,21 +33,18 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: { twilio_account_sid?: string; twilio_auth_token?: string; phone?: string };
+  let rawBody: unknown;
   try {
-    body = await request.json();
+    rawBody = await request.json();
   } catch {
     return Response.json({ success: false, error: "Invalid request." }, { status: 400 });
   }
 
-  const { twilio_account_sid, twilio_auth_token, phone } = body;
-
-  if (!twilio_account_sid || !twilio_auth_token) {
-    return Response.json(
-      { success: false, error: "Account SID and Auth Token are required." },
-      { status: 400 }
-    );
+  const parsed = TwilioTestSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return Response.json({ success: false, error: "Invalid credentials format." }, { status: 400 });
   }
+  const { twilio_account_sid, twilio_auth_token, phone } = parsed.data;
 
   try {
     const client = twilio(twilio_account_sid, twilio_auth_token);

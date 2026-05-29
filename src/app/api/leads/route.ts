@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { LeadCreateSchema } from "@/lib/schemas/agent";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -9,23 +10,18 @@ export async function POST(request: Request) {
 
   if (!user) return new Response("Unauthorized", { status: 401 });
 
-  let body: {
-    firstName: string;
-    lastName?: string;
-    phone: string;
-    email?: string;
-    note?: string;
-  };
-
+  let rawBody: unknown;
   try {
-    body = await request.json();
+    rawBody = await request.json();
   } catch {
     return new Response("Bad request", { status: 400 });
   }
 
-  if (!body.firstName || !body.phone) {
-    return Response.json({ error: "firstName and phone are required" }, { status: 400 });
+  const parsed = LeadCreateSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return Response.json({ error: "Validation failed", details: parsed.error.format() }, { status: 400 });
   }
+  const body = parsed.data;
 
   // Get agent for this user
   const { data: agentRow } = await supabase
@@ -39,7 +35,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "No agent found" }, { status: 404 });
   }
 
-  const contactName = [body.firstName, body.lastName].filter(Boolean).join(" ");
+  const contactName = [body.firstName, body.lastName ?? ""].filter(Boolean).join(" ");
   const supabaseAdmin = createAdminClient();
 
   // Insert conversation row

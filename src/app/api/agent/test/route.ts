@@ -1,5 +1,21 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAnthropicClient } from "@/lib/claude";
+import { AgentTestSchema } from "@/lib/schemas/agent";
+
+// In-memory rate limit: max 30 requests per user per hour
+const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT_MAX = 30;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+
+function isRateLimited(userId: string): boolean {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+  const timestamps = (rateLimitMap.get(userId) ?? []).filter((t) => t > windowStart);
+  if (timestamps.length >= RATE_LIMIT_MAX) return true;
+  timestamps.push(now);
+  rateLimitMap.set(userId, timestamps);
+  return false;
+}
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -8,14 +24,25 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
-  let message: string;
+  if (isRateLimited(user.id)) {
+    return Response.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+  }
+
+  let rawBody: unknown;
   try {
-    const body = await request.json();
-    message = body.message;
+    rawBody = await request.json();
   } catch {
     return new Response("Bad request", { status: 400 });
   }
-  if (!message?.trim()) return new Response("Missing message", { status: 400 });
+
+  const parsed = AgentTestSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return Response.json({ error: "Validation failed", details: parsed.error.format() }, { status: 400 });
+  }
+  const { message } = parsed.data;
 
   const { data: agents } = await supabase
     .from("agents")

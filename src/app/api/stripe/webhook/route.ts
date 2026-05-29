@@ -38,8 +38,6 @@ export async function POST(request: Request) {
   const rawBody = await request.text();
   const signature = request.headers.get("stripe-signature");
 
-  console.log("[webhook] received event, signature present:", !!signature);
-
   if (!signature) return new Response("Missing signature", { status: 400 });
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -57,27 +55,45 @@ export async function POST(request: Request) {
     return new Response("Invalid signature", { status: 400 });
   }
 
-  console.log("[webhook] event type:", event.type, "id:", event.id);
+  console.log("[webhook] event:", event.type);
 
   const stripe = getStripe();
 
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
-      console.log("[webhook] checkout.session.completed — session id:", session.id);
-      console.log("[webhook] metadata:", JSON.stringify(session.metadata));
-      console.log("[webhook] client_reference_id:", session.client_reference_id);
 
       // user_id from metadata (primary) or client_reference_id (fallback)
       const userId =
         session.metadata?.user_id ?? session.client_reference_id ?? null;
-      const plan = session.metadata?.plan ?? "starter";
+
+      // Validate plan from metadata against whitelist
+      const planFromMetadata = session.metadata?.plan;
+      const validPlanIds = PLANS.map((p) => p.id);
+      if (!planFromMetadata || !validPlanIds.includes(planFromMetadata as typeof PLANS[number]["id"])) {
+        console.error("[webhook] invalid plan in session metadata:", planFromMetadata);
+        return new Response("Invalid plan", { status: 400 });
+      }
+      const plan = planFromMetadata;
+
+      // Cross-check the actual priceId used vs expected for this plan
+      try {
+        const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 });
+        const actualPriceId = items.data[0]?.price?.id;
+        const expectedPriceId = process.env[`STRIPE_PRICE_${plan.toUpperCase()}`];
+        if (!actualPriceId || actualPriceId !== expectedPriceId) {
+          console.error("[webhook] price mismatch", { plan, actualPriceId, expectedPriceId });
+          return new Response("Price mismatch", { status: 400 });
+        }
+      } catch (err) {
+        console.error("[webhook] failed to verify line items:", err);
+        return new Response("Verification failed", { status: 500 });
+      }
+
       const customerId =
         typeof session.customer === "string" ? session.customer : null;
       const subscriptionId =
         typeof session.subscription === "string" ? session.subscription : null;
-
-      console.log("[webhook] userId:", userId, "plan:", plan, "customerId:", customerId, "subscriptionId:", subscriptionId);
 
       if (!userId) {
         console.error("[webhook] no userId — cannot update agent. Check client_reference_id and metadata in checkout session.");
@@ -96,7 +112,6 @@ export async function POST(request: Request) {
       try {
         const sub = await stripe.subscriptions.retrieve(subscriptionId);
         planStatus = sub.status;
-        console.log("[webhook] subscription status:", planStatus);
       } catch (err) {
         console.error("[webhook] failed to retrieve subscription:", err);
       }
@@ -114,7 +129,6 @@ export async function POST(request: Request) {
       if (updateError) {
         console.error("[webhook] supabase update error:", updateError);
       } else {
-        console.log("[webhook] agent updated successfully for user:", userId);
         await trackMetaPurchase(plan);
       }
       break;
@@ -122,7 +136,6 @@ export async function POST(request: Request) {
 
     case "customer.subscription.updated": {
       const sub = event.data.object as Stripe.Subscription;
-      console.log("[webhook] customer.subscription.updated — sub id:", sub.id, "status:", sub.status);
       const { error } = await supabaseAdmin
         .from("agents")
         .update({ plan_status: sub.status })
@@ -133,7 +146,6 @@ export async function POST(request: Request) {
 
     case "customer.subscription.deleted": {
       const sub = event.data.object as Stripe.Subscription;
-      console.log("[webhook] customer.subscription.deleted — sub id:", sub.id);
       const { error } = await supabaseAdmin
         .from("agents")
         .update({ plan_status: "canceled" })
@@ -143,7 +155,6 @@ export async function POST(request: Request) {
     }
 
     default:
-      console.log("[webhook] unhandled event type:", event.type);
   }
 
   return new Response("OK", { status: 200 });

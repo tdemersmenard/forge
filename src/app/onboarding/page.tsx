@@ -438,9 +438,11 @@ export default function OnboardingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.sector, lang]);
 
-  // Persist form to localStorage as user progresses
+  // Persist form to localStorage as user progresses (exclude secrets)
   useEffect(() => {
-    localStorage.setItem("forgee_onboarding_data", JSON.stringify(form));
+    const { twilioAccountSid, twilioAuthToken, ...persistable } = form;
+    void twilioAccountSid; void twilioAuthToken;
+    localStorage.setItem("forgee_onboarding_data", JSON.stringify(persistable));
   }, [form]);
 
   // Deploy animation (step 7)

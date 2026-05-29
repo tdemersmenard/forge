@@ -34,15 +34,13 @@ type OnboardingData = {
   phone: string;
 };
 
-async function saveAgentData(userId: string, data: OnboardingData) {
-  const supabase = createClient();
+async function saveAgentData(data: OnboardingData): Promise<boolean> {
   const filteredServices = data.servicesList.filter((s) => s.name.trim());
   const payload = {
-    user_id: userId,
     agent_name: data.agentName,
     business_name: data.businessName,
     sector: data.sector,
-    services_list: filteredServices,
+    services_list: filteredServices.map(({ name, price, unit }) => ({ name, price, unit })),
     services: filteredServices.map((s) => `${s.name} (${s.price} ${s.unit})`).join(", "),
     contract_value: data.contractValue,
     qualification_questions: data.qualificationQuestions.filter((q) => q.trim()),
@@ -55,11 +53,21 @@ async function saveAgentData(userId: string, data: OnboardingData) {
     promotions: data.promotions || null,
     never_say: data.neverSay || null,
     escalation_criteria: data.escalationCriteria || null,
-    twilio_account_sid: data.twilioAccountSid || null,
-    twilio_auth_token: data.twilioAuthToken || null,
+    twilio_account_sid: (data as OnboardingData & { twilioAccountSid?: string }).twilioAccountSid || null,
+    twilio_auth_token: (data as OnboardingData & { twilioAuthToken?: string }).twilioAuthToken || null,
     phone: data.phone || null,
   };
-  await supabase.from("agents").insert(payload);
+
+  try {
+    const res = await fetch("/api/agent/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 export default function SignupPage() {
@@ -114,12 +122,8 @@ export default function SignupPage() {
       return;
     }
 
-    if (onboardingData && authData.user) {
-      try {
-        await saveAgentData(authData.user.id, onboardingData);
-      } catch {
-        // non-fatal — user still lands on plan page
-      }
+    if (onboardingData) {
+      await saveAgentData(onboardingData);
       localStorage.removeItem("forgee_onboarding_data");
       router.push("/onboarding/plan");
     } else {

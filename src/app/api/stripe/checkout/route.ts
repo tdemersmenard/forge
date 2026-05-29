@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
 import type { PlanId } from "@/lib/plans";
+import { CheckoutSchema } from "@/lib/schemas/agent";
 
 const PRICE_IDS: Record<PlanId, string | undefined> = {
   starter: process.env.STRIPE_PRICE_STARTER,
@@ -22,7 +23,11 @@ export async function POST(request: Request) {
   let plan: PlanId;
   try {
     const body = await request.json();
-    plan = body.plan as PlanId;
+    const parsed = CheckoutSchema.safeParse(body);
+    if (!parsed.success) {
+      return Response.json({ error: "Invalid plan" }, { status: 400 });
+    }
+    plan = parsed.data.plan;
   } catch {
     return new Response("Bad request", { status: 400 });
   }

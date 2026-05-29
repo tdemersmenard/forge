@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 import type { AgentRow } from "./page";
 
@@ -169,9 +168,28 @@ interface Props {
   userEmail: string;
 }
 
+async function callAgentUpdate(
+  section: "identity" | "services" | "qualification" | "personality" | "instructions" | "twilio" | "facebook" | "notifications",
+  data: Record<string, unknown>
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/agent/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ section, data }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { error?: string };
+      return { ok: false, error: body.error ?? "Save failed" };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Network error" };
+  }
+}
+
 export function SettingsClient({ agent, userEmail }: Props) {
   const t = useTranslations("settings");
-  const supabase = createClient();
   const [tab, setTab] = useState<Tab>("identity");
 
   // ── Identity ─────────────────────────────────────────────────────────────
@@ -271,7 +289,12 @@ export function SettingsClient({ agent, userEmail }: Props) {
   async function saveIdentity() {
     if (!agent) return;
     setIdentitySaving(true);
-    await supabase.from("agents").update(identityForm).eq("id", agent.id);
+    const result = await callAgentUpdate("identity", identityForm);
+    if (!result.ok) {
+      console.error("Identity save failed:", result.error);
+      setIdentitySaving(false);
+      return;
+    }
     await markSaved(setIdentitySaving, setIdentitySaved);
   }
 
@@ -279,85 +302,105 @@ export function SettingsClient({ agent, userEmail }: Props) {
     if (!agent) return;
     setServicesSaving(true);
     const filtered = servicesList.filter((s) => s.name.trim());
-    await supabase
-      .from("agents")
-      .update({
-        services_list: filtered,
-        services: filtered.map((s) => `${s.name} (${s.price} ${s.unit})`).join(", "),
-        contract_value: contractValue,
-      })
-      .eq("id", agent.id);
+    const result = await callAgentUpdate("services", {
+      services_list: filtered,
+      services: filtered.map((s) => `${s.name} (${s.price} ${s.unit})`).join(", "),
+      contract_value: contractValue,
+    });
+    if (!result.ok) {
+      console.error("Services save failed:", result.error);
+      setServicesSaving(false);
+      return;
+    }
     await markSaved(setServicesSaving, setServicesSaved);
   }
 
   async function saveQualification() {
     if (!agent) return;
     setQualSaving(true);
-    await supabase
-      .from("agents")
-      .update({
-        qualification_questions: questions.filter((q) => q.trim()),
-        disqualification_criteria: disqualification || null,
-      })
-      .eq("id", agent.id);
+    const result = await callAgentUpdate("qualification", {
+      qualification_questions: questions.filter((q) => q.trim()),
+      disqualification_criteria: disqualification || null,
+    });
+    if (!result.ok) {
+      console.error("Qualification save failed:", result.error);
+      setQualSaving(false);
+      return;
+    }
     await markSaved(setQualSaving, setQualSaved);
   }
 
   async function savePersonality() {
     if (!agent) return;
     setPersonalitySaving(true);
-    await supabase
-      .from("agents")
-      .update({
-        tone: personalityForm.tone,
-        language: personalityForm.language,
-        bilingual: personalityForm.bilingual,
-        business_hours: {
-          openTime: personalityForm.openTime,
-          closeTime: personalityForm.closeTime,
-          days: personalityForm.openDays,
-        },
-      })
-      .eq("id", agent.id);
+    const result = await callAgentUpdate("personality", {
+      tone: personalityForm.tone,
+      language: personalityForm.language,
+      bilingual: personalityForm.bilingual,
+      business_hours: {
+        openTime: personalityForm.openTime,
+        closeTime: personalityForm.closeTime,
+        days: personalityForm.openDays,
+      },
+    });
+    if (!result.ok) {
+      console.error("Personality save failed:", result.error);
+      setPersonalitySaving(false);
+      return;
+    }
     await markSaved(setPersonalitySaving, setPersonalitySaved);
   }
 
   async function saveInstructions() {
     if (!agent) return;
     setInstructionsSaving(true);
-    await supabase
-      .from("agents")
-      .update({
-        service_area: instructionsForm.service_area || null,
-        promotions: instructionsForm.promotions || null,
-        never_say: instructionsForm.never_say || null,
-        escalation_criteria: instructionsForm.escalation_criteria || null,
-      })
-      .eq("id", agent.id);
+    const result = await callAgentUpdate("instructions", {
+      service_area: instructionsForm.service_area || null,
+      promotions: instructionsForm.promotions || null,
+      never_say: instructionsForm.never_say || null,
+      escalation_criteria: instructionsForm.escalation_criteria || null,
+    });
+    if (!result.ok) {
+      console.error("Instructions save failed:", result.error);
+      setInstructionsSaving(false);
+      return;
+    }
     await markSaved(setInstructionsSaving, setInstructionsSaved);
   }
 
   async function saveTwilio() {
     if (!agent) return;
     setTwilioSaving(true);
-    await supabase.from("agents").update(twilioForm).eq("id", agent.id);
+    const result = await callAgentUpdate("twilio", twilioForm);
+    if (!result.ok) {
+      console.error("Twilio save failed:", result.error);
+      setTwilioSaving(false);
+      return;
+    }
     await markSaved(setTwilioSaving, setTwilioSaved);
   }
 
   async function saveFacebook() {
     if (!agent) return;
     setFbSaving(true);
-    await supabase.from("agents").update(fbForm).eq("id", agent.id);
+    const result = await callAgentUpdate("facebook", fbForm);
+    if (!result.ok) {
+      console.error("Facebook save failed:", result.error);
+      setFbSaving(false);
+      return;
+    }
     await markSaved(setFbSaving, setFbSaved);
   }
 
   async function saveNotifications() {
     if (!agent) return;
     setNotifSaving(true);
-    await supabase
-      .from("agents")
-      .update({ notifications_prefs: notifForm })
-      .eq("id", agent.id);
+    const result = await callAgentUpdate("notifications", { notifications_prefs: notifForm });
+    if (!result.ok) {
+      console.error("Notifications save failed:", result.error);
+      setNotifSaving(false);
+      return;
+    }
     await markSaved(setNotifSaving, setNotifSaved);
   }
 
