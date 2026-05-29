@@ -36,10 +36,11 @@ export async function POST(request: Request) {
   }
 
   // Check for existing Stripe customer
-  const { data: existingSub } = await supabase
-    .from("subscriptions")
+  const { data: agentRow } = await supabase
+    .from("agents")
     .select("stripe_customer_id")
     .eq("user_id", user.id)
+    .limit(1)
     .single();
 
   const stripe = getStripe();
@@ -55,8 +56,8 @@ export async function POST(request: Request) {
     metadata: { user_id: user.id, plan },
   };
 
-  if (existingSub?.stripe_customer_id) {
-    sessionParams.customer = existingSub.stripe_customer_id;
+  if (agentRow?.stripe_customer_id) {
+    sessionParams.customer = agentRow.stripe_customer_id;
   } else {
     sessionParams.customer_email = user.email;
   }

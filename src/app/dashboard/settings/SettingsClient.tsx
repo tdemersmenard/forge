@@ -160,7 +160,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
   const [urlCopied, setUrlCopied] = useState(false);
   const [showFbToken, setShowFbToken] = useState(false);
 
-  const WEBHOOK_URL = "https://forge-zeta-silk.vercel.app/api/webhook/facebook";
+  const WEBHOOK_URL = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app"}/api/webhook/facebook`;
 
   // ── Notifications tab ──────────────────────────────────────────────────────
   const defaultPrefs = agent?.notifications_prefs ?? {

@@ -6,9 +6,9 @@ import type { PlanId } from "@/lib/plans";
 
 type SubscriptionData = {
   plan: string;
-  status: string;
-  trial_end: string | null;
+  plan_status: string;
   stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
 } | null;
 
 type Invoice = {
@@ -38,7 +38,7 @@ export function BillingClient({
 
   const currentPlan = subscription?.plan ?? "trial";
   const isTrialing =
-    subscription?.status === "trialing" || !subscription;
+    subscription?.plan_status === "trialing" || !subscription;
 
   async function handleUpgrade(planId: PlanId) {
     setCheckoutLoading(planId);
@@ -124,19 +124,19 @@ export function BillingClient({
             <p className="mt-1 text-xl font-semibold capitalize text-white">
               {currentPlan === "trial" ? "Free Trial" : currentPlan}
             </p>
-            {subscription?.status && (
+            {subscription?.plan_status && (
               <span
                 className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                  subscription.status === "active"
+                  subscription.plan_status === "active"
                     ? "bg-emerald-400/10 text-emerald-400"
-                    : subscription.status === "trialing"
+                    : subscription.plan_status === "trialing"
                     ? "bg-amber-400/10 text-amber-400"
-                    : subscription.status === "canceled"
+                    : subscription.plan_status === "canceled"
                     ? "bg-red-400/10 text-red-400"
                     : "bg-white/[0.06] text-white/40"
                 }`}
               >
-                {subscription.status}
+                {subscription.plan_status}
               </span>
             )}
           </div>
@@ -181,7 +181,7 @@ export function BillingClient({
           )}
         </div>
 
-        {subscription?.stripe_customer_id && subscription.status === "active" && (
+        {subscription?.stripe_customer_id && subscription.plan_status === "active" && (
           <p className="mt-4 text-xs text-white/25">
             View exact billing dates in the customer portal →
           </p>

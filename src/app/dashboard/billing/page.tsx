@@ -19,23 +19,23 @@ export default async function BillingPage() {
 
   if (!user) return null;
 
-  // Subscription
+  // Subscription — read from agents table
   let subscription: {
     plan: string;
-    status: string;
-    trial_end: string | null;
+    plan_status: string;
     stripe_customer_id: string | null;
+    stripe_subscription_id: string | null;
   } | null = null;
 
-  try {
-    const { data } = await supabase
-      .from("subscriptions")
-      .select("plan, status, trial_end, stripe_customer_id")
-      .eq("user_id", user.id)
-      .single();
-    subscription = data;
-  } catch {
-    // Table may not exist yet — treat as free trial
+  const { data: agentData } = await supabase
+    .from("agents")
+    .select("plan, plan_status, stripe_customer_id, stripe_subscription_id")
+    .eq("user_id", user.id)
+    .limit(1)
+    .single();
+
+  if (agentData?.plan_status) {
+    subscription = agentData;
   }
 
   // Conversations this month (unique contacts)
@@ -65,11 +65,11 @@ export default async function BillingPage() {
 
   // Stripe invoices
   let invoices: Invoice[] = [];
-  if (subscription?.stripe_customer_id) {
+  if (agentData?.stripe_customer_id) {
     try {
       const stripe = getStripe();
       const list = await stripe.invoices.list({
-        customer: subscription.stripe_customer_id,
+        customer: agentData.stripe_customer_id,
         limit: 10,
       });
       invoices = list.data.map((inv) => ({
@@ -84,16 +84,9 @@ export default async function BillingPage() {
     }
   }
 
-  // Trial days remaining
+  // Trial days remaining — computed from account creation + 7 days
   let trialDaysRemaining: number | null = null;
-  if (subscription?.status === "trialing" && subscription.trial_end) {
-    const end = new Date(subscription.trial_end);
-    trialDaysRemaining = Math.max(
-      0,
-      Math.ceil((end.getTime() - Date.now()) / 86400000)
-    );
-  } else if (!subscription) {
-    // No subscription yet — trial starts from account creation
+  if (!subscription || subscription.plan_status === "trialing") {
     const end = new Date(user.created_at);
     end.setDate(end.getDate() + 7);
     trialDaysRemaining = Math.max(

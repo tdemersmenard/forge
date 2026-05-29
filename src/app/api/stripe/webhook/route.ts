@@ -39,33 +39,24 @@ export async function POST(request: Request) {
 
       const sub = await stripe.subscriptions.retrieve(subscriptionId);
 
-      await supabase.from("subscriptions").upsert(
-        {
-          user_id: userId,
+      await supabase
+        .from("agents")
+        .update({
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptionId,
           plan,
-          status: sub.status,
-          trial_end: sub.trial_end
-            ? new Date(sub.trial_end * 1000).toISOString()
-            : null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      );
+          plan_status: sub.status,
+        })
+        .eq("user_id", userId);
       break;
     }
 
     case "customer.subscription.updated": {
       const sub = event.data.object as Stripe.Subscription;
       await supabase
-        .from("subscriptions")
+        .from("agents")
         .update({
-          status: sub.status,
-          trial_end: sub.trial_end
-            ? new Date(sub.trial_end * 1000).toISOString()
-            : null,
-          updated_at: new Date().toISOString(),
+          plan_status: sub.status,
         })
         .eq("stripe_subscription_id", sub.id);
       break;
@@ -74,10 +65,9 @@ export async function POST(request: Request) {
     case "customer.subscription.deleted": {
       const sub = event.data.object as Stripe.Subscription;
       await supabase
-        .from("subscriptions")
+        .from("agents")
         .update({
-          status: "canceled",
-          updated_at: new Date().toISOString(),
+          plan_status: "canceled",
         })
         .eq("stripe_subscription_id", sub.id);
       break;

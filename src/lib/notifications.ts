@@ -9,7 +9,7 @@ function getResend() {
 const FROM =
   process.env.RESEND_FROM_EMAIL ?? "Forge <onboarding@resend.dev>";
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://yourapp.vercel.app";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app";
 
 export async function sendNewLeadEmail(opts: {
   to: string;

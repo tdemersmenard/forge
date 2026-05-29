@@ -13,9 +13,10 @@ export async function POST() {
   if (!user) return new Response("Unauthorized", { status: 401 });
 
   const { data: sub } = await supabase
-    .from("subscriptions")
+    .from("agents")
     .select("stripe_customer_id")
     .eq("user_id", user.id)
+    .limit(1)
     .single();
 
   if (!sub?.stripe_customer_id) {

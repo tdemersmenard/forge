@@ -3,6 +3,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+function redirectTo(pathname: string, request: NextRequest) {
+  const url = request.nextUrl.clone();
+  url.pathname = pathname;
+  return NextResponse.redirect(url);
+}
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -27,22 +33,44 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // Refresh the session (important: do not run code between createServerClient
-  // and supabase.auth.getUser() — a stale session could cause auth issues).
+  // Refresh session — do NOT add code between createServerClient and getUser
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
-  const isProtected =
-    pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding");
+  const isDashboard = pathname.startsWith("/dashboard");
+  const isOnboarding = pathname.startsWith("/onboarding");
 
-  if (!user && isProtected) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+  // 1. Not authenticated → /login
+  if (!user && (isDashboard || isOnboarding)) {
+    return redirectTo("/login", request);
   }
 
+  // 2. Authenticated, accessing /dashboard/* → check agent + subscription
+  if (user && isDashboard) {
+    const { data: agents } = await supabase
+      .from("agents")
+      .select("id, stripe_subscription_id")
+      .eq("user_id", user.id)
+      .limit(1);
+
+    const agent = agents?.[0] as
+      | { id: string; stripe_subscription_id: string | null }
+      | undefined;
+
+    // No agent yet → send to onboarding wizard
+    if (!agent) {
+      return redirectTo("/onboarding", request);
+    }
+
+    // Agent exists but no active subscription → send to plan selection
+    if (!agent.stripe_subscription_id) {
+      return redirectTo("/onboarding/plan", request);
+    }
+  }
+
+  // 3. Authenticated, accessing /onboarding/* → always allow
   return supabaseResponse;
 }
 

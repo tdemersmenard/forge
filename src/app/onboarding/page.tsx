@@ -500,7 +500,7 @@ export default function OnboardingPage() {
                   In Meta for Developers → Your App → Webhooks, add callback URL:
                 </p>
                 <p className="mt-1 font-mono text-xs text-white/50">
-                  https://yourapp.vercel.app/api/webhook/facebook
+                  {process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app"}/api/webhook/facebook
                 </p>
                 <p className="mt-2 text-xs text-white/30">
                   Subscribe to the <span className="text-white/50">leadgen</span> field on the Page object.
