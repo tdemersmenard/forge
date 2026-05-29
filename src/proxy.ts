@@ -57,6 +57,12 @@ export async function proxy(request: NextRequest) {
 
   // 2. Authenticated + /dashboard → check agent + subscription
   if (user && isDashboard) {
+    // Coming back from Stripe checkout — webhook may not have fired yet,
+    // allow through so the success banner can show while DB catches up
+    const isSuccessCallback =
+      request.nextUrl.searchParams.get("success") === "true";
+    if (isSuccessCallback) return supabaseResponse;
+
     const { data: agents } = await supabase
       .from("agents")
       .select("id, stripe_subscription_id")
