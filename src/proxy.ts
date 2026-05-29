@@ -41,32 +41,47 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isDashboard =
     pathname === "/dashboard" || pathname.startsWith("/dashboard/");
+  const isOnboarding =
+    pathname === "/onboarding" || pathname.startsWith("/onboarding/");
 
-  // 1. Not authenticated → /login
+  // /onboarding and /onboarding/* → always allow through (never redirect away)
+  if (isOnboarding) {
+    if (!user) return redirectTo("/login", request);
+    return supabaseResponse;
+  }
+
+  // 1. Not authenticated trying to reach /dashboard → /login
   if (!user && isDashboard) {
     return redirectTo("/login", request);
   }
 
-  // 2. Authenticated, accessing /dashboard → check agent exists
+  // 2. Authenticated + /dashboard → check agent + subscription
   if (user && isDashboard) {
     const { data: agents } = await supabase
       .from("agents")
-      .select("id")
+      .select("id, stripe_subscription_id")
       .eq("user_id", user.id)
       .limit(1);
 
-    const hasAgent = (agents?.length ?? 0) > 0;
+    const agent = agents?.[0] as
+      | { id: string; stripe_subscription_id: string | null }
+      | undefined;
 
-    // No agent yet → send to onboarding wizard
-    if (!hasAgent) {
+    // No agent yet → onboarding wizard
+    if (!agent) {
       return redirectTo("/onboarding", request);
+    }
+
+    // Agent exists but no subscription → plan selection
+    if (!agent.stripe_subscription_id) {
+      return redirectTo("/onboarding/plan", request);
     }
   }
 
-  // 3. /onboarding/* and everything else → always allow through
+  // 3. Everything else → allow through
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/dashboard", "/dashboard/:path*"],
+  matcher: ["/dashboard", "/dashboard/:path*", "/onboarding", "/onboarding/:path*"],
 };
