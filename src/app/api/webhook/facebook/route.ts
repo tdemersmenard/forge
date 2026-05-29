@@ -22,25 +22,27 @@ export async function POST(req: NextRequest) {
   // 1. Read raw body for signature verification
   const rawBody = await req.text();
 
-  // 2. Verify X-Hub-Signature-256
+  // 2. Verify X-Hub-Signature-256 — fail-closed: reject if secret not configured
   const signature = req.headers.get("x-hub-signature-256");
   const appSecret = process.env.FACEBOOK_APP_SECRET;
-  if (appSecret) {
-    if (!signature) {
-      return new NextResponse("Missing signature", { status: 403 });
-    }
-    const expected = `sha256=${crypto
-      .createHmac("sha256", appSecret)
-      .update(rawBody)
-      .digest("hex")}`;
-    const sigBuffer = Buffer.from(signature);
-    const expBuffer = Buffer.from(expected);
-    if (
-      sigBuffer.length !== expBuffer.length ||
-      !crypto.timingSafeEqual(sigBuffer, expBuffer)
-    ) {
-      return new NextResponse("Invalid signature", { status: 403 });
-    }
+  if (!appSecret) {
+    console.error("FACEBOOK_APP_SECRET is not set — rejecting webhook");
+    return new NextResponse("Server misconfiguration", { status: 500 });
+  }
+  if (!signature) {
+    return new NextResponse("Missing signature", { status: 403 });
+  }
+  const expected = `sha256=${crypto
+    .createHmac("sha256", appSecret)
+    .update(rawBody)
+    .digest("hex")}`;
+  const sigBuffer = Buffer.from(signature);
+  const expBuffer = Buffer.from(expected);
+  if (
+    sigBuffer.length !== expBuffer.length ||
+    !crypto.timingSafeEqual(sigBuffer, expBuffer)
+  ) {
+    return new NextResponse("Invalid signature", { status: 403 });
   }
 
   // 3. Parse payload

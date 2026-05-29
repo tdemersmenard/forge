@@ -53,16 +53,15 @@ export async function proxy(request: NextRequest) {
     return redirectTo("/signup", request);
   }
 
-  // Coming back from Stripe checkout (/dashboard?success=true) — always allow through
-  // so the page can show a success state even if the session expired during checkout
-  if (isDashboard && isSuccessCallback) return supabaseResponse;
-
-  // 1. Not authenticated trying to reach /dashboard → /login
+  // 1. Not authenticated trying to reach /dashboard → /login (always, even with ?success=true)
   if (!user && isDashboard) {
     return redirectTo("/login", request);
   }
 
-  // 2. Authenticated + /dashboard → check agent + subscription
+  // 2. Authenticated + returning from Stripe checkout → allow through so page can handle redirect
+  if (user && isDashboard && isSuccessCallback) return supabaseResponse;
+
+  // 3. Authenticated + /dashboard → check agent + subscription
   if (user && isDashboard) {
     const { data: agents } = await supabase
       .from("agents")

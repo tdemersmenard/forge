@@ -1,6 +1,37 @@
 import twilio from "twilio";
+import { createClient } from "@/lib/supabase/server";
+
+// In-memory rate limit: max 10 requests per user per hour
+const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+
+function isRateLimited(userId: string): boolean {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+  const timestamps = (rateLimitMap.get(userId) ?? []).filter((t) => t > windowStart);
+  if (timestamps.length >= RATE_LIMIT_MAX) return true;
+  timestamps.push(now);
+  rateLimitMap.set(userId, timestamps);
+  return false;
+}
 
 export async function POST(request: Request) {
+  // Require authenticated user
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return Response.json({ success: false, error: "Unauthorized." }, { status: 401 });
+  }
+
+  // Rate limit
+  if (isRateLimited(user.id)) {
+    return Response.json(
+      { success: false, error: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   let body: { twilio_account_sid?: string; twilio_auth_token?: string; phone?: string };
   try {
     body = await request.json();
@@ -32,15 +63,13 @@ export async function POST(request: Request) {
       if (numbers.length === 0) {
         return Response.json({
           success: false,
-          error: `Phone number ${phone} not found in this account.`,
+          error: "Phone number not found in this Twilio account.",
         });
       }
     }
 
     return Response.json({ success: true });
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Could not connect to Twilio.";
-    return Response.json({ success: false, error: message });
+  } catch {
+    return Response.json({ success: false, error: "Could not connect to Twilio. Check your credentials." });
   }
 }

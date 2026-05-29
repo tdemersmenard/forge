@@ -40,6 +40,32 @@ export async function POST(request: Request) {
   type ServiceItem = { name: string; price: string; unit: string };
   type BusinessHours = { openTime: string; closeTime: string; days: string[] };
 
+  // 2a. Validate Twilio webhook signature
+  const twilioSignature = request.headers.get("X-Twilio-Signature") ?? "";
+  const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app"}/api/webhook/twilio`;
+  const rawAgent = agents[0] as { twilio_auth_token?: string | null };
+  const authToken = rawAgent.twilio_auth_token;
+
+  if (!authToken) {
+    console.error("No twilio_auth_token configured for agent with phone:", to);
+    return new Response("<Response/>", {
+      status: 200,
+      headers: { "Content-Type": "text/xml" },
+    });
+  }
+
+  const paramsObj: Record<string, string> = {};
+  params.forEach((value, key) => { paramsObj[key] = value; });
+
+  const isValid = twilio.validateRequest(authToken, twilioSignature, webhookUrl, paramsObj);
+  if (!isValid) {
+    console.warn("Invalid Twilio signature from:", from);
+    return new Response("<Response/>", {
+      status: 403,
+      headers: { "Content-Type": "text/xml" },
+    });
+  }
+
   const agent = agents[0] as {
     id: string;
     user_id: string;
