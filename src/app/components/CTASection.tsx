@@ -20,7 +20,7 @@ export default function CTASection() {
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
-              href="/signup"
+              href="/onboarding"
               className="inline-flex h-11 items-center justify-center rounded-md bg-white px-8 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
             >
               {t("startFree")}

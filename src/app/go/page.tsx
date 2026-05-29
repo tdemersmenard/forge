@@ -36,7 +36,7 @@ function CTAButton() {
   return (
     <div className="flex flex-col items-center gap-2">
       <Link
-        href="/signup"
+        href="/onboarding"
         className="block w-full max-w-sm rounded-xl bg-white px-8 py-4 text-center text-base font-bold text-black transition-opacity hover:opacity-90"
       >
         Start your free 7-day trial →

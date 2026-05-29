@@ -41,13 +41,13 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isDashboard =
     pathname === "/dashboard" || pathname.startsWith("/dashboard/");
-  const isOnboarding =
-    pathname === "/onboarding" || pathname.startsWith("/onboarding/");
+  // /onboarding/plan and sub-paths require auth; /onboarding itself is public
+  const isPlanPage =
+    pathname === "/onboarding/plan" || pathname.startsWith("/onboarding/plan/");
 
-  // /onboarding and /onboarding/* → always allow through (never redirect away)
-  if (isOnboarding) {
-    if (!user) return redirectTo("/login", request);
-    return supabaseResponse;
+  // /onboarding/plan → requires auth
+  if (isPlanPage && !user) {
+    return redirectTo("/signup", request);
   }
 
   // 1. Not authenticated trying to reach /dashboard → /login
@@ -89,5 +89,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard", "/dashboard/:path*", "/onboarding", "/onboarding/:path*"],
+  matcher: ["/dashboard", "/dashboard/:path*", "/onboarding/plan", "/onboarding/plan/:path*"],
 };

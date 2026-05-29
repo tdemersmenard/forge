@@ -37,7 +37,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <LanguageToggle />
           <Link
-            href="/signup"
+            href="/onboarding"
             className="rounded-md bg-white px-4 py-1.5 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
           >
             {t("getStarted")}

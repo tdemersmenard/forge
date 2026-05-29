@@ -11,6 +11,57 @@ declare global {
   }
 }
 
+type OnboardingData = {
+  agentName: string;
+  businessName: string;
+  sector: string;
+  servicesList: { id: string; name: string; price: string; unit: string }[];
+  contractValue: string;
+  qualificationQuestions: string[];
+  disqualificationCriteria: string;
+  tone: string;
+  language: string;
+  bilingual: boolean;
+  openDays: string[];
+  openTime: string;
+  closeTime: string;
+  serviceArea: string;
+  promotions: string;
+  neverSay: string;
+  escalationCriteria: string;
+  twilioAccountSid: string;
+  twilioAuthToken: string;
+  phone: string;
+};
+
+async function saveAgentData(userId: string, data: OnboardingData) {
+  const supabase = createClient();
+  const filteredServices = data.servicesList.filter((s) => s.name.trim());
+  const payload = {
+    user_id: userId,
+    agent_name: data.agentName,
+    business_name: data.businessName,
+    sector: data.sector,
+    services_list: filteredServices,
+    services: filteredServices.map((s) => `${s.name} (${s.price} ${s.unit})`).join(", "),
+    contract_value: data.contractValue,
+    qualification_questions: data.qualificationQuestions.filter((q) => q.trim()),
+    disqualification_criteria: data.disqualificationCriteria || null,
+    tone: data.tone,
+    language: data.language,
+    bilingual: data.bilingual,
+    business_hours: { openTime: data.openTime, closeTime: data.closeTime, days: data.openDays },
+    service_area: data.serviceArea || null,
+    promotions: data.promotions || null,
+    never_say: data.neverSay || null,
+    escalation_criteria: data.escalationCriteria || null,
+    twilio_account_sid: data.twilioAccountSid || null,
+    twilio_auth_token: data.twilioAuthToken || null,
+    phone: data.phone || null,
+  };
+  await supabase.from("agents").insert(payload);
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const t = useTranslations("signup");
@@ -19,6 +70,18 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [trackLead, setTrackLead] = useState(false);
+  const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null);
+
+  useEffect(() => {
+    const raw = localStorage.getItem("forgee_onboarding_data");
+    if (raw) {
+      try {
+        setOnboardingData(JSON.parse(raw) as OnboardingData);
+      } catch {
+        // ignore malformed data
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!trackLead) return;
@@ -31,7 +94,7 @@ export default function SignupPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({ email, password });
+    const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
 
     if (authError) {
       setError(authError.message);
@@ -40,12 +103,31 @@ export default function SignupPage() {
     }
 
     setTrackLead(true);
-    router.push("/onboarding");
+
+    if (onboardingData && authData.user) {
+      try {
+        await saveAgentData(authData.user.id, onboardingData);
+      } catch {
+        // non-fatal — user still lands on plan page
+      }
+      localStorage.removeItem("forgee_onboarding_data");
+      router.push("/onboarding/plan");
+    } else {
+      router.push("/onboarding");
+    }
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] px-4">
       <div className="w-full max-w-sm">
+        {/* Agent ready banner */}
+        {onboardingData && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-4 py-3 text-sm text-emerald-400">
+            <span>✓</span>
+            <span>{t("agentReadyBanner")}</span>
+          </div>
+        )}
+
         {/* Logo */}
         <div className="mb-8 flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded bg-white">

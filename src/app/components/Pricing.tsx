@@ -103,7 +103,7 @@ export default function Pricing() {
 
                 {/* CTA */}
                 <Link
-                  href="/signup"
+                  href="/onboarding"
                   className={`mt-auto block rounded-md py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90 ${
                     highlighted
                       ? "bg-[#0a0a0a] text-white"

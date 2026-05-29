@@ -122,7 +122,8 @@
     "passwordPlaceholder": "Min. 8 caractères",
     "createAccount": "Créer un compte",
     "creatingAccount": "Création du compte…",
-    "terms": "En créant un compte, vous acceptez nos Conditions d'utilisation."
+    "terms": "En créant un compte, vous acceptez nos Conditions d'utilisation.",
+    "agentReadyBanner": "Votre agent est prêt — créez votre compte pour l'activer."
   },
   "onboarding": {
     "stepOf": "Étape {step} sur {total}",

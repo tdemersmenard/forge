@@ -122,7 +122,8 @@
     "passwordPlaceholder": "Min. 8 characters",
     "createAccount": "Create account",
     "creatingAccount": "Creating account…",
-    "terms": "By creating an account you agree to our Terms of Service."
+    "terms": "By creating an account you agree to our Terms of Service.",
+    "agentReadyBanner": "Your agent is ready — create your account to activate it."
   },
   "onboarding": {
     "stepOf": "Step {step} of {total}",

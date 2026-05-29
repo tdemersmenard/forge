@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 
 declare global {
@@ -129,6 +128,11 @@ export default function OnboardingPage() {
     window.fbq?.("track", "CompleteRegistration");
   }, []);
 
+  // Persist form to localStorage as user progresses
+  useEffect(() => {
+    localStorage.setItem("forgee_onboarding_data", JSON.stringify(form));
+  }, [form]);
+
   // Step entry animation
   useEffect(() => {
     setVisible(false);
@@ -168,19 +172,10 @@ export default function OnboardingPage() {
       timers.push(setTimeout(() => setDeployIndex(i), 400 + i * 600));
     });
 
-    timers.push(
-      setTimeout(() => {
-        saveAgent().catch((e) => {
-          console.error("Save error:", e);
-          setError(t("saveError"));
-        });
-      }, 200)
-    );
-
     const totalDuration = 400 + labels.length * 600 + 700;
     timers.push(
       setTimeout(() => {
-        router.push("/onboarding/plan");
+        router.push("/signup");
       }, totalDuration)
     );
 
@@ -208,65 +203,6 @@ export default function OnboardingPage() {
       return form.qualificationQuestions.some((q) => q.trim() !== "");
     if (step === 4) return form.tone !== "";
     return true;
-  }
-
-  async function saveAgent() {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    const { data: existing } = await supabase
-      .from("agents")
-      .select("id")
-      .eq("user_id", user.id)
-      .limit(1)
-      .single();
-
-    const filteredServices = form.servicesList.filter((s) =>
-      s.name.trim()
-    );
-
-    const payload = {
-      user_id: user.id,
-      agent_name: form.agentName,
-      business_name: form.businessName,
-      sector: form.sector,
-      services_list: filteredServices,
-      services: filteredServices
-        .map((s) => `${s.name} (${s.price} ${s.unit})`)
-        .join(", "),
-      contract_value: form.contractValue,
-      qualification_questions: form.qualificationQuestions.filter((q) =>
-        q.trim()
-      ),
-      disqualification_criteria: form.disqualificationCriteria || null,
-      tone: form.tone,
-      language: form.language,
-      bilingual: form.bilingual,
-      business_hours: {
-        openTime: form.openTime,
-        closeTime: form.closeTime,
-        days: form.openDays,
-      },
-      service_area: form.serviceArea || null,
-      promotions: form.promotions || null,
-      never_say: form.neverSay || null,
-      escalation_criteria: form.escalationCriteria || null,
-      twilio_account_sid: form.twilioAccountSid || null,
-      twilio_auth_token: form.twilioAuthToken || null,
-      phone: form.phone || null,
-    };
-
-    if (existing?.id) {
-      await supabase.from("agents").update(payload).eq("id", existing.id);
-    } else {
-      await supabase.from("agents").insert(payload);
-    }
   }
 
   async function testTwilio() {
