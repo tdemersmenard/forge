@@ -1,6 +1,33 @@
 import { createClient } from "@/lib/supabase/server";
 import { SettingsClient } from "./SettingsClient";
 
+export type AgentRow = {
+  id: string;
+  agent_name: string | null;
+  business_name: string;
+  sector: string;
+  services: string;
+  services_list: { name: string; price: string; unit: string }[] | null;
+  contract_value: string | null;
+  tone: string;
+  language: string;
+  bilingual: boolean | null;
+  business_hours: { openTime: string; closeTime: string; days: string[] } | null;
+  qualification_questions: string[] | null;
+  disqualification_criteria: string | null;
+  service_area: string | null;
+  promotions: string | null;
+  never_say: string | null;
+  escalation_criteria: string | null;
+  phone: string | null;
+  twilio_account_sid: string | null;
+  twilio_auth_token: string | null;
+  facebook_page_id: string | null;
+  facebook_access_token: string | null;
+  facebook_verify_token: string | null;
+  notifications_prefs: { new_lead: boolean; deal_closed: boolean } | null;
+};
+
 export default async function SettingsPage() {
   const supabase = await createClient();
 
@@ -15,21 +42,7 @@ export default async function SettingsPage() {
     .select("*")
     .limit(1);
 
-  const agent = (agents?.[0] ?? null) as {
-    id: string;
-    business_name: string;
-    sector: string;
-    services: string;
-    tone: string;
-    language: string;
-    phone: string | null;
-    twilio_account_sid: string | null;
-    twilio_auth_token: string | null;
-    facebook_page_id: string | null;
-    facebook_access_token: string | null;
-    facebook_verify_token: string | null;
-    notifications_prefs: { new_lead: boolean; deal_closed: boolean } | null;
-  } | null;
+  const agent = (agents?.[0] ?? null) as AgentRow | null;
 
   return (
     <main className="flex-1 overflow-auto px-6 py-8">

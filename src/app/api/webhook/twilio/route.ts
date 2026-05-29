@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   const { data: agents, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, business_name, sector, services, tone, language, phone, twilio_account_sid, twilio_auth_token, notifications_prefs"
+      "id, user_id, agent_name, business_name, sector, services, services_list, tone, language, bilingual, business_hours, phone, twilio_account_sid, twilio_auth_token, qualification_questions, disqualification_criteria, service_area, promotions, never_say, escalation_criteria, notifications_prefs"
     )
     .eq("phone", to)
     .limit(1);
@@ -37,17 +37,30 @@ export async function POST(request: Request) {
     });
   }
 
+  type ServiceItem = { name: string; price: string; unit: string };
+  type BusinessHours = { openTime: string; closeTime: string; days: string[] };
+
   const agent = agents[0] as {
     id: string;
     user_id: string;
+    agent_name: string | null;
     business_name: string;
     sector: string;
     services: string;
+    services_list: ServiceItem[] | null;
     tone: string;
     language: string;
+    bilingual: boolean | null;
+    business_hours: BusinessHours | null;
     phone: string;
     twilio_account_sid: string | null;
     twilio_auth_token: string | null;
+    qualification_questions: string[] | null;
+    disqualification_criteria: string | null;
+    service_area: string | null;
+    promotions: string | null;
+    never_say: string | null;
+    escalation_criteria: string | null;
     notifications_prefs: { new_lead?: boolean; deal_closed?: boolean } | null;
   };
 
@@ -60,21 +73,66 @@ export async function POST(request: Request) {
     .order("created_at", { ascending: true })
     .limit(10);
 
-  // 3. Build system prompt
-  const systemPrompt = `Tu es l'assistant virtuel de ${agent.business_name}, une entreprise de ${agent.sector}.
-Ton rôle est de qualifier les leads, répondre aux questions et aider à closer des clients.
-Services offerts: ${agent.services}.
-Ton ton: ${agent.tone}. Langue principale: ${agent.language}.
-Tu communiques par SMS — sois concis, max 2-3 phrases par message.
-Ne mentionne jamais que tu es une IA sauf si on te le demande directement.`;
+  // 3. Build comprehensive system prompt from all agent fields
+  const agentName = agent.agent_name ?? "Agent";
+  const lang = agent.language ?? "FR";
+  const bilingual = agent.bilingual ?? false;
+
+  const servicesText =
+    agent.services_list && agent.services_list.length > 0
+      ? agent.services_list
+          .map((s) => `- ${s.name}: ${s.price} ${s.unit}`)
+          .join("\n")
+      : agent.services
+        ? agent.services
+        : "Services non spécifiés";
+
+  const questionsText =
+    agent.qualification_questions && agent.qualification_questions.length > 0
+      ? agent.qualification_questions
+          .map((q, i) => `${i + 1}. ${q}`)
+          .join("\n")
+      : null;
+
+  const hoursText = agent.business_hours
+    ? `${agent.business_hours.days?.join(", ") ?? ""} ${agent.business_hours.openTime ?? ""}–${agent.business_hours.closeTime ?? ""}`
+    : null;
+
+  const systemPrompt = `Tu es ${agentName}, l'assistant virtuel de ${agent.business_name}.
+
+SECTEUR: ${agent.sector}
+
+SERVICES ET PRIX:
+${servicesText}
+
+TON: ${agent.tone}
+LANGUE: ${lang}${bilingual ? " (réponds dans la langue du client — FR ou EN)" : ""}
+${hoursText ? `\nHEURES D'OUVERTURE: ${hoursText}` : ""}
+${agent.service_area ? `\nZONE DE SERVICE: ${agent.service_area}` : ""}
+${
+  questionsText
+    ? `\nQUESTIONS DE QUALIFICATION À POSER (dans l'ordre):\n${questionsText}`
+    : ""
+}
+${agent.disqualification_criteria ? `\nCRITÈRES DE DISQUALIFICATION: ${agent.disqualification_criteria}` : ""}
+${agent.promotions ? `\nPROMOTIONS EN COURS: ${agent.promotions}` : ""}
+${agent.never_say ? `\nNE JAMAIS DIRE OU FAIRE: ${agent.never_say}` : ""}
+${agent.escalation_criteria ? `\nESCALADER À UN HUMAIN SI: ${agent.escalation_criteria}` : ""}
+
+RÈGLES IMPORTANTES:
+- Tu communiques par SMS — sois concis, max 2-3 phrases par message
+- Ne mentionne jamais que tu es une IA sauf si on te le demande directement
+- Si hors heures d'ouverture, informe le lead que tu lui répondras dès l'ouverture
+- Si lead hors zone de service, décline poliment et suggère de contacter une autre entreprise
+- Pose une question à la fois pour qualifier le lead
+- Toujours signer avec ton prénom: ${agentName}`;
 
   // 4. Build messages array for Claude (alternating user/assistant)
   type Message = { role: "user" | "assistant"; content: string };
   const conversationHistory: Message[] = (history ?? [])
     .filter(
-      (
-        row: { role: string | null; last_message: string | null }
-      ) => row.last_message
+      (row: { role: string | null; last_message: string | null }) =>
+        row.last_message
     )
     .map((row: { role: string | null; last_message: string | null }) => ({
       role: row.role === "agent" ? ("assistant" as const) : ("user" as const),
@@ -99,7 +157,7 @@ Ne mentionne jamais que tu es une IA sauf si on te le demande directement.`;
   } catch (err) {
     console.error("Claude error:", err);
     aiResponse =
-      agent.language === "FR"
+      lang === "FR"
         ? "Désolé, je rencontre une difficulté technique. Veuillez réessayer dans un instant."
         : "Sorry, I'm experiencing a technical issue. Please try again shortly.";
   }
@@ -143,7 +201,6 @@ Ne mentionne jamais que tu es une IA sauf si on te le demande directement.`;
   }
 
   const newStatus = detectStatus(body) ?? "new";
-
   const isNewLead = !history || history.length === 0;
 
   // 7. Save user message
