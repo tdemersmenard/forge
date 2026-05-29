@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+
+declare global {
+  interface Window {
+    fbq: any;
+  }
+}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -12,6 +18,12 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [trackLead, setTrackLead] = useState(false);
+
+  useEffect(() => {
+    if (!trackLead) return;
+    window.fbq?.("track", "Lead");
+  }, [trackLead]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,7 +39,7 @@ export default function SignupPage() {
       return;
     }
 
-    (window as Window & { fbq?: (cmd: string, event: string) => void }).fbq?.("track", "Lead");
+    setTrackLead(true);
     router.push("/onboarding");
   }
 

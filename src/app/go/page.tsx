@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GoPixel } from "./GoPixel";
 
 export const metadata = {
   title: "Forgee — Your AI Agent for Service Businesses",
@@ -49,6 +50,8 @@ export default function GoPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="mx-auto flex max-w-2xl flex-col items-center px-6 py-16">
+
+        <GoPixel />
 
         {/* 1. Logo */}
         <div className="mb-10">

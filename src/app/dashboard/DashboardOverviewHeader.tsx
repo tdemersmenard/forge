@@ -1,14 +1,30 @@
 "use client";
 
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { PLANS } from "@/lib/plans";
+
+declare global {
+  interface Window {
+    fbq: any;
+  }
+}
 
 interface Props {
   email: string;
   showSuccess: boolean;
+  plan?: string | null;
 }
 
-export function DashboardOverviewHeader({ email, showSuccess }: Props) {
+export function DashboardOverviewHeader({ email, showSuccess, plan }: Props) {
   const t = useTranslations("dashboard");
+
+  useEffect(() => {
+    if (!showSuccess) return;
+    const planData = PLANS.find((p) => p.id === plan);
+    const value = planData?.price ?? 97;
+    window.fbq?.("track", "Purchase", { value, currency: "USD" });
+  }, [showSuccess, plan]);
 
   return (
     <>

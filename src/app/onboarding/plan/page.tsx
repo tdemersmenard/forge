@@ -7,6 +7,12 @@ import type { PlanId } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 
+declare global {
+  interface Window {
+    fbq: any;
+  }
+}
+
 function getRecommendedPlan(contractValue: string | null): PlanId {
   if (!contractValue) return "growth";
   if (contractValue === "Under $500") return "starter";
@@ -22,6 +28,10 @@ export default function PlanPage() {
   const [agentName, setAgentName] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [recommendedPlan, setRecommendedPlan] = useState<PlanId>("growth");
+
+  useEffect(() => {
+    window.fbq?.("track", "InitiateCheckout");
+  }, []);
 
   useEffect(() => {
     const supabase = createClient();
@@ -58,7 +68,7 @@ export default function PlanPage() {
         setCheckoutLoading(null);
         return;
       }
-      (window as Window & { fbq?: (cmd: string, event: string) => void }).fbq?.("track", "StartTrial");
+      window.fbq?.("track", "StartTrial");
       window.location.href = data.url;
     } catch {
       setError(t("networkError"));

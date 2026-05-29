@@ -33,8 +33,9 @@ export default async function DashboardPage({
   const params = await searchParams;
   const showSuccess = params.success === "true";
 
-  const { data: agents } = await supabase.from("agents").select("id");
-  const agentIds = (agents ?? []).map((a: { id: string }) => a.id);
+  const { data: agents } = await supabase.from("agents").select("id, plan");
+  const agentIds = (agents ?? []).map((a: { id: string; plan?: string }) => a.id);
+  const agentPlan = (agents ?? [])[0] ? (agents![0] as { id: string; plan?: string }).plan ?? null : null;
 
   let initialConversations: ConvRow[] = [];
   if (agentIds.length > 0) {
@@ -52,6 +53,7 @@ export default async function DashboardPage({
       <DashboardOverviewHeader
         email={user.email ?? ""}
         showSuccess={showSuccess}
+        plan={agentPlan}
       />
       <RealtimeOverview
         agentIds={agentIds}

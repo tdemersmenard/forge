@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 
+declare global {
+  interface Window {
+    fbq: any;
+  }
+}
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const SECTORS = [
@@ -117,6 +123,11 @@ export default function OnboardingPage() {
     twilioAuthToken: "",
     phone: "",
   });
+
+  // Track CompleteRegistration on first load
+  useEffect(() => {
+    window.fbq?.("track", "CompleteRegistration");
+  }, []);
 
   // Step entry animation
   useEffect(() => {
