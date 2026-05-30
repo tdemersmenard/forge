@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
 import type { PlanId } from "@/lib/plans";
 import { CheckoutSchema } from "@/lib/schemas/agent";
+import { originGuard } from "@/lib/security";
+import { getAppUrl } from "@/lib/env";
 
 const PRICE_IDS: Record<PlanId, string | undefined> = {
   starter: process.env.STRIPE_PRICE_STARTER,
@@ -9,10 +11,11 @@ const PRICE_IDS: Record<PlanId, string | undefined> = {
   agency: process.env.STRIPE_PRICE_AGENCY,
 };
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app";
 
 export async function POST(request: Request) {
+  const originBlock = originGuard(request);
+  if (originBlock) return originBlock;
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -55,8 +58,8 @@ export async function POST(request: Request) {
     payment_method_types: ["card"],
     line_items: [{ price: priceId, quantity: 1 }],
     subscription_data: { trial_period_days: 7 },
-    success_url: `${APP_URL}/onboarding/plan?success=true`,
-    cancel_url: `${APP_URL}/onboarding/plan`,
+    success_url: `${getAppUrl()}/onboarding/plan?success=true`,
+    cancel_url: `${getAppUrl()}/onboarding/plan`,
     allow_promotion_codes: true,
     // user_id in both metadata and client_reference_id for webhook reliability
     client_reference_id: user.id,

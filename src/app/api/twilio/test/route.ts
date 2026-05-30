@@ -1,6 +1,7 @@
 import twilio from "twilio";
 import { createClient } from "@/lib/supabase/server";
 import { TwilioTestSchema } from "@/lib/schemas/agent";
+import { originGuard } from "@/lib/security";
 
 // In-memory rate limit: max 10 requests per user per hour
 const rateLimitMap = new Map<string, number[]>();
@@ -18,6 +19,9 @@ function isRateLimited(userId: string): boolean {
 }
 
 export async function POST(request: Request) {
+  const originBlock = originGuard(request);
+  if (originBlock) return originBlock;
+
   // Require authenticated user
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

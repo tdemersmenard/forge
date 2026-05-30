@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { originGuard } from "@/lib/security";
 import { z } from "zod";
 import {
   IdentityUpdateSchema,
@@ -30,21 +31,9 @@ const RequestSchema = z.object({
   data: z.record(z.string(), z.unknown()),
 });
 
-// Origin check (cheap CSRF defense)
-function isAllowedOrigin(request: Request): boolean {
-  const origin = request.headers.get("origin");
-  if (!origin) return true; // same-origin requests may not send Origin
-  const allowed = [
-    process.env.NEXT_PUBLIC_APP_URL,
-    "http://localhost:3000",
-  ].filter(Boolean);
-  return allowed.includes(origin);
-}
-
 export async function POST(request: Request) {
-  if (!isAllowedOrigin(request)) {
-    return Response.json({ error: "Forbidden origin" }, { status: 403 });
-  }
+  const originBlock = originGuard(request);
+  if (originBlock) return originBlock;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LeadCreateSchema } from "@/lib/schemas/agent";
+import { originGuard } from "@/lib/security";
 
 export async function POST(request: Request) {
+  const originBlock = originGuard(request);
+  if (originBlock) return originBlock;
+
   const supabase = await createClient();
   const {
     data: { user },

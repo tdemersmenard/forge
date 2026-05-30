@@ -46,20 +46,25 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
     if (agentIds.length === 0) return;
     const supabase = createClient();
 
+    // Build a server-side filter so Supabase only streams rows for this user's agents
+    const realtimeFilter = agentIds.length === 1
+      ? `agent_id=eq.${agentIds[0]}`
+      : `agent_id=in.(${agentIds.join(",")})`;
+
     const channel = supabase
       .channel("overview-conversations")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "conversations" },
+        { event: "INSERT", schema: "public", table: "conversations", filter: realtimeFilter },
         (payload) => {
           const row = payload.new as ConvRow;
-          if (!agentIds.includes(row.agent_id)) return;
+          if (!agentIds.includes(row.agent_id)) return; // belt-and-suspenders
           setConversations((prev) => [row, ...prev]);
         }
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "conversations" },
+        { event: "UPDATE", schema: "public", table: "conversations", filter: realtimeFilter },
         (payload) => {
           const row = payload.new as ConvRow;
           if (!agentIds.includes(row.agent_id)) return;

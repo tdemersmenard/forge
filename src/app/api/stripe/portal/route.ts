@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
+import { originGuard } from "@/lib/security";
+import { getAppUrl } from "@/lib/env";
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app";
+export async function POST(request: Request) {
+  const originBlock = originGuard(request);
+  if (originBlock) return originBlock;
 
-export async function POST() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -29,7 +31,7 @@ export async function POST() {
   const stripe = getStripe();
   const session = await stripe.billingPortal.sessions.create({
     customer: sub.stripe_customer_id,
-    return_url: `${APP_URL}/dashboard/billing`,
+    return_url: `${getAppUrl()}/dashboard/billing`,
   });
 
   return Response.json({ url: session.url });

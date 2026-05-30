@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import type { AgentRow } from "./page";
 
@@ -246,11 +247,12 @@ export function SettingsClient({ agent, userEmail }: Props) {
   const [twilioForm, setTwilioForm] = useState({
     phone: agent?.phone ?? "",
     twilio_account_sid: agent?.twilio_account_sid ?? "",
-    twilio_auth_token: agent?.twilio_auth_token ?? "",
+    twilio_auth_token: "", // never pre-filled — must be re-entered to change
   });
   const [twilioSaving, setTwilioSaving] = useState(false);
   const [twilioSaved, setTwilioSaved] = useState(false);
   const [showTwilioToken, setShowTwilioToken] = useState(false);
+  const [editingTwilioToken, setEditingTwilioToken] = useState(!agent?._twilioConfigured);
   const [twilioTestStatus, setTwilioTestStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
@@ -258,12 +260,13 @@ export function SettingsClient({ agent, userEmail }: Props) {
 
   const [fbForm, setFbForm] = useState({
     facebook_page_id: agent?.facebook_page_id ?? "",
-    facebook_access_token: agent?.facebook_access_token ?? "",
-    facebook_verify_token: agent?.facebook_verify_token ?? "",
+    facebook_access_token: "", // never pre-filled
+    facebook_verify_token: "", // never pre-filled
   });
   const [fbSaving, setFbSaving] = useState(false);
   const [fbSaved, setFbSaved] = useState(false);
   const [showFbToken, setShowFbToken] = useState(false);
+  const [editingFbTokens, setEditingFbTokens] = useState(!agent?._facebookConfigured);
   const [vtCopied, setVtCopied] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
 
@@ -291,7 +294,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
     setIdentitySaving(true);
     const result = await callAgentUpdate("identity", identityForm);
     if (!result.ok) {
-      console.error("Identity save failed:", result.error);
+      toast.error(result.error ?? "Save failed");
       setIdentitySaving(false);
       return;
     }
@@ -308,7 +311,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       contract_value: contractValue,
     });
     if (!result.ok) {
-      console.error("Services save failed:", result.error);
+      toast.error(result.error ?? "Save failed");
       setServicesSaving(false);
       return;
     }
@@ -323,7 +326,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       disqualification_criteria: disqualification || null,
     });
     if (!result.ok) {
-      console.error("Qualification save failed:", result.error);
+      toast.error(result.error ?? "Save failed");
       setQualSaving(false);
       return;
     }
@@ -344,7 +347,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       },
     });
     if (!result.ok) {
-      console.error("Personality save failed:", result.error);
+      toast.error(result.error ?? "Save failed");
       setPersonalitySaving(false);
       return;
     }
@@ -361,7 +364,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       escalation_criteria: instructionsForm.escalation_criteria || null,
     });
     if (!result.ok) {
-      console.error("Instructions save failed:", result.error);
+      toast.error(result.error ?? "Save failed");
       setInstructionsSaving(false);
       return;
     }
@@ -371,24 +374,44 @@ export function SettingsClient({ agent, userEmail }: Props) {
   async function saveTwilio() {
     if (!agent) return;
     setTwilioSaving(true);
-    const result = await callAgentUpdate("twilio", twilioForm);
+    const payload: Record<string, string> = {
+      phone: twilioForm.phone,
+      twilio_account_sid: twilioForm.twilio_account_sid,
+    };
+    if (twilioForm.twilio_auth_token.length > 0) {
+      payload.twilio_auth_token = twilioForm.twilio_auth_token;
+    }
+    const result = await callAgentUpdate("twilio", payload);
     if (!result.ok) {
-      console.error("Twilio save failed:", result.error);
+      toast.error(result.error ?? "Save failed");
       setTwilioSaving(false);
       return;
     }
+    setTwilioForm((p) => ({ ...p, twilio_auth_token: "" }));
+    setEditingTwilioToken(false);
     await markSaved(setTwilioSaving, setTwilioSaved);
   }
 
   async function saveFacebook() {
     if (!agent) return;
     setFbSaving(true);
-    const result = await callAgentUpdate("facebook", fbForm);
+    const payload: Record<string, string> = {
+      facebook_page_id: fbForm.facebook_page_id,
+    };
+    if (fbForm.facebook_access_token.length > 0) {
+      payload.facebook_access_token = fbForm.facebook_access_token;
+    }
+    if (fbForm.facebook_verify_token.length > 0) {
+      payload.facebook_verify_token = fbForm.facebook_verify_token;
+    }
+    const result = await callAgentUpdate("facebook", payload);
     if (!result.ok) {
-      console.error("Facebook save failed:", result.error);
+      toast.error(result.error ?? "Save failed");
       setFbSaving(false);
       return;
     }
+    setFbForm((p) => ({ ...p, facebook_access_token: "", facebook_verify_token: "" }));
+    setEditingFbTokens(false);
     await markSaved(setFbSaving, setFbSaved);
   }
 
@@ -397,7 +420,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
     setNotifSaving(true);
     const result = await callAgentUpdate("notifications", { notifications_prefs: notifForm });
     if (!result.ok) {
-      console.error("Notifications save failed:", result.error);
+      toast.error(result.error ?? "Save failed");
       setNotifSaving(false);
       return;
     }
@@ -1012,38 +1035,65 @@ export function SettingsClient({ agent, userEmail }: Props) {
                 />
               </Field>
               <Field label={t("integrations.authToken")}>
-                <div className="flex gap-2">
-                  <input
-                    type={showTwilioToken ? "text" : "password"}
-                    value={twilioForm.twilio_auth_token}
-                    onChange={(e) =>
-                      setTwilioForm((p) => ({
-                        ...p,
-                        twilio_auth_token: e.target.value,
-                      }))
-                    }
-                    placeholder="Your Twilio Auth Token"
-                    className={`${inputCls} flex-1 font-mono`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowTwilioToken((v) => !v)}
-                    className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/40 transition-colors hover:text-white/70"
-                  >
-                    {showTwilioToken ? (
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
-                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
-                        <path d="M2 2l10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                      </svg>
-                    ) : (
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
-                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
-                      </svg>
+                {editingTwilioToken ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <input
+                        type={showTwilioToken ? "text" : "password"}
+                        value={twilioForm.twilio_auth_token}
+                        onChange={(e) =>
+                          setTwilioForm((p) => ({
+                            ...p,
+                            twilio_auth_token: e.target.value,
+                          }))
+                        }
+                        placeholder="Your Twilio Auth Token"
+                        className={`${inputCls} flex-1 font-mono`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowTwilioToken((v) => !v)}
+                        className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/40 transition-colors hover:text-white/70"
+                      >
+                        {showTwilioToken ? (
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                            <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+                            <path d="M2 2l10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                          </svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                            <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                    {agent?._twilioConfigured && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingTwilioToken(false);
+                          setTwilioForm((p) => ({ ...p, twilio_auth_token: "" }));
+                        }}
+                        className="w-fit text-xs text-white/30 underline underline-offset-2 hover:text-white/60"
+                      >
+                        Cancel
+                      </button>
                     )}
-                  </button>
-                </div>
+                  </div>
+                ) : (
+                  <div className="flex h-10 items-center gap-3">
+                    <span className="text-sm text-white/40 font-mono">•••••••••••••••• (configured)</span>
+                    <button
+                      type="button"
+                      onClick={() => setEditingTwilioToken(true)}
+                      className="text-xs text-white/40 underline underline-offset-2 hover:text-white/70"
+                    >
+                      Replace
+                    </button>
+                  </div>
+                )}
               </Field>
               <div className="flex items-center gap-3">
                 <button
@@ -1052,7 +1102,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
                   disabled={
                     twilioTestStatus === "loading" ||
                     !twilioForm.twilio_account_sid ||
-                    !twilioForm.twilio_auth_token
+                    (!twilioForm.twilio_auth_token && !agent?._twilioConfigured)
                   }
                   className="rounded-md border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:border-white/20 hover:text-white disabled:opacity-40"
                 >
@@ -1093,49 +1143,85 @@ export function SettingsClient({ agent, userEmail }: Props) {
                 />
               </Field>
               <Field label={t("integrations.accessToken")}>
-                <div className="flex gap-2">
-                  <input
-                    type={showFbToken ? "text" : "password"}
-                    value={fbForm.facebook_access_token}
-                    onChange={(e) =>
-                      setFbForm((p) => ({
-                        ...p,
-                        facebook_access_token: e.target.value,
-                      }))
-                    }
-                    placeholder="EAAxxxxxxxx…"
-                    className={`${inputCls} flex-1 font-mono`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowFbToken((v) => !v)}
-                    className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/40 transition-colors hover:text-white/70"
-                  >
-                    {showFbToken ? (
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
-                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
-                        <path d="M2 2l10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                      </svg>
-                    ) : (
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
-                        <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                {editingFbTokens ? (
+                  <div className="flex gap-2">
+                    <input
+                      type={showFbToken ? "text" : "password"}
+                      value={fbForm.facebook_access_token}
+                      onChange={(e) =>
+                        setFbForm((p) => ({
+                          ...p,
+                          facebook_access_token: e.target.value,
+                        }))
+                      }
+                      placeholder="EAAxxxxxxxx…"
+                      className={`${inputCls} flex-1 font-mono`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowFbToken((v) => !v)}
+                      className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/40 transition-colors hover:text-white/70"
+                    >
+                      {showFbToken ? (
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                          <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+                          <path d="M2 2l10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                        </svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.2" />
+                          <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex h-10 items-center gap-3">
+                    <span className="text-sm text-white/40 font-mono">•••••••••••••••• (configured)</span>
+                    <button
+                      type="button"
+                      onClick={() => setEditingFbTokens(true)}
+                      className="text-xs text-white/40 underline underline-offset-2 hover:text-white/70"
+                    >
+                      Replace
+                    </button>
+                  </div>
+                )}
               </Field>
-              <Field label={`${t("integrations.verifyToken")} (read-only)`}>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={fbForm.facebook_verify_token}
-                    className="h-10 flex-1 rounded-md border border-white/10 bg-white/[0.02] px-3 font-mono text-xs text-white/50 outline-none select-all"
-                  />
-                  <CopyButton copied={vtCopied} onClick={copyVerifyToken} />
-                </div>
+              <Field label={t("integrations.verifyToken")}>
+                {editingFbTokens ? (
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="text"
+                      value={fbForm.facebook_verify_token}
+                      onChange={(e) =>
+                        setFbForm((p) => ({
+                          ...p,
+                          facebook_verify_token: e.target.value,
+                        }))
+                      }
+                      placeholder="my-verify-token"
+                      className={`${inputCls} font-mono`}
+                    />
+                    {agent?._facebookConfigured && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingFbTokens(false);
+                          setFbForm((p) => ({ ...p, facebook_access_token: "", facebook_verify_token: "" }));
+                        }}
+                        className="w-fit text-xs text-white/30 underline underline-offset-2 hover:text-white/60"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex h-10 items-center gap-3">
+                    <span className="text-sm text-white/40 font-mono">•••••••••••••••• (configured)</span>
+                  </div>
+                )}
               </Field>
               <Field label={`${t("integrations.webhookLabel")} (read-only)`}>
                 <div className="flex gap-2">

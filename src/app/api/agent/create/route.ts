@@ -1,13 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
+import { originGuard } from "@/lib/security";
 import { AgentCreateSchema } from "@/lib/schemas/agent";
 
 export async function POST(request: Request) {
-  // Origin check
-  const origin = request.headers.get("origin");
-  const allowed = [process.env.NEXT_PUBLIC_APP_URL, "http://localhost:3000"].filter(Boolean);
-  if (origin && !allowed.includes(origin)) {
-    return Response.json({ error: "Forbidden origin" }, { status: 403 });
-  }
+  const originBlock = originGuard(request);
+  if (originBlock) return originBlock;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

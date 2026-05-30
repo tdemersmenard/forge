@@ -19,7 +19,7 @@ export default async function ConversationsPage() {
   if (agentIds.length > 0) {
     const { data } = await supabase
       .from("conversations")
-      .select("*")
+      .select("id, agent_id, contact_name, contact_phone, contact_email, last_message, role, status, revenue, source, created_at")
       .in("agent_id", agentIds)
       .order("created_at", { ascending: true })
       .limit(1000);

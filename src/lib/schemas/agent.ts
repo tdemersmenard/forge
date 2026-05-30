@@ -68,13 +68,13 @@ export const TwilioUpdateSchema = z.object({
     z.string().regex(/^AC[a-zA-Z0-9]{32}$/, "Invalid Twilio Account SID format"),
     z.literal(""),
   ]),
-  twilio_auth_token: trimmedString(64),
+  twilio_auth_token: trimmedString(64).optional(), // omitted = keep existing value
 });
 
 export const FacebookUpdateSchema = z.object({
   facebook_page_id: trimmedString(40),
-  facebook_access_token: trimmedString(500),
-  facebook_verify_token: trimmedString(100),
+  facebook_access_token: trimmedString(500).optional(), // omitted = keep existing value
+  facebook_verify_token: trimmedString(100).optional(), // omitted = keep existing value
 });
 
 export const NotificationsUpdateSchema = z.object({

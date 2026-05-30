@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { getAppUrl } from "@/lib/env";
 
 let _resend: Resend | null = null;
 function getResend() {
@@ -22,8 +23,6 @@ function safeSubject(s: string): string {
 
 const FROM =
   process.env.RESEND_FROM_EMAIL ?? "Forge <onboarding@resend.dev>";
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app";
 
 export async function sendNewLeadEmail(opts: {
   to: string;
@@ -51,7 +50,7 @@ export async function sendNewLeadEmail(opts: {
     ${contactPhone ? `<tr><td style="padding:8px 0;color:#888;font-size:13px">Phone</td><td style="padding:8px 0;font-size:13px">${contactPhone}</td></tr>` : ""}
     <tr><td style="padding:8px 0;color:#888;font-size:13px">Source</td><td style="padding:8px 0;font-size:13px">${src}</td></tr>
   </table>
-  <a href="${APP_URL}/dashboard/leads"
+  <a href="${getAppUrl()}/dashboard/leads"
      style="display:inline-block;padding:10px 20px;background:#0a0a0a;color:#fff;text-decoration:none;border-radius:6px;font-size:14px">
     View leads →
   </a>
@@ -77,7 +76,7 @@ export async function sendDealClosedEmail(opts: {
 <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
   <h2 style="font-size:18px;color:#0a0a0a;margin:0 0 8px">Deal closed 🎉</h2>
   <p style="color:#555;margin:0 0 20px"><strong>${who}</strong> has been marked as closed in <strong>${businessName}</strong>.</p>
-  <a href="${APP_URL}/dashboard/leads"
+  <a href="${getAppUrl()}/dashboard/leads"
      style="display:inline-block;padding:10px 20px;background:#0a0a0a;color:#fff;text-decoration:none;border-radius:6px;font-size:14px">
     View leads →
   </a>
