@@ -3,7 +3,8 @@
     "product": "Produit",
     "pricing": "Tarifs",
     "docs": "Docs",
-    "getStarted": "Commencer"
+    "getStarted": "Commencer",
+    "logIn": "Se connecter"
   },
   "hero": {
     "badge": "Maintenant en bêta",
