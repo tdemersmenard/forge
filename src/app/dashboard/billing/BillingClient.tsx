@@ -23,14 +23,12 @@ type Invoice = {
 interface Props {
   subscription: SubscriptionData;
   conversationsThisMonth: number;
-  trialDaysRemaining: number | null;
   invoices: Invoice[];
 }
 
 export function BillingClient({
   subscription,
   conversationsThisMonth,
-  trialDaysRemaining,
   invoices,
 }: Props) {
   const t = useTranslations("billing");
@@ -39,8 +37,6 @@ export function BillingClient({
   const [error, setError] = useState<string | null>(null);
 
   const currentPlan = subscription?.plan ?? "trial";
-  const isTrialing =
-    subscription?.plan_status === "trialing" || !subscription;
 
   async function handleUpgrade(planId: PlanId) {
     setCheckoutLoading(planId);
@@ -91,30 +87,6 @@ export function BillingClient({
       {error && (
         <div className="rounded-lg border border-red-500/20 bg-red-500/[0.08] px-4 py-3 text-sm text-red-400">
           {error}
-        </div>
-      )}
-
-      {/* Trial banner */}
-      {isTrialing && trialDaysRemaining !== null && (
-        <div className="flex items-center justify-between rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-5 py-4">
-          <div>
-            <p className="text-sm font-semibold text-amber-400">
-              {trialDaysRemaining > 0
-                ? (trialDaysRemaining === 1 ? t("trialEndsIn", { days: trialDaysRemaining }) : t("trialEndsInPlural", { days: trialDaysRemaining }))
-                : t("trialEnded")}
-            </p>
-            <p className="mt-0.5 text-xs text-amber-400/60">
-              {t("trialDesc")}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => handleUpgrade("growth")}
-            disabled={checkoutLoading !== null}
-            className="ml-4 shrink-0 rounded-md bg-amber-400 px-4 py-2 text-xs font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            {t("activateNow")}
-          </button>
         </div>
       )}
 

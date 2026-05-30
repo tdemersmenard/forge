@@ -84,17 +84,6 @@ export default async function BillingPage() {
     }
   }
 
-  // Trial days remaining — computed from account creation + 7 days
-  let trialDaysRemaining: number | null = null;
-  if (!subscription || subscription.plan_status === "trialing") {
-    const end = new Date(user.created_at);
-    end.setDate(end.getDate() + 7);
-    trialDaysRemaining = Math.max(
-      0,
-      Math.ceil((end.getTime() - Date.now()) / 86400000)
-    );
-  }
-
   return (
     <main className="flex-1 overflow-auto px-6 py-8">
       <div className="mb-8">
@@ -106,7 +95,6 @@ export default async function BillingPage() {
       <BillingClient
         subscription={subscription}
         conversationsThisMonth={conversationsThisMonth}
-        trialDaysRemaining={trialDaysRemaining}
         invoices={invoices}
       />
     </main>

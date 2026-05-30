@@ -110,13 +110,8 @@ export default function DashboardPreview() {
             {/* Sidebar */}
             <div className="hidden w-52 shrink-0 flex-col border-r border-white/[0.06] bg-[#0d0d0d] py-5 md:flex">
               {/* Logo */}
-              <div className="mb-6 flex items-center gap-2 px-5">
-                <div className="flex h-5 w-5 items-center justify-center rounded bg-white">
-                  <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
-                    <path d="M2 2h4v4H2V2zM8 2h4v4H8V2zM2 8h4v4H2V8zM9 9l2 2-2 2" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <span className="text-sm font-semibold text-white">Forge</span>
+              <div className="mb-6 px-5">
+                <img src="/logo.svg" alt="Forgee" height="22" />
               </div>
 
               {/* Nav items */}

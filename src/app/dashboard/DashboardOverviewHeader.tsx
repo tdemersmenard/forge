@@ -14,9 +14,10 @@ interface Props {
   email: string;
   showSuccess: boolean;
   plan?: string | null;
+  trialDaysRemaining?: number | null;
 }
 
-export function DashboardOverviewHeader({ email, showSuccess, plan }: Props) {
+export function DashboardOverviewHeader({ email, showSuccess, plan, trialDaysRemaining }: Props) {
   const t = useTranslations("dashboard");
 
   useEffect(() => {
@@ -39,6 +40,27 @@ export function DashboardOverviewHeader({ email, showSuccess, plan }: Props) {
               {t("agentActiveDesc")}
             </p>
           </div>
+        </div>
+      )}
+
+      {trialDaysRemaining !== null && trialDaysRemaining !== undefined && (
+        <div className="mb-6 flex items-center justify-between rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-5 py-4">
+          <p className="text-sm text-amber-400">
+            <span className="font-semibold">
+              {trialDaysRemaining === 0
+                ? "Your free trial ends today"
+                : trialDaysRemaining === 1
+                ? "Your free trial ends in 1 day"
+                : `Your free trial ends in ${trialDaysRemaining} days`}
+            </span>
+            {" — activate your plan to keep your agent running."}
+          </p>
+          <a
+            href="/dashboard/billing"
+            className="ml-4 shrink-0 rounded-md bg-amber-400 px-4 py-2 text-xs font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90"
+          >
+            Activate now →
+          </a>
         </div>
       )}
 

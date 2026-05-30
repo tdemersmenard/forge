@@ -37,19 +37,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="mb-8 flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-white">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M2 2h4v4H2V2zM8 2h4v4H8V2zM2 8h4v4H2V8zM9 9l2 2-2 2"
-                stroke="#0a0a0a"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <span className="text-sm font-semibold text-white">Forge</span>
+        <div className="mb-8">
+          <img src="/logo.svg" alt="Forgee" height="28" />
         </div>
 
         <h1 className="mb-2 text-xl font-semibold tracking-tight text-white">

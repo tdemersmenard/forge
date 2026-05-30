@@ -27,7 +27,7 @@ const UNITS = ["fixed", "per visit", "per sqft", "custom"];
 const CONTRACT_VALUES = ["Under $500", "$500–$2,000", "$2,000–$5,000", "$5,000+"];
 
 const WEBHOOK_URL = `${
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app"
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://forgee.app"
 }/api/webhook/facebook`;
 
 // ─── Types ────────────────────────────────────────────────────────────────────

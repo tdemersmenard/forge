@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getStripe } from "@/lib/stripe";
 import { RealtimeOverview } from "./RealtimeOverview";
 import { DashboardOverviewHeader } from "./DashboardOverviewHeader";
 
@@ -33,9 +34,39 @@ export default async function DashboardPage({
   const params = await searchParams;
   const showSuccess = params.success === "true";
 
-  const { data: agents } = await supabase.from("agents").select("id, plan");
-  const agentIds = (agents ?? []).map((a: { id: string; plan?: string }) => a.id);
-  const agentPlan = (agents ?? [])[0] ? (agents![0] as { id: string; plan?: string }).plan ?? null : null;
+  const { data: agents } = await supabase
+    .from("agents")
+    .select("id, plan, plan_status, stripe_subscription_id");
+
+  type AgentRow = { id: string; plan?: string; plan_status?: string; stripe_subscription_id?: string | null };
+  const agentIds = (agents ?? []).map((a: AgentRow) => a.id);
+  const firstAgent = (agents ?? [])[0] as AgentRow | undefined;
+  const agentPlan = firstAgent?.plan ?? null;
+
+  // Trial banner: only fetch from Stripe if trialing + subscription exists
+  let trialDaysRemaining: number | null = null;
+  if (
+    firstAgent?.plan_status === "trialing" &&
+    firstAgent?.stripe_subscription_id
+  ) {
+    try {
+      const stripe = getStripe();
+      const sub = await stripe.subscriptions.retrieve(
+        firstAgent.stripe_subscription_id
+      );
+      if (sub.trial_end) {
+        const days = Math.ceil(
+          (sub.trial_end * 1000 - Date.now()) / 86_400_000
+        );
+        // Only show banner when 3 days or fewer remain
+        if (days >= 0 && days <= 3) {
+          trialDaysRemaining = days;
+        }
+      }
+    } catch {
+      // Non-critical — skip the banner if Stripe is unreachable
+    }
+  }
 
   let initialConversations: ConvRow[] = [];
   if (agentIds.length > 0) {
@@ -54,6 +85,7 @@ export default async function DashboardPage({
         email={user.email ?? ""}
         showSuccess={showSuccess}
         plan={agentPlan}
+        trialDaysRemaining={trialDaysRemaining}
       />
       <RealtimeOverview
         agentIds={agentIds}

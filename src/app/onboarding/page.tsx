@@ -112,7 +112,7 @@ const TRANSLATIONS = {
     step6_testing: "Testing\u2026",
     step6_connected: "Connected",
 
-    step7_title: "Forge is building your agent.",
+    step7_title: "Forgee is building your agent.",
     step7_profile: "Saving your business profile...",
     step7_personality: "Generating agent personality...",
     step7_services: "Loading your services and pricing...",
@@ -253,7 +253,7 @@ const TRANSLATIONS = {
     step6_testing: "Test en cours\u2026",
     step6_connected: "Connect\u00E9",
 
-    step7_title: "Forge construit votre agent.",
+    step7_title: "Forgee construit votre agent.",
     step7_profile: "Sauvegarde du profil de votre entreprise...",
     step7_personality: "G\u00E9n\u00E9ration de la personnalit\u00E9 de l\u2019agent...",
     step7_services: "Chargement de vos services et tarifs...",
@@ -329,7 +329,7 @@ const UNITS = ["fixed", "per visit", "per sqft", "custom"];
 const TOTAL_STEPS = 7;
 
 const WEBHOOK_URL = `${
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://forge-zeta-silk.vercel.app"
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://forgee.app"
 }/api/webhook/twilio`;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -578,19 +578,8 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
       {/* ── Top bar ── */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-white">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M2 2h4v4H2V2zM8 2h4v4H8V2zM2 8h4v4H2V8zM9 9l2 2-2 2"
-                stroke="#0a0a0a"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <span className="text-sm font-semibold text-white">Forge</span>
+        <div>
+          <img src="/logo.svg" alt="Forgee" height="28" />
         </div>
 
         <div className="flex items-center gap-3">

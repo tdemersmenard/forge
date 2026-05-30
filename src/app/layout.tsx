@@ -16,20 +16,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Forge — AI Agent Builder for Service Businesses",
+  title: "Forgee — AI Agents for Service Businesses",
   description:
-    "Build and deploy AI agents that qualify leads, close deals, collect payments, and handle operations — without writing code.",
+    "Deploy an AI agent that qualifies leads, sends contracts and collects payments. Live in 15 minutes.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
   openGraph: {
-    title: "Forge — AI Agent Builder for Service Businesses",
+    title: "Forgee — AI Agents for Service Businesses",
     description:
-      "Build and deploy AI agents that qualify leads, close deals, collect payments, and handle operations — without writing code.",
+      "Deploy an AI agent that qualifies leads, sends contracts and collects payments. Live in 15 minutes.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Forge — AI Agent Builder for Service Businesses",
+    title: "Forgee — AI Agents for Service Businesses",
     description:
-      "Build and deploy AI agents that qualify leads, close deals, collect payments, and handle operations.",
+      "Deploy an AI agent that qualifies leads, sends contracts and collects payments. Live in 15 minutes.",
   },
 };
 

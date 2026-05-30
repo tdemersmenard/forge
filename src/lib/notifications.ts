@@ -22,7 +22,7 @@ function safeSubject(s: string): string {
 }
 
 const FROM =
-  process.env.RESEND_FROM_EMAIL ?? "Forge <onboarding@resend.dev>";
+  process.env.RESEND_FROM_EMAIL ?? "Forgee <onboarding@resend.dev>";
 
 export async function sendNewLeadEmail(opts: {
   to: string;

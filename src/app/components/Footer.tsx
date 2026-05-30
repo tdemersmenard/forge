@@ -25,13 +25,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded bg-white">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 2h4v4H2V2zM8 2h4v4H8V2zM2 8h4v4H2V8zM9 9l2 2-2 2" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <span className="text-sm font-semibold text-white">Forge</span>
+            <div className="mb-4">
+              <img src="/logo.svg" alt="Forgee" height="28" />
             </div>
             <p className="text-sm text-white/30 leading-relaxed">
               {t("tagline")}
