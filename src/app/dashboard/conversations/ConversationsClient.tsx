@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import { useActiveAgent } from "@/lib/useActiveAgent";
 import type { ConvRow } from "../page";
 
 type Thread = {
@@ -81,6 +82,15 @@ export function ConversationsClient({ agentIds, initialConversations }: Props) {
     useState<ConvRow[]>(initialConversations);
   const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { activeAgentId } = useActiveAgent(agentIds);
+
+  const activeConversations = useMemo(
+    () =>
+      activeAgentId
+        ? conversations.filter((c) => c.agent_id === activeAgentId)
+        : conversations,
+    [conversations, activeAgentId]
+  );
 
   // Realtime subscription
   useEffect(() => {
@@ -116,10 +126,10 @@ export function ConversationsClient({ agentIds, initialConversations }: Props) {
     };
   }, [agentIds]);
 
-  // Group by contact_phone into threads
+  // Group by contact_phone into threads (filtered to active agent)
   const threads = useMemo<Thread[]>(() => {
     const byPhone = new Map<string, ConvRow[]>();
-    for (const row of conversations) {
+    for (const row of activeConversations) {
       const phone = row.contact_phone ?? "unknown";
       if (!byPhone.has(phone)) byPhone.set(phone, []);
       byPhone.get(phone)!.push(row);
@@ -141,7 +151,7 @@ export function ConversationsClient({ agentIds, initialConversations }: Props) {
     return result.sort((a, b) =>
       b.lastMessage.created_at.localeCompare(a.lastMessage.created_at)
     );
-  }, [conversations]);
+  }, [activeConversations]);
 
   // Auto-select first thread on load
   useEffect(() => {

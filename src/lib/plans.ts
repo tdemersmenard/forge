@@ -5,6 +5,7 @@ export type Plan = {
   name: string;
   price: number;
   limit: number | null;
+  agentLimit: number | null;
   badge?: string;
   featured: boolean;
   features: readonly string[];
@@ -16,6 +17,7 @@ export const PLANS: Plan[] = [
     name: "Starter",
     price: 97,
     limit: 500,
+    agentLimit: 1,
     featured: false,
     features: [
       "1 AI agent",
@@ -30,6 +32,7 @@ export const PLANS: Plan[] = [
     name: "Growth",
     price: 297,
     limit: null,
+    agentLimit: 3,
     badge: "Most Popular",
     featured: true,
     features: [
@@ -46,6 +49,7 @@ export const PLANS: Plan[] = [
     name: "Agency",
     price: 697,
     limit: null,
+    agentLimit: null,
     featured: false,
     features: [
       "Unlimited agents",

@@ -28,7 +28,11 @@ export type AgentRow = {
   _facebookConfigured: boolean;
 };
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ agent?: string }>;
+}) {
   const supabase = await createClient();
 
   const {
@@ -37,17 +41,20 @@ export default async function SettingsPage() {
 
   if (!user) return null;
 
-  const { data: agentData } = await supabase
-    .from("agents")
-    .select(`
-      id, user_id, agent_name, business_name, sector, services, services_list,
-      contract_value, qualification_questions, disqualification_criteria,
-      tone, language, bilingual, business_hours,
-      service_area, promotions, never_say, escalation_criteria,
-      phone, twilio_account_sid, facebook_page_id, notifications_prefs
-    `)
-    .limit(1)
-    .maybeSingle();
+  const params = await searchParams;
+  const requestedAgentId = params.agent;
+
+  const selectCols = `
+    id, user_id, agent_name, business_name, sector, services, services_list,
+    contract_value, qualification_questions, disqualification_criteria,
+    tone, language, bilingual, business_hours,
+    service_area, promotions, never_say, escalation_criteria,
+    phone, twilio_account_sid, facebook_page_id, notifications_prefs
+  `;
+
+  const { data: agentData } = requestedAgentId
+    ? await supabase.from("agents").select(selectCols).eq("id", requestedAgentId).maybeSingle()
+    : await supabase.from("agents").select(selectCols).limit(1).maybeSingle();
 
   // Fetch secret presence as booleans only — tokens never leave the server
   let twilioConfigured = false;

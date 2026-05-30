@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import { useActiveAgent } from "@/lib/useActiveAgent";
 import type { ConvRow } from "./page";
 
 function formatTime(iso: string) {
@@ -40,6 +41,16 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
   const t = useTranslations("dashboard");
   const [conversations, setConversations] =
     useState<ConvRow[]>(initialConversations);
+  const { activeAgentId } = useActiveAgent(agentIds);
+
+  // Filter to active agent only
+  const filtered = useMemo(
+    () =>
+      activeAgentId
+        ? conversations.filter((c) => c.agent_id === activeAgentId)
+        : conversations,
+    [conversations, activeAgentId]
+  );
 
   // Supabase Realtime subscription
   useEffect(() => {
@@ -80,7 +91,7 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
     };
   }, [agentIds]);
 
-  // Compute stats from current conversation state
+  // Compute stats from active-agent-filtered conversations
   const stats = useMemo(() => {
     const now = new Date();
     const startOfMonth = new Date(
@@ -89,7 +100,7 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
       1
     ).toISOString();
 
-    const thisMonth = conversations.filter(
+    const thisMonth = filtered.filter(
       (c) => c.created_at >= startOfMonth
     );
 
@@ -117,12 +128,12 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
       totalLeads > 0 ? Math.round((closedCount / totalLeads) * 100) : 0;
 
     return { revenue, totalLeads, autoClosedPct };
-  }, [conversations]);
+  }, [filtered]);
 
   // Recent activity: last 5 rows, all statuses, sorted desc
   const recentActivity = useMemo(
     () =>
-      [...conversations]
+      [...filtered]
         .sort((a, b) => b.created_at.localeCompare(a.created_at))
         .slice(0, 5),
     [conversations]

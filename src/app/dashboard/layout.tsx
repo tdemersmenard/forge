@@ -14,12 +14,14 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  const { data: agents } = await supabase.from("agents").select("id");
-  const agentCount = agents?.length ?? 0;
+  const { data: agents } = await supabase
+    .from("agents")
+    .select("id, agent_name, business_name, sector, phone, plan, plan_status")
+    .order("created_at", { ascending: true });
 
   return (
     <div className="flex min-h-screen bg-[#0a0a0a]">
-      <DashboardSidebar agentCount={agentCount} />
+      <DashboardSidebar agents={agents ?? []} />
       {children}
     </div>
   );

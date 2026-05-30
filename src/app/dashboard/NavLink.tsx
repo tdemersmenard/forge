@@ -11,8 +11,9 @@ interface NavLinkProps {
 export function NavLink({ href, icon, children }: NavLinkProps) {
   const pathname = usePathname();
   // Overview requires exact match; sub-pages use startsWith
+  const hrefPath = href.split("?")[0];
   const isActive =
-    href === "/dashboard" ? pathname === href : pathname.startsWith(href);
+    hrefPath === "/dashboard" ? pathname === hrefPath : pathname.startsWith(hrefPath);
 
   return (
     <a

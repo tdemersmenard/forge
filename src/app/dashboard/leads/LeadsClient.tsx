@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { useActiveAgent } from "@/lib/useActiveAgent";
 import type { ConvRow } from "../page";
 
 type Lead = {
@@ -94,6 +95,14 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
   const t = useTranslations("leads");
   const [conversations, setConversations] =
     useState<ConvRow[]>(initialConversations);
+  const { activeAgentId } = useActiveAgent(agentIds);
+  const activeConversations = useMemo(
+    () =>
+      activeAgentId
+        ? conversations.filter((c) => c.agent_id === activeAgentId)
+        : conversations,
+    [conversations, activeAgentId]
+  );
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -183,10 +192,10 @@ export function LeadsClient({ agentIds, initialConversations }: Props) {
 
   const leads = useMemo(
     () =>
-      groupIntoLeads(conversations).sort((a, b) =>
+      groupIntoLeads(activeConversations).sort((a, b) =>
         b.lastActivity.localeCompare(a.lastActivity)
       ),
-    [conversations]
+    [activeConversations]
   );
 
   // Summary stats

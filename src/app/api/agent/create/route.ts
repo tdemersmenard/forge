@@ -24,15 +24,21 @@ export async function POST(request: Request) {
     return Response.json({ error: "Validation failed", details: parsed.error.format() }, { status: 400 });
   }
 
-  // Check if user already has an agent (one-per-user invariant)
+  // Enforce plan-based agent limit
   const { data: existing } = await supabase
     .from("agents")
-    .select("id")
-    .eq("user_id", user.id)
-    .limit(1);
+    .select("id, plan")
+    .eq("user_id", user.id);
 
-  if (existing && existing.length > 0) {
-    return Response.json({ error: "Agent already exists" }, { status: 409 });
+  const count = existing?.length ?? 0;
+  const userPlan = (existing ?? [])[0]?.plan ?? null;
+  const limit = userPlan === "agency" ? null : userPlan === "growth" ? 3 : 1;
+
+  if (limit !== null && count >= limit) {
+    return Response.json(
+      { error: `Your plan allows up to ${limit} agent${limit === 1 ? "" : "s"}. Upgrade to add more.` },
+      { status: 403 }
+    );
   }
 
   // Insert — user_id comes from session, NEVER from client
