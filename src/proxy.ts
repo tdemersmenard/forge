@@ -38,11 +38,12 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
   const isDashboard =
     pathname === "/dashboard" || pathname.startsWith("/dashboard/");
   const isSuccessCallback =
-    request.nextUrl.searchParams.get("success") === "true";
+    searchParams.get("success") === "true" ||
+    searchParams.get("checkout_success") === "true";
   // /onboarding/plan requires auth, except when returning from Stripe (?success=true)
   const isPlanPage =
     (pathname === "/onboarding/plan" || pathname.startsWith("/onboarding/plan/")) &&
@@ -53,9 +54,11 @@ export async function proxy(request: NextRequest) {
     return redirectTo("/signup", request);
   }
 
-  // 1. Not authenticated trying to reach /dashboard → /login (always, even with ?success=true)
+  // 1. Not authenticated trying to reach /dashboard → /login?returnTo=...
   if (!user && isDashboard) {
-    return redirectTo("/login", request);
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("returnTo", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   // 2. Authenticated + returning from Stripe checkout → allow through so page can handle redirect

@@ -21,7 +21,7 @@ export type ConvRow = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ success?: string }>;
+  searchParams: Promise<{ success?: string; checkout_success?: string }>;
 }) {
   const supabase = await createClient();
 
@@ -29,10 +29,11 @@ export default async function DashboardPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?returnTo=/dashboard");
 
   const params = await searchParams;
   const showSuccess = params.success === "true";
+  const checkoutSuccess = params.checkout_success === "true";
 
   const { data: agents } = await supabase
     .from("agents")
@@ -84,6 +85,7 @@ export default async function DashboardPage({
       <DashboardOverviewHeader
         email={user.email ?? ""}
         showSuccess={showSuccess}
+        checkoutSuccess={checkoutSuccess}
         plan={agentPlan}
         trialDaysRemaining={trialDaysRemaining}
       />
