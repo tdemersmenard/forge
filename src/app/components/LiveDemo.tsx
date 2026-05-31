@@ -2,32 +2,36 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
 type Message = { role: "user" | "assistant"; content: string };
 
-const INITIAL_MESSAGES: Message[] = [
-  {
-    role: "assistant",
-    content: "Hey! I'm Max from PoolPro 👋 Looking to get your pool cleaned or serviced?",
-  },
-];
-
-const QUICK_REPLIES = [
-  "Yes, I need a quote",
-  "What's included?",
-  "How much does it cost?",
-];
-
 export default function LiveDemo() {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const t = useTranslations("liveDemo");
+  const { locale } = useLanguage();
+
+  const [messages, setMessages] = useState<Message[]>([
+    { role: "assistant", content: t("initialMessage") },
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Reset conversation when language changes
+  useEffect(() => {
+    setMessages([{ role: "assistant", content: t("initialMessage") }]);
+    setStarted(false);
+    setInput("");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const QUICK_REPLIES = [t("quickReply1"), t("quickReply2"), t("quickReply3")];
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
@@ -43,7 +47,7 @@ export default function LiveDemo() {
       const res = await fetch("/api/demo/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ messages: newMessages, lang: locale }),
       });
 
       const data = await res.json() as { reply?: string; error?: string };
@@ -53,7 +57,7 @@ export default function LiveDemo() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, something went wrong. Please try again." },
+        { role: "assistant", content: locale === "fr" ? "Désolé, une erreur s'est produite. Veuillez réessayer." : "Sorry, something went wrong. Please try again." },
       ]);
     } finally {
       setLoading(false);
@@ -67,23 +71,18 @@ export default function LiveDemo() {
           {/* Left: copy */}
           <div>
             <p className="mb-3 text-xs font-medium uppercase tracking-widest text-white/30">
-              Live demo
+              {t("label")}
             </p>
             <h2 className="mb-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Talk to a real agent.
+              {t("heading")}
               <br />
-              <span className="text-white/40">Right now.</span>
+              <span className="text-white/40">{t("headingSub")}</span>
             </h2>
             <p className="mb-8 text-base leading-relaxed text-white/40">
-              This is an actual Forgee agent — same AI, same logic your
-              customers will experience. Ask it anything a pool lead would ask.
+              {t("desc")}
             </p>
             <ul className="flex flex-col gap-3">
-              {[
-                "Qualifies you with smart follow-up questions",
-                "Gives ballpark pricing on the spot",
-                "Moves toward booking an assessment",
-              ].map((item) => (
+              {([t("check1"), t("check2"), t("check3")] as string[]).map((item) => (
                 <li key={item} className="flex items-center gap-2.5 text-sm text-white/50">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0 text-emerald-400">
                     <path d="M2.5 7l3.5 3.5 5.5-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -115,10 +114,10 @@ export default function LiveDemo() {
                     M
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">Max · PoolPro</p>
+                    <p className="text-sm font-medium text-white">{t("agentName")}</p>
                     <p className="flex items-center gap-1 text-[11px] text-emerald-400">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      Online
+                      {t("agentOnline")}
                     </p>
                   </div>
                 </div>
@@ -190,7 +189,7 @@ export default function LiveDemo() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
-                    placeholder="Type a message…"
+                    placeholder={t("inputPlaceholder")}
                     className="flex-1 bg-transparent text-[13px] text-white placeholder:text-white/20 outline-none"
                   />
                   <button

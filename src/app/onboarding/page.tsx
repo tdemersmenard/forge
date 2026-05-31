@@ -121,6 +121,18 @@ const TRANSLATIONS = {
     step7_ready: "Your agent is ready.",
     step7_readyNamed: (name: string) => `Your agent ${name} is ready.`,
 
+    celebrationTitle: (step: number) => `Step ${step} complete!`,
+    celebrationDesc: {
+      1: "Your agent now has a name and knows what industry it works in.",
+      2: "Your agent now knows exactly what to sell and at what price. It can quote leads instantly.",
+      3: "Your agent knows what questions to ask to find your best leads — and which leads to politely turn away.",
+      4: "Your agent now has a personality. It will sound exactly the way you want when talking to your clients.",
+      5: "Your agent knows your service area, your promotions, and what to never say. It's basically you, but tireless.",
+      6: "Your agent is connected to your phone number. It can now send and receive SMS messages 24/7.",
+    } as Record<number, string>,
+    celebrationFact: (lines: number) =>
+      `Forgee just generated ${lines} lines of personalized instructions for your agent.`,
+
     defaultQuestions: {
       pool: [
         "What size is your pool?",
@@ -262,6 +274,18 @@ const TRANSLATIONS = {
     step7_ready: "Votre agent est pr\u00EAt.",
     step7_readyNamed: (name: string) => `Votre agent ${name} est pr\u00EAt.`,
 
+    celebrationTitle: (step: number) => `\u00C9tape ${step} compl\u00E8te!`,
+    celebrationDesc: {
+      1: "Ton agent a maintenant un nom et sait dans quelle industrie il travaille.",
+      2: "Ton agent sait maintenant exactement quoi vendre et \u00E0 quel prix. Il peut faire des devis instantan\u00E9ment.",
+      3: "Ton agent sait quelles questions poser pour trouver tes meilleurs leads \u2014 et lesquels refuser poliment.",
+      4: "Ton agent a maintenant une personnalit\u00E9. Il va parler exactement de la fa\u00E7on que tu veux \u00E0 tes clients.",
+      5: "Ton agent conna\u00EEt ta zone de service, tes promotions, et ce qu\u2019il ne doit jamais dire. C\u2019est toi, mais infatigable.",
+      6: "Ton agent est connect\u00E9 \u00E0 ton num\u00E9ro de t\u00E9l\u00E9phone. Il peut maintenant envoyer et recevoir des SMS 24/7.",
+    } as Record<number, string>,
+    celebrationFact: (lines: number) =>
+      `Forgee vient de g\u00E9n\u00E9rer ${lines} lignes d\u2019instructions personnalis\u00E9es pour ton agent.`,
+
     defaultQuestions: {
       pool: [
         "Quelle est la taille de votre piscine?",
@@ -364,6 +388,65 @@ function newService(): ServiceItem {
   return { id: Math.random().toString(36).slice(2), name: "", price: "", unit: "fixed" };
 }
 
+function calcInstructionLines(completedStep: number, form: FormData): number {
+  let lines = 85;
+  lines += form.agentName.trim() ? 12 : 0;
+  lines += form.businessName.trim() ? 10 : 0;
+  lines += form.sector ? 18 : 0;
+  lines += form.servicesList.filter((s) => s.name.trim()).length * 14;
+  lines += form.contractValue ? 8 : 0;
+  lines += form.qualificationQuestions.filter((q) => q.trim()).length * 11;
+  lines += form.disqualificationCriteria.trim() ? 22 : 0;
+  if (completedStep >= 4) {
+    lines += form.tone ? 28 : 0;
+    lines += form.bilingual ? 18 : 0;
+    lines += form.openDays.length * 2;
+  }
+  if (completedStep >= 5) {
+    lines += form.serviceArea.trim() ? 16 : 0;
+    lines += form.promotions.trim() ? 14 : 0;
+    lines += form.neverSay.trim() ? 18 : 0;
+    lines += form.escalationCriteria.trim() ? 20 : 0;
+  }
+  if (completedStep >= 6) {
+    lines += form.phone.trim() ? 38 : 0;
+  }
+  return lines;
+}
+
+function playDing() {
+  try {
+    type AnyWindow = Window & { webkitAudioContext?: typeof AudioContext };
+    const AudioCtx = window.AudioContext || (window as AnyWindow).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "sine";
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.45);
+    // Second harmonic for a richer "ding"
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.type = "sine";
+    osc2.frequency.value = 1320;
+    gain2.gain.setValueAtTime(0.06, ctx.currentTime);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc2.start(ctx.currentTime);
+    osc2.stop(ctx.currentTime + 0.3);
+    setTimeout(() => ctx.close(), 1000);
+  } catch {
+    // AudioContext not available — silently skip
+  }
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
@@ -371,7 +454,7 @@ export default function OnboardingPage() {
 
   const [lang, setLang] = useState<Lang>("en");
   const [step, setStep] = useState(1);
-  const [celebrating, setCelebrating] = useState(false);
+  const [celebratingStep, setCelebratingStep] = useState<number | null>(null);
   const [visible, setVisible] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deployIndex, setDeployIndex] = useState(-1);
@@ -624,31 +707,84 @@ export default function OnboardingPage() {
         />
       </div>
 
-      {/* ── Step celebration overlay ── */}
+      {/* ── Step celebration card ── */}
       <AnimatePresence>
-        {celebrating && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.1 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
-          >
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-400/10 shadow-2xl shadow-emerald-400/10">
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                <motion.path
-                  d="M7 18l8 8 14-16"
-                  stroke="#34d399"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.3, delay: 0.05 }}
-                />
-              </svg>
-            </div>
-          </motion.div>
+        {celebratingStep !== null && (
+          <>
+            {/* Subtle backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+            />
+            {/* Card sliding in from right */}
+            <motion.div
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 30 }}
+              className="fixed bottom-0 right-0 top-0 z-50 flex items-center pr-6 sm:pr-10"
+            >
+              <div className="relative w-80 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0f0f0f] p-7 shadow-2xl">
+                {/* Green glow */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-400/[0.05] to-transparent" />
+
+                {/* Checkmark */}
+                <div className="mb-5 flex items-center justify-center">
+                  <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.08]">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                      <motion.path
+                        d="M6 16l7 7 13-14"
+                        stroke="#34d399"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+                      />
+                    </svg>
+                    {/* Ripple */}
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0.5 }}
+                      animate={{ scale: 1.8, opacity: 0 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      className="absolute inset-0 rounded-full border border-emerald-400/30"
+                    />
+                  </div>
+                </div>
+
+                {/* Title */}
+                <h3 className="mb-2 text-center text-lg font-semibold text-white">
+                  {text.celebrationTitle(celebratingStep)}
+                </h3>
+
+                {/* Description */}
+                <p className="mb-5 text-center text-sm leading-relaxed text-white/50">
+                  {text.celebrationDesc[celebratingStep]}
+                </p>
+
+                {/* Fact pill */}
+                <div className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-center">
+                  <p className="text-xs leading-relaxed text-white/35">
+                    {text.celebrationFact(calcInstructionLines(celebratingStep, form))}
+                  </p>
+                </div>
+
+                {/* Auto-advance progress bar */}
+                <div className="mt-4 h-0.5 overflow-hidden rounded-full bg-white/[0.06]">
+                  <motion.div
+                    className="h-full bg-emerald-400/60"
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 2.3, ease: "linear" }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
@@ -1277,11 +1413,12 @@ export default function OnboardingPage() {
             <button
               type="button"
               onClick={() => {
-                setCelebrating(true);
+                playDing();
+                setCelebratingStep(step);
                 setTimeout(() => {
-                  setCelebrating(false);
+                  setCelebratingStep(null);
                   setStep((s) => s + 1);
-                }, 500);
+                }, 2500);
               }}
               disabled={!canProceed()}
               className="rounded-lg bg-white px-6 py-2 text-sm font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-35"

@@ -2,33 +2,9 @@
 
 import { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
-const FAQS = [
-  {
-    q: "How long does setup actually take?",
-    a: "Most users are live in under 15 minutes. You fill out a form describing your business — services, prices, hours — and we generate your agent instantly. No engineers, no calls.",
-  },
-  {
-    q: "Do I need to know how to code?",
-    a: "Not at all. Forgee is built for business owners, not developers. If you can fill out a form, you can deploy an agent.",
-  },
-  {
-    q: "What happens when a lead texts in?",
-    a: "Your agent picks up immediately, asks qualifying questions, gives pricing info, and tries to book an on-site assessment or consultation. If the lead doesn't qualify, the conversation ends cleanly. No human time wasted.",
-  },
-  {
-    q: "Can I customize what my agent says?",
-    a: "Yes — you control the tone (professional, friendly, or direct), the language (EN, FR, or bilingual), what questions it asks, what it should never say, and when to escalate to you.",
-  },
-  {
-    q: "What if a lead asks something my agent doesn't know?",
-    a: "You define escalation criteria upfront. When those are triggered — angry customer, complex legal question, anything outside your agent's knowledge — it hands off to you with full context.",
-  },
-  {
-    q: "Is my data secure?",
-    a: "Yes. All data is encrypted at rest and in transit. We never store raw Twilio auth tokens in your browser. Conversation data lives in an isolated Supabase database scoped to your account.",
-  },
-];
+const FAQ_KEYS = ["q1", "q2", "q3", "q4", "q5", "q6"] as const;
 
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
@@ -68,6 +44,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function FAQ() {
+  const t = useTranslations("faq");
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
@@ -81,10 +58,10 @@ export default function FAQ() {
           className="mb-12 text-center"
         >
           <p className="mb-3 text-xs font-medium uppercase tracking-widest text-white/30">
-            FAQ
+            {t("label")}
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Questions we always get
+            {t("heading")}
           </h2>
         </motion.div>
 
@@ -94,8 +71,8 @@ export default function FAQ() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="divide-y divide-white/[0.06] rounded-xl border border-white/[0.06] bg-white/[0.02] px-6"
         >
-          {FAQS.map((faq) => (
-            <FAQItem key={faq.q} q={faq.q} a={faq.a} />
+          {FAQ_KEYS.map((key) => (
+            <FAQItem key={key} q={t(key as `q${number}`)} a={t(key.replace("q", "a") as `a${number}`)} />
           ))}
         </motion.div>
       </div>

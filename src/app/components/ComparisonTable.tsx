@@ -2,17 +2,16 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { useTranslations } from "next-intl";
 
-const rows = [
-  { feature: "Available 24/7", forgee: true, receptionist: false, diy: false },
-  { feature: "Responds in < 30 seconds", forgee: true, receptionist: false, diy: false },
-  { feature: "Qualifies every lead", forgee: true, receptionist: true, diy: false },
-  { feature: "Sends quotes automatically", forgee: true, receptionist: false, diy: false },
-  { feature: "Handles 100+ leads at once", forgee: true, receptionist: false, diy: false },
-  { feature: "No salary or benefits", forgee: true, receptionist: false, diy: true },
-  { feature: "Setup in 15 minutes", forgee: true, receptionist: false, diy: false },
-  { feature: "Gets smarter over time", forgee: true, receptionist: false, diy: false },
-];
+const FEAT_KEYS = [
+  "feat1", "feat2", "feat3", "feat4",
+  "feat5", "feat6", "feat7", "feat8",
+] as const;
+
+const FORGEE_YES  = [true, true, true, true, true, true, true, true];
+const RECEPT_YES  = [false, false, true, false, false, false, false, false];
+const DIY_YES     = [false, false, false, false, false, true, false, false];
 
 function Check({ yes }: { yes: boolean }) {
   if (yes) {
@@ -34,6 +33,7 @@ function Check({ yes }: { yes: boolean }) {
 }
 
 export default function ComparisonTable() {
+  const t = useTranslations("comparison");
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
@@ -47,12 +47,12 @@ export default function ComparisonTable() {
           className="mb-12 text-center"
         >
           <p className="mb-3 text-xs font-medium uppercase tracking-widest text-white/30">
-            Why Forgee
+            {t("label")}
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Replace your front desk.
+            {t("heading")}
             <br />
-            <span className="text-white/40">Not your whole team.</span>
+            <span className="text-white/40">{t("headingSub")}</span>
           </h2>
         </motion.div>
 
@@ -67,54 +67,48 @@ export default function ComparisonTable() {
             <div className="px-5 py-4" />
             <div className="px-4 py-4 text-center">
               <div className="inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-1.5">
-                <span className="text-xs font-semibold text-[#0a0a0a]">Forgee</span>
+                <span className="text-xs font-semibold text-[#0a0a0a]">{t("colForgee")}</span>
                 <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
               </div>
             </div>
             <div className="px-4 py-4 text-center">
-              <span className="text-xs font-medium text-white/40">Receptionist</span>
+              <span className="text-xs font-medium text-white/40">{t("colReceptionist")}</span>
             </div>
             <div className="px-4 py-4 text-center">
-              <span className="text-xs font-medium text-white/40">DIY / Manual</span>
+              <span className="text-xs font-medium text-white/40">{t("colDiy")}</span>
             </div>
           </div>
 
-          {/* Rows */}
-          {rows.map((row, i) => (
+          {/* Feature rows */}
+          {FEAT_KEYS.map((key, i) => (
             <div
-              key={row.feature}
+              key={key}
               className={`grid grid-cols-4 border-b border-white/[0.04] ${
                 i % 2 === 0 ? "bg-transparent" : "bg-white/[0.01]"
               }`}
             >
               <div className="px-5 py-3.5">
-                <span className="text-sm text-white/60">{row.feature}</span>
+                <span className="text-sm text-white/60">{t(key)}</span>
               </div>
-              <div className="py-3.5">
-                <Check yes={row.forgee} />
-              </div>
-              <div className="py-3.5">
-                <Check yes={row.receptionist} />
-              </div>
-              <div className="py-3.5">
-                <Check yes={row.diy} />
-              </div>
+              <div className="py-3.5"><Check yes={FORGEE_YES[i]} /></div>
+              <div className="py-3.5"><Check yes={RECEPT_YES[i]} /></div>
+              <div className="py-3.5"><Check yes={DIY_YES[i]} /></div>
             </div>
           ))}
 
           {/* Cost row */}
-          <div className="grid grid-cols-4 bg-white/[0.02] px-0">
+          <div className="grid grid-cols-4 bg-white/[0.02]">
             <div className="px-5 py-4">
-              <span className="text-sm font-medium text-white/80">Monthly cost</span>
+              <span className="text-sm font-medium text-white/80">{t("costLabel")}</span>
             </div>
             <div className="flex items-center justify-center py-4">
-              <span className="text-sm font-semibold text-emerald-400">From $97/mo</span>
+              <span className="text-sm font-semibold text-emerald-400">{t("costForgee")}</span>
             </div>
             <div className="flex items-center justify-center py-4">
-              <span className="text-sm text-white/40">$3,000–6,000</span>
+              <span className="text-sm text-white/40">{t("costReceptionist")}</span>
             </div>
             <div className="flex items-center justify-center py-4">
-              <span className="text-sm text-white/40">Your time</span>
+              <span className="text-sm text-white/40">{t("costDiy")}</span>
             </div>
           </div>
         </motion.div>

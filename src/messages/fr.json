@@ -394,6 +394,85 @@
     "portalFailed": "Impossible d'ouvrir le portail de facturation.",
     "networkError": "Erreur réseau — veuillez réessayer."
   },
+  "howItWorks": {
+    "label": "Comment ça marche",
+    "heading": "En ligne en 15 minutes, pas en 15 semaines",
+    "step1": {
+      "title": "Décris ton entreprise",
+      "desc": "Indique-nous tes services, tes prix et ce qui fait un bon lead. Ça prend 5 minutes."
+    },
+    "step2": {
+      "title": "Forgee bâtit ton agent",
+      "desc": "On génère ton agent IA instantanément — calibré selon ton ton, tes services et tes heures."
+    },
+    "step3": {
+      "title": "Tes leads sont gérés",
+      "desc": "Ton agent qualifie chaque lead, envoie des devis et réserve des contrats — 24h/24, sans congés."
+    }
+  },
+  "liveDemo": {
+    "label": "Démo en direct",
+    "heading": "Parle à un vrai agent.",
+    "headingSub": "Là, maintenant.",
+    "desc": "C'est un vrai agent Forgee — la même IA, la même logique que tes clients vivront. Pose-lui n'importe quelle question comme un prospect le ferait.",
+    "check1": "Te qualifie avec des questions pertinentes",
+    "check2": "Donne une estimation de prix sur le champ",
+    "check3": "Pousse vers la prise de rendez-vous",
+    "inputPlaceholder": "Écris un message comme un client le ferait…",
+    "quickReply1": "Oui, j'ai besoin d'un devis",
+    "quickReply2": "Qu'est-ce qui est inclus?",
+    "quickReply3": "Combien ça coûte?",
+    "initialMessage": "Salut! Je suis Max de PoolPro 👋 Tu cherches à faire nettoyer ou entretenir ta piscine?",
+    "agentName": "Max · PoolPro",
+    "agentOnline": "En ligne"
+  },
+  "faq": {
+    "label": "FAQ",
+    "heading": "Les questions qu'on nous pose tout le temps",
+    "q1": "Est-ce que ça va sonner robotique à mes clients?",
+    "a1": "Pas du tout. Les agents Forgee sont conçus pour sonner naturel, chaleureux et fidèle à ta marque. Tu choisis le ton — professionnel, amical ou direct — et l'agent s'y tient. La plupart des leads ne réalisent pas qu'ils parlent à une IA avant d'être déjà qualifiés.",
+    "q2": "Et si ma business est très spécifique?",
+    "a2": "C'est exactement pour ça qu'on a été conçus. Tu décris tes services, ta tarification et tes questions de qualification lors de la configuration. Plus tu es précis, mieux ton agent performera. Tu peux aussi ajouter des instructions personnalisées pour couvrir chaque cas particulier.",
+    "q3": "À quelle vitesse l'agent répond?",
+    "a3": "En quelques secondes — généralement moins de 5. Ton agent ne met jamais les leads en attente. Dès qu'un texto arrive, il répond. Des études montrent que répondre en moins de 5 minutes est 100x plus efficace qu'attendre une heure. Ton agent le fait à chaque fois.",
+    "q4": "Est-ce que je peux voir les conversations de mon agent?",
+    "a4": "Oui — chaque conversation est enregistrée dans ton tableau de bord en temps réel. Tu peux lire chaque message, voir le statut des leads, suivre les revenus et intervenir manuellement quand tu veux. Rien ne se passe dans l'ombre.",
+    "q5": "Qu'est-ce qui arrive si j'annule?",
+    "a5": "Tu peux annuler en tout temps en 2 clics depuis ta page de facturation. Tes données restent disponibles 30 jours après l'annulation pour que tu puisses tout exporter. Pas de pénalités, pas de contrats, pas d'appels gênants.",
+    "q6": "Faut-il des connaissances techniques?",
+    "a6": "Aucune. Si tu sais remplir un formulaire, tu peux déployer un agent. La seule étape légèrement technique est de connecter un numéro Twilio pour les SMS — et on te guide étape par étape en moins de 3 minutes."
+  },
+  "comparison": {
+    "label": "Pourquoi Forgee",
+    "heading": "Remplace ton accueil.",
+    "headingSub": "Pas toute ton équipe.",
+    "colForgee": "Forgee",
+    "colReceptionist": "Réceptionniste",
+    "colDiy": "Manuel / DIY",
+    "feat1": "Disponible 24h/24",
+    "feat2": "Répond en < 30 secondes",
+    "feat3": "Qualifie chaque lead",
+    "feat4": "Envoie des devis automatiquement",
+    "feat5": "Gère 100+ leads à la fois",
+    "feat6": "Pas de salaire ni d'avantages",
+    "feat7": "Configuration en 15 minutes",
+    "feat8": "S'améliore avec le temps",
+    "costLabel": "Coût mensuel",
+    "costForgee": "À partir de 97$/mois",
+    "costReceptionist": "3 000$ – 6 000$",
+    "costDiy": "Ton temps"
+  },
+  "exitIntent": {
+    "badge": "Offre fondateur — places limitées",
+    "heading": "Attends — avant de partir",
+    "desc": "Obtiens 20% de rabais sur tes 3 premiers mois. Disponible pour les 24 prochaines heures.",
+    "emailPlaceholder": "ton@email.com",
+    "cta": "Réclamer mon rabais",
+    "decline": "Non merci",
+    "saving": "En cours…",
+    "successTitle": "C'est dans la poche.",
+    "successDesc": "Vérifie ton courriel pour ton rabais exclusif."
+  },
   "settings": {
     "title": "Paramètres",
     "saveChanges": "Sauvegarder",

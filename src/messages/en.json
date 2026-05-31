@@ -394,6 +394,85 @@
     "portalFailed": "Could not open billing portal.",
     "networkError": "Network error — please try again."
   },
+  "howItWorks": {
+    "label": "How it works",
+    "heading": "Live in 15 minutes, not 15 weeks",
+    "step1": {
+      "title": "Describe your business",
+      "desc": "Tell us your services, prices, and what makes a good lead. Takes 5 minutes."
+    },
+    "step2": {
+      "title": "Forgee builds your agent",
+      "desc": "We generate your AI agent instantly — calibrated for your tone, services, and hours."
+    },
+    "step3": {
+      "title": "Your leads get handled",
+      "desc": "Your agent qualifies every lead, sends quotes, and books jobs — 24/7, no days off."
+    }
+  },
+  "liveDemo": {
+    "label": "Live demo",
+    "heading": "Talk to a real agent.",
+    "headingSub": "Right now.",
+    "desc": "This is an actual Forgee agent — same AI, same logic your customers will experience. Ask it anything a pool lead would ask.",
+    "check1": "Qualifies you with smart follow-up questions",
+    "check2": "Gives ballpark pricing on the spot",
+    "check3": "Moves toward booking an assessment",
+    "inputPlaceholder": "Type a message like a lead would…",
+    "quickReply1": "Yes, I need a quote",
+    "quickReply2": "What's included?",
+    "quickReply3": "How much does it cost?",
+    "initialMessage": "Hey! I'm Max from PoolPro 👋 Looking to get your pool cleaned or serviced?",
+    "agentName": "Max · PoolPro",
+    "agentOnline": "Online"
+  },
+  "faq": {
+    "label": "FAQ",
+    "heading": "Questions we always get",
+    "q1": "Will this sound robotic to my leads?",
+    "a1": "Not at all. Forgee agents are fine-tuned to sound natural, warm, and on-brand. You choose the tone — professional, friendly, or direct — and the agent sticks to it consistently. Most leads don't realize they're talking to AI until they're already qualified.",
+    "q2": "What if my business is very specific?",
+    "a2": "That's exactly what we designed for. You describe your exact services, pricing, and qualifying questions during setup. The more specific you are, the better your agent performs. You can also add custom instructions covering every edge case.",
+    "q3": "How fast does the agent respond?",
+    "a3": "In seconds — usually under 5. Your agent never puts leads on hold. The moment a text comes in, it replies. Studies show that responding within 5 minutes is 100x more effective than waiting an hour. Your agent does it every single time.",
+    "q4": "Can I see the conversations my agent has?",
+    "a4": "Yes — every conversation is logged in your dashboard in real time. You can read every message, see lead status, track revenue, and jump in manually whenever you want. Nothing happens in the dark.",
+    "q5": "What happens if I cancel?",
+    "a5": "You can cancel anytime in 2 clicks from your billing page. Your data stays available for 30 days after cancellation so you can export anything you need. No penalties, no contracts, no awkward calls.",
+    "q6": "Do I need any technical knowledge?",
+    "a6": "None. If you can fill out a form, you can deploy an agent. The only slightly technical step is connecting a Twilio number for SMS — and we walk you through it step by step in under 3 minutes."
+  },
+  "comparison": {
+    "label": "Why Forgee",
+    "heading": "Replace your front desk.",
+    "headingSub": "Not your whole team.",
+    "colForgee": "Forgee",
+    "colReceptionist": "Receptionist",
+    "colDiy": "DIY / Manual",
+    "feat1": "Available 24/7",
+    "feat2": "Responds in < 30 seconds",
+    "feat3": "Qualifies every lead",
+    "feat4": "Sends quotes automatically",
+    "feat5": "Handles 100+ leads at once",
+    "feat6": "No salary or benefits",
+    "feat7": "Setup in 15 minutes",
+    "feat8": "Gets smarter over time",
+    "costLabel": "Monthly cost",
+    "costForgee": "From $97/mo",
+    "costReceptionist": "$3,000–6,000",
+    "costDiy": "Your time"
+  },
+  "exitIntent": {
+    "badge": "Founder offer — limited spots",
+    "heading": "Don't leave without your 20% discount",
+    "desc": "We're offering founding members 20% off their first 3 months. Leave your email and we'll hold your spot.",
+    "emailPlaceholder": "your@email.com",
+    "cta": "Claim my 20% discount",
+    "decline": "No thanks, I'll pay full price",
+    "saving": "Saving…",
+    "successTitle": "You're in.",
+    "successDesc": "Check your inbox for your exclusive discount."
+  },
   "settings": {
     "title": "Settings",
     "saveChanges": "Save changes",
