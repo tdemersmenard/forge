@@ -136,7 +136,7 @@ export function RealtimeOverview({ agentIds, initialConversations }: Props) {
       [...filtered]
         .sort((a, b) => b.created_at.localeCompare(a.created_at))
         .slice(0, 5),
-    [conversations]
+    [filtered]
   );
 
   return (

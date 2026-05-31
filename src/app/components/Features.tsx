@@ -1,6 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 
 const FEATURE_KEYS = [
   {
@@ -64,25 +66,35 @@ const FEATURE_KEYS = [
 
 export default function Features() {
   const t = useTranslations("features");
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="product" className="px-6 py-24">
+    <section id="product" ref={ref} className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <div className="mb-16 max-w-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          className="mb-16 max-w-xl"
+        >
           <p className="mb-3 text-xs font-medium uppercase tracking-widest text-white/30">
             {t("label")}
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
             {t("heading")}
           </h2>
-        </div>
+        </motion.div>
 
         {/* Grid */}
         <div className="grid grid-cols-1 gap-px border border-white/[0.06] bg-white/[0.06] md:grid-cols-2 lg:grid-cols-3">
-          {FEATURE_KEYS.map((f) => (
-            <div
+          {FEATURE_KEYS.map((f, i) => (
+            <motion.div
               key={f.key}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.4, delay: i * 0.07 }}
               className="flex flex-col gap-4 bg-[#0a0a0a] p-7 transition-colors hover:bg-white/[0.02]"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-white/70">
@@ -96,7 +108,7 @@ export default function Features() {
                   {t(`${f.key}.desc`)}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

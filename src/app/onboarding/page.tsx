@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 
 declare global {
   interface Window {
@@ -370,6 +371,7 @@ export default function OnboardingPage() {
 
   const [lang, setLang] = useState<Lang>("en");
   const [step, setStep] = useState(1);
+  const [celebrating, setCelebrating] = useState(false);
   const [visible, setVisible] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deployIndex, setDeployIndex] = useState(-1);
@@ -416,9 +418,9 @@ export default function OnboardingPage() {
     localStorage.setItem("forgee_lang", newLang);
   }
 
-  // Track CompleteRegistration on first load
+  // Track ViewContent when user starts onboarding
   useEffect(() => {
-    window.fbq?.("track", "CompleteRegistration");
+    window.fbq?.("track", "ViewContent");
   }, []);
 
   // Step entry animation
@@ -614,11 +616,41 @@ export default function OnboardingPage() {
 
       {/* ── Progress bar ── */}
       <div className="h-0.5 bg-white/[0.05]">
-        <div
-          className="h-full bg-white transition-all duration-500 ease-out"
-          style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+        <motion.div
+          className="h-full bg-white"
+          initial={false}
+          animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         />
       </div>
+
+      {/* ── Step celebration overlay ── */}
+      <AnimatePresence>
+        {celebrating && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
+          >
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-400/10 shadow-2xl shadow-emerald-400/10">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <motion.path
+                  d="M7 18l8 8 14-16"
+                  stroke="#34d399"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.3, delay: 0.05 }}
+                />
+              </svg>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Step content ── */}
       <main
@@ -1244,7 +1276,13 @@ export default function OnboardingPage() {
             )}
             <button
               type="button"
-              onClick={() => setStep((s) => s + 1)}
+              onClick={() => {
+                setCelebrating(true);
+                setTimeout(() => {
+                  setCelebrating(false);
+                  setStep((s) => s + 1);
+                }, 500);
+              }}
               disabled={!canProceed()}
               className="rounded-lg bg-white px-6 py-2 text-sm font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-35"
             >

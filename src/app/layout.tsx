@@ -16,25 +16,46 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Forgee — AI Agents for Service Businesses",
+  title: "Forgee — AI Agents for Service Businesses | Live in 15 Minutes",
   description:
-    "Deploy an AI agent that qualifies leads, sends contracts and collects payments. Live in 15 minutes.",
+    "Stop losing leads to voicemail. Forgee deploys an AI agent that qualifies leads, sends quotes, collects payments, and books jobs — 24/7 with no code required.",
+  keywords: [
+    "AI agent for service businesses",
+    "lead qualification automation",
+    "SMS AI agent",
+    "pool cleaning software",
+    "HVAC lead management",
+    "landscaping AI",
+    "no-code AI agent",
+    "automated lead follow-up",
+  ],
+  authors: [{ name: "Forgee" }],
+  creator: "Forgee",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://forgee.app"),
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
     apple: "/favicon.svg",
   },
   openGraph: {
-    title: "Forgee — AI Agents for Service Businesses",
+    title: "Forgee — AI Agents for Service Businesses | Live in 15 Minutes",
     description:
-      "Deploy an AI agent that qualifies leads, sends contracts and collects payments. Live in 15 minutes.",
+      "Stop losing leads to voicemail. Deploy an AI sales agent that qualifies leads, sends quotes, and books jobs — 24/7, no code required.",
     type: "website",
+    url: "/",
+    siteName: "Forgee",
   },
   twitter: {
     card: "summary_large_image",
     title: "Forgee — AI Agents for Service Businesses",
     description:
-      "Deploy an AI agent that qualifies leads, sends contracts and collects payments. Live in 15 minutes.",
+      "Stop losing leads to voicemail. Deploy an AI agent in 15 minutes — qualifies leads, sends quotes, books jobs.",
+    creator: "@forgeeapp",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
   },
 };
 
@@ -49,6 +70,14 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <head>
+        {/* Preconnect to external origins for faster resource loading */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {process.env.NEXT_PUBLIC_SUPABASE_URL && (
+          <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} />
+        )}
+        <link rel="dns-prefetch" href="https://js.stripe.com" />
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
+
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
           <Script id="meta-pixel" strategy="afterInteractive">
             {`
