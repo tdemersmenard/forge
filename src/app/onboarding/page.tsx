@@ -20,6 +20,13 @@ const TRANSLATIONS = {
     skip: "I'll set this up later",
     saveError: "Failed to save data. Please try again.",
 
+    welcomeBadge: "Welcome to Forgee",
+    welcomeHeading: "Let's build your AI agent.",
+    welcomeSubtitle: "In 5 minutes, you'll have an AI agent that responds to your leads 24/7 — qualifies, quotes, and closes. No code, no setup.",
+    welcomeProof1: "Live in 15 minutes",
+    welcomeProof2: "7-day free trial",
+    welcomeProof3: "Cancel anytime",
+
     step1_title: "What kind of business do you run?",
     step1_subtitle: "Your agent will introduce itself by this name when texting your leads.",
     step1_agentNameLabel: "Agent name",
@@ -169,6 +176,13 @@ const TRANSLATIONS = {
     back: "Retour",
     skip: "Je ferai \u00E7a plus tard",
     saveError: "Erreur lors de la sauvegarde. Veuillez r\u00E9essayer.",
+
+    welcomeBadge: "Bienvenue sur Forgee",
+    welcomeHeading: "Construisons votre agent IA.",
+    welcomeSubtitle: "En 5 minutes, vous aurez un agent IA qui r\u00E9pond \u00E0 vos leads 24/7 \u2014 qualifie, soumissionne et conclut. Aucun code, aucune configuration.",
+    welcomeProof1: "En ligne en 15 minutes",
+    welcomeProof2: "7 jours d\u2019essai gratuit",
+    welcomeProof3: "Annulez n\u2019importe quand",
 
     step1_title: "Quel type de business avez-vous?",
     step1_subtitle:
@@ -711,28 +725,29 @@ export default function OnboardingPage() {
       <AnimatePresence>
         {celebratingStep !== null && (
           <>
-            {/* Subtle backdrop */}
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
             />
-            {/* Card sliding in from right */}
-            <motion.div
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "100%", opacity: 0 }}
-              transition={{ type: "spring", stiffness: 320, damping: 30 }}
-              className="fixed bottom-0 right-0 top-0 z-50 flex items-center pr-6 sm:pr-10"
-            >
-              <div className="relative w-80 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0f0f0f] p-7 shadow-2xl">
+
+            {/* Centered card */}
+            <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="pointer-events-auto relative w-full max-w-[480px] overflow-hidden rounded-xl border border-white/[0.08] bg-[#0f0f0f] p-8 shadow-2xl"
+              >
                 {/* Green glow */}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-400/[0.05] to-transparent" />
 
                 {/* Checkmark */}
-                <div className="mb-5 flex items-center justify-center">
+                <div className="mb-6 flex items-center justify-center">
                   <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.08]">
                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                       <motion.path
@@ -743,47 +758,47 @@ export default function OnboardingPage() {
                         strokeLinejoin="round"
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+                        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
                       />
                     </svg>
                     {/* Ripple */}
                     <motion.div
-                      initial={{ scale: 0.8, opacity: 0.5 }}
-                      animate={{ scale: 1.8, opacity: 0 }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                      className="absolute inset-0 rounded-full border border-emerald-400/30"
+                      initial={{ scale: 0.8, opacity: 0.6 }}
+                      animate={{ scale: 1.9, opacity: 0 }}
+                      transition={{ duration: 0.7, delay: 0.15 }}
+                      className="absolute inset-0 rounded-full border border-emerald-400/40"
                     />
                   </div>
                 </div>
 
                 {/* Title */}
-                <h3 className="mb-2 text-center text-lg font-semibold text-white">
+                <h3 className="mb-2 text-center text-xl font-semibold text-white">
                   {text.celebrationTitle(celebratingStep)}
                 </h3>
 
                 {/* Description */}
-                <p className="mb-5 text-center text-sm leading-relaxed text-white/50">
+                <p className="mb-6 text-center text-sm leading-relaxed text-white/50">
                   {text.celebrationDesc[celebratingStep]}
                 </p>
 
                 {/* Fact pill */}
-                <div className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-center">
+                <div className="mb-5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-5 py-3 text-center">
                   <p className="text-xs leading-relaxed text-white/35">
                     {text.celebrationFact(calcInstructionLines(celebratingStep, form))}
                   </p>
                 </div>
 
-                {/* Auto-advance progress bar */}
-                <div className="mt-4 h-0.5 overflow-hidden rounded-full bg-white/[0.06]">
+                {/* Auto-advance countdown bar — empties from full to zero */}
+                <div className="h-0.5 overflow-hidden rounded-full bg-white/[0.06]">
                   <motion.div
-                    className="h-full bg-emerald-400/60"
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 2.3, ease: "linear" }}
+                    className="h-full bg-emerald-400/50"
+                    initial={{ width: "100%" }}
+                    animate={{ width: "0%" }}
+                    transition={{ duration: 3.3, ease: "linear" }}
                   />
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
@@ -809,11 +824,34 @@ export default function OnboardingPage() {
           ════════════════════════════════════════ */}
           {step === 1 && (
             <div className="flex flex-col gap-8">
-              <div>
-                <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  {text.step1_title}
+              {/* Welcome header — cold traffic / ad arrivals */}
+              <div className="pb-2">
+                <div className="mb-5 inline-flex items-center rounded-full border border-white/[0.10] bg-white/[0.04] px-3.5 py-1">
+                  <span className="text-xs font-medium text-white/60">{text.welcomeBadge}</span>
+                </div>
+                <h1 className="mb-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                  {text.welcomeHeading}
                 </h1>
-                <p className="mt-2 text-base text-white/50">{text.step1_subtitle}</p>
+                <p className="mb-6 max-w-lg text-base leading-relaxed text-white/50">
+                  {text.welcomeSubtitle}
+                </p>
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                  {[text.welcomeProof1, text.welcomeProof2, text.welcomeProof3].map((item) => (
+                    <span key={item} className="flex items-center gap-1.5 text-sm text-white/40">
+                      <span className="text-emerald-400">✓</span>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="h-px bg-white/[0.06]" />
+
+              <div>
+                <h2 className="text-xl font-semibold tracking-tight text-white">
+                  {text.step1_title}
+                </h2>
+                <p className="mt-1.5 text-sm text-white/50">{text.step1_subtitle}</p>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
@@ -1418,7 +1456,7 @@ export default function OnboardingPage() {
                 setTimeout(() => {
                   setCelebratingStep(null);
                   setStep((s) => s + 1);
-                }, 2500);
+                }, 3500);
               }}
               disabled={!canProceed()}
               className="rounded-lg bg-white px-6 py-2 text-sm font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-35"
