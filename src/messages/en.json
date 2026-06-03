@@ -154,11 +154,13 @@
     "back": "Back",
     "skip": "Skip for now",
     "step1": {
-      "title": "First, let's name your agent.",
-      "subtitle": "Your agent will introduce itself by this name when texting your leads.",
+      "title": "Name your agent and your business.",
+      "subtitle": "Give your AI assistant a name, and tell us what your business is called. We'll handle the rest.",
       "agentNameLabel": "Agent name",
+      "agentNameHelper": "This is the name your agent will use when texting your leads.",
       "agentNamePlaceholder": "Max, Sophie, Alex...",
       "businessNameLabel": "Business name",
+      "businessNameHelper": "Your business name as your clients know it.",
       "businessNamePlaceholder": "Pool Pro, GreenLawn...",
       "sectorLabel": "Sector",
       "sectors": {

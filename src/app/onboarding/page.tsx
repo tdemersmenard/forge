@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import posthog from "posthog-js";
-import { toast } from "sonner";
 
 declare global {
   interface Window {
@@ -29,15 +28,15 @@ const TRANSLATIONS = {
     welcomeProof2: "7-day free trial",
     welcomeProof3: "Cancel anytime",
 
-    step1_title: "What kind of business do you run?",
-    step1_subtitle: "Just one click. We'll customize everything else around this.",
-    stepIdentity_title: "Let's set up your agent.",
-    stepIdentity_subtitle: (sector: string) => `Tell us about your ${sector} business.`,
-    buildingToast: (sector: string) => `Building your ${sector} agent...`,
+    step1_title: "Name your agent and your business.",
+    step1_subtitle: "Give your AI assistant a name, and tell us what your business is called. We'll handle the rest.",
     step1_agentNameLabel: "Agent name",
+    step1_agentNameHelper: "This is the name your agent will use when texting your leads.",
     step1_agentNamePlaceholder: "Max, Sophie, Alex...",
     step1_businessNameLabel: "Business name",
+    step1_businessNameHelper: "Your business name as your clients know it.",
     step1_businessNamePlaceholder: "Pool Pro, GreenLawn...",
+
     step1_sectorLabel: "Sector",
     sectors: {
       pool: "Pool & Spa",
@@ -135,12 +134,12 @@ const TRANSLATIONS = {
 
     celebrationTitle: (step: number) => `Step ${step} complete!`,
     celebrationDesc: {
-      2: "Your agent now has a name and knows what industry it works in.",
-      3: "Your agent now knows exactly what to sell and at what price. It can quote leads instantly.",
-      4: "Your agent knows what questions to ask to find your best leads — and which leads to politely turn away.",
-      5: "Your agent now has a personality. It will sound exactly the way you want when talking to your clients.",
-      6: "Your agent knows your service area, your promotions, and what to never say. It's basically you, but tireless.",
-      7: "Your agent is connected to your phone number. It can now send and receive SMS messages 24/7.",
+      1: "Your agent now has a name and knows what industry it works in.",
+      2: "Your agent now knows exactly what to sell and at what price. It can quote leads instantly.",
+      3: "Your agent knows what questions to ask to find your best leads — and which leads to politely turn away.",
+      4: "Your agent now has a personality. It will sound exactly the way you want when talking to your clients.",
+      5: "Your agent knows your service area, your promotions, and what to never say. It's basically you, but tireless.",
+      6: "Your agent is connected to your phone number. It can now send and receive SMS messages 24/7.",
     } as Record<number, string>,
     celebrationFact: (lines: number) =>
       `Forgee just generated ${lines} lines of personalized instructions for your agent.`,
@@ -189,14 +188,13 @@ const TRANSLATIONS = {
     welcomeProof2: "7 jours d\u2019essai gratuit",
     welcomeProof3: "Annulez n\u2019importe quand",
 
-    step1_title: "Quel type de business avez-vous?",
-    step1_subtitle: "Un seul clic. On personnalise tout le reste autour de \u00E7a.",
-    stepIdentity_title: "Configurons votre agent.",
-    stepIdentity_subtitle: (sector: string) => `Parlez-nous de votre business de ${sector}.`,
-    buildingToast: (sector: string) => `Construction de votre agent ${sector}...`,
+    step1_title: "Nommez votre agent et votre entreprise.",
+    step1_subtitle: "Donnez un nom \u00E0 votre assistant IA, et dites-nous le nom de votre entreprise. On s\u2019occupe du reste.",
     step1_agentNameLabel: "Nom de l\u2019agent",
+    step1_agentNameHelper: "C\u2019est le nom que votre agent utilisera pour texter vos leads.",
     step1_agentNamePlaceholder: "Max, Sophie, Alex...",
     step1_businessNameLabel: "Nom de l\u2019entreprise",
+    step1_businessNameHelper: "Le nom de votre entreprise comme vos clients la connaissent.",
     step1_businessNamePlaceholder: "Pool Pro, GreenLawn...",
     step1_sectorLabel: "Secteur",
     sectors: {
@@ -297,12 +295,12 @@ const TRANSLATIONS = {
 
     celebrationTitle: (step: number) => `\u00C9tape ${step} compl\u00E8te!`,
     celebrationDesc: {
-      2: "Ton agent a maintenant un nom et sait dans quelle industrie il travaille.",
-      3: "Ton agent sait maintenant exactement quoi vendre et \u00E0 quel prix. Il peut faire des devis instantan\u00E9ment.",
-      4: "Ton agent sait quelles questions poser pour trouver tes meilleurs leads \u2014 et lesquels refuser poliment.",
-      5: "Ton agent a maintenant une personnalit\u00E9. Il va parler exactement de la fa\u00E7on que tu veux \u00E0 tes clients.",
-      6: "Ton agent conna\u00EEt ta zone de service, tes promotions, et ce qu\u2019il ne doit jamais dire. C\u2019est toi, mais infatigable.",
-      7: "Ton agent est connect\u00E9 \u00E0 ton num\u00E9ro de t\u00E9l\u00E9phone. Il peut maintenant envoyer et recevoir des SMS 24/7.",
+      1: "Ton agent a maintenant un nom et sait dans quelle industrie il travaille.",
+      2: "Ton agent sait maintenant exactement quoi vendre et \u00E0 quel prix. Il peut faire des devis instantan\u00E9ment.",
+      3: "Ton agent sait quelles questions poser pour trouver tes meilleurs leads \u2014 et lesquels refuser poliment.",
+      4: "Ton agent a maintenant une personnalit\u00E9. Il va parler exactement de la fa\u00E7on que tu veux \u00E0 tes clients.",
+      5: "Ton agent conna\u00EEt ta zone de service, tes promotions, et ce qu\u2019il ne doit jamais dire. C\u2019est toi, mais infatigable.",
+      6: "Ton agent est connect\u00E9 \u00E0 ton num\u00E9ro de t\u00E9l\u00E9phone. Il peut maintenant envoyer et recevoir des SMS 24/7.",
     } as Record<number, string>,
     celebrationFact: (lines: number) =>
       `Forgee vient de g\u00E9n\u00E9rer ${lines} lignes d\u2019instructions personnalis\u00E9es pour ton agent.`,
@@ -372,7 +370,7 @@ const CONTRACT_VALUES = ["Under $500", "$500\u2013$2,000", "$2,000\u2013$5,000",
 
 const UNITS = ["fixed", "per visit", "per sqft", "custom"];
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 7;
 
 const WEBHOOK_URL = `${
   process.env.NEXT_PUBLIC_APP_URL ?? "https://forgee.app"
@@ -552,9 +550,9 @@ export default function OnboardingPage() {
     localStorage.setItem("forgee_onboarding_data", JSON.stringify(persistable));
   }, [form]);
 
-  // Deploy animation (step 8)
+  // Deploy animation (step 7)
   useEffect(() => {
-    if (step !== 8) return;
+    if (step !== 7) return;
 
     setDeployIndex(-1);
     setError(null);
@@ -589,10 +587,12 @@ export default function OnboardingPage() {
   }
 
   function canProceed(): boolean {
-    if (step === 2) return form.agentName.trim() !== "" && form.businessName.trim() !== "";
-    if (step === 3) return form.servicesList.some((s) => s.name.trim() !== "") && form.contractValue !== "";
-    if (step === 4) return form.qualificationQuestions.some((q) => q.trim() !== "");
-    if (step === 5) return form.tone !== "";
+    if (step === 1)
+      return form.agentName.trim() !== "" && form.businessName.trim() !== "" && form.sector !== "";
+    if (step === 2)
+      return form.servicesList.some((s) => s.name.trim() !== "") && form.contractValue !== "";
+    if (step === 3) return form.qualificationQuestions.some((q) => q.trim() !== "");
+    if (step === 4) return form.tone !== "";
     return true;
   }
 
@@ -826,7 +826,7 @@ export default function OnboardingPage() {
           )}
 
           {/* ════════════════════════════════════════
-              STEP 1: Sector Selection
+              STEP 1: Agent Identity
           ════════════════════════════════════════ */}
           {step === 1 && (
             <div className="flex flex-col gap-8">
@@ -860,56 +860,6 @@ export default function OnboardingPage() {
                 <p className="mt-1.5 text-sm text-white/50">{text.step1_subtitle}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {SECTORS.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => {
-                      set("sector", s.id);
-                      toast(text.buildingToast(text.sectors[s.id]), { duration: 3000 });
-                      posthog.capture("sector_selected", { sector: s.id });
-                      posthog.capture("onboarding_step_completed", { step: 1 });
-                      setTimeout(() => setStep(2), 400);
-                    }}
-                    className={`relative flex flex-col items-start gap-2 rounded-xl border p-4 text-left transition-colors ${
-                      form.sector === s.id
-                        ? "border-white bg-white/[0.08] text-white"
-                        : "border-white/[0.07] bg-white/[0.02] text-white/50 hover:border-white/20 hover:text-white/70"
-                    }`}
-                  >
-                    {form.sector === s.id && (
-                      <span className="absolute right-2.5 top-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-white">
-                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                          <path d="M1.5 4l2 2 3-3" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </span>
-                    )}
-                    <span className="text-xl">{s.emoji}</span>
-                    <span className="text-xs font-medium leading-snug">
-                      {text.sectors[s.id]}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ════════════════════════════════════════
-              STEP 2: Agent Identity
-          ════════════════════════════════════════ */}
-          {step === 2 && (
-            <div className="flex flex-col gap-8">
-              <div>
-                <h1 className="text-3xl font-semibold tracking-tight text-white">
-                  {text.stepIdentity_title}
-                </h1>
-                <p className="mt-2 text-base text-white/50">
-                  {form.sector
-                    ? text.stepIdentity_subtitle(text.sectors[form.sector as SectorId])
-                    : text.stepIdentity_subtitle("")}
-                </p>
-              </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
@@ -921,8 +871,8 @@ export default function OnboardingPage() {
                     onChange={(e) => set("agentName", e.target.value)}
                     placeholder={text.step1_agentNamePlaceholder}
                     className={inputCls}
-                    autoFocus
                   />
+                  <p className="text-xs text-white/30">{text.step1_agentNameHelper}</p>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-white/50">
@@ -935,15 +885,50 @@ export default function OnboardingPage() {
                     placeholder={text.step1_businessNamePlaceholder}
                     className={inputCls}
                   />
+                  <p className="text-xs text-white/30">{text.step1_businessNameHelper}</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-medium text-white/50">
+                    {text.step1_sectorLabel}
+                  </label>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {SECTORS.map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => {
+                          set("sector", s.id);
+                          posthog.capture("sector_selected", { sector: s.id });
+                        }}
+                        className={`relative flex flex-col items-start gap-2 rounded-xl border p-4 text-left transition-colors ${
+                          form.sector === s.id
+                            ? "border-white bg-white/[0.08] text-white"
+                            : "border-white/[0.07] bg-white/[0.02] text-white/50 hover:border-white/20 hover:text-white/70"
+                        }`}
+                      >
+                        {form.sector === s.id && (
+                          <span className="absolute right-2.5 top-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-white">
+                            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                              <path d="M1.5 4l2 2 3-3" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </span>
+                        )}
+                        <span className="text-xl">{s.emoji}</span>
+                        <span className="text-xs font-medium leading-snug">
+                          {text.sectors[s.id]}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {/* ════════════════════════════════════════
-              STEP 3: Services & Pricing
+              STEP 2: Services & Pricing
           ════════════════════════════════════════ */}
-          {step === 3 && (
+          {step === 2 && (
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
@@ -1038,9 +1023,9 @@ export default function OnboardingPage() {
           )}
 
           {/* ════════════════════════════════════════
-              STEP 4: Lead Qualification
+              STEP 3: Lead Qualification
           ════════════════════════════════════════ */}
-          {step === 4 && (
+          {step === 3 && (
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
@@ -1099,9 +1084,9 @@ export default function OnboardingPage() {
           )}
 
           {/* ════════════════════════════════════════
-              STEP 5: Agent Personality
+              STEP 4: Agent Personality
           ════════════════════════════════════════ */}
-          {step === 5 && (
+          {step === 4 && (
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
@@ -1208,9 +1193,9 @@ export default function OnboardingPage() {
           )}
 
           {/* ════════════════════════════════════════
-              STEP 6: Special Instructions
+              STEP 5: Special Instructions
           ════════════════════════════════════════ */}
-          {step === 6 && (
+          {step === 5 && (
             <div className="flex flex-col gap-8">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
@@ -1272,9 +1257,9 @@ export default function OnboardingPage() {
           )}
 
           {/* ════════════════════════════════════════
-              STEP 7: Connect Phone Number
+              STEP 6: Connect Phone Number
           ════════════════════════════════════════ */}
-          {step === 7 && (
+          {step === 6 && (
             <div className="flex flex-col gap-7">
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
@@ -1413,7 +1398,7 @@ export default function OnboardingPage() {
 
               <button
                 type="button"
-                onClick={() => setStep(8)}
+                onClick={() => setStep(7)}
                 className="w-fit text-xs text-white/25 underline underline-offset-4 transition-colors hover:text-white/50"
               >
                 {text.skip}
@@ -1422,9 +1407,9 @@ export default function OnboardingPage() {
           )}
 
           {/* ════════════════════════════════════════
-              STEP 8: Building (automated)
+              STEP 7: Building (automated)
           ════════════════════════════════════════ */}
-          {step === 8 && (
+          {step === 7 && (
             <div className="flex flex-col items-center gap-10 py-8">
               <div className="text-center">
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
@@ -1468,16 +1453,20 @@ export default function OnboardingPage() {
       </main>
 
       {/* ── Navigation ── */}
-      {step > 1 && step < 8 && (
+      {step < 7 && (
         <footer className="sticky bottom-0 border-t border-white/[0.06] bg-[#0a0a0a] px-6 py-4">
           <div className="mx-auto flex max-w-2xl items-center justify-between">
-            <button
-              type="button"
-              onClick={() => setStep((s) => s - 1)}
-              className="rounded-lg border border-white/10 px-5 py-2 text-sm font-medium text-white/55 transition-colors hover:border-white/20 hover:text-white"
-            >
-              ← {text.back}
-            </button>
+            {step > 1 ? (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s - 1)}
+                className="rounded-lg border border-white/10 px-5 py-2 text-sm font-medium text-white/55 transition-colors hover:border-white/20 hover:text-white"
+              >
+                ← {text.back}
+              </button>
+            ) : (
+              <div />
+            )}
             <button
               type="button"
               onClick={() => {

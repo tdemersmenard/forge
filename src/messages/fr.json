@@ -154,11 +154,13 @@
     "back": "Retour",
     "skip": "Passer pour l'instant",
     "step1": {
-      "title": "Commençons par nommer votre agent.",
-      "subtitle": "Votre agent se présentera par ce nom lorsqu'il enverra des SMS à vos leads.",
+      "title": "Nommez votre agent et votre entreprise.",
+      "subtitle": "Donnez un nom à votre assistant IA, et dites-nous le nom de votre entreprise. On s'occupe du reste.",
       "agentNameLabel": "Nom de l'agent",
+      "agentNameHelper": "C'est le nom que votre agent utilisera pour texter vos leads.",
       "agentNamePlaceholder": "Max, Sophie, Alex...",
       "businessNameLabel": "Nom de l'entreprise",
+      "businessNameHelper": "Le nom de votre entreprise comme vos clients la connaissent.",
       "businessNamePlaceholder": "Piscine Pro, GreenLawn...",
       "sectorLabel": "Secteur",
       "sectors": {
