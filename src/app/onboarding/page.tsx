@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import posthog from "posthog-js";
 
 declare global {
   interface Window {
@@ -519,10 +520,11 @@ export default function OnboardingPage() {
     window.fbq?.("track", "ViewContent");
   }, []);
 
-  // Step entry animation
+  // Step entry animation + tracking
   useEffect(() => {
     setVisible(false);
     const timer = setTimeout(() => setVisible(true), 40);
+    posthog.capture("onboarding_step_viewed", { step });
     return () => clearTimeout(timer);
   }, [step]);
 
@@ -1450,6 +1452,7 @@ export default function OnboardingPage() {
             <button
               type="button"
               onClick={() => {
+                posthog.capture("onboarding_step_completed", { step });
                 playDing();
                 setCelebratingStep(step);
                 setTimeout(() => {

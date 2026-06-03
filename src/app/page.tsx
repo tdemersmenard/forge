@@ -1,5 +1,6 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import { LandingTracker } from "./components/LandingTracker";
 import DashboardPreview from "./components/DashboardPreview";
 import StatsBar from "./components/StatsBar";
 import HowItWorks from "./components/HowItWorks";
@@ -15,6 +16,7 @@ import ExitIntentPopup from "./components/ExitIntentPopup";
 export default function Home() {
   return (
     <>
+      <LandingTracker />
       <Navbar />
       <main>
         <Hero />

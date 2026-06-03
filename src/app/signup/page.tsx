@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import posthog from "posthog-js";
 
 declare global {
   interface Window {
@@ -121,6 +122,11 @@ export default function SignupPage() {
       setLoading(false);
       return;
     }
+
+    // Account created and session confirmed
+    window.fbq?.("track", "CompleteRegistration");
+    posthog.identify(authData.user!.id, { email });
+    posthog.capture("user_signed_up");
 
     if (onboardingData) {
       await saveAgentData(onboardingData);

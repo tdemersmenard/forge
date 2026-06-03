@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { PLANS } from "@/lib/plans";
+import posthog from "posthog-js";
 
 declare global {
   interface Window {
@@ -31,7 +32,8 @@ export function DashboardOverviewHeader({ email, showSuccess, checkoutSuccess, p
   useEffect(() => {
     if (!checkoutSuccess) return;
     localStorage.setItem("forgee_just_subscribed", "true");
-  }, [checkoutSuccess]);
+    posthog.capture("subscription_started", { plan });
+  }, [checkoutSuccess, plan]);
 
   return (
     <>

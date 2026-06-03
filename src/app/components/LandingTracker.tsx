@@ -3,15 +3,8 @@
 import { useEffect } from "react";
 import posthog from "posthog-js";
 
-declare global {
-  interface Window {
-    fbq: any;
-  }
-}
-
-export function GoPixel() {
+export function LandingTracker() {
   useEffect(() => {
-    window.fbq?.("track", "ViewContent", { content_name: "Ad Landing Page" });
     posthog.capture("landing_viewed");
   }, []);
   return null;

@@ -6,6 +6,7 @@ import { PLANS } from "@/lib/plans";
 import type { PlanId } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import posthog from "posthog-js";
 
 declare global {
   interface Window {
@@ -76,6 +77,7 @@ export default function PlanPage() {
         return;
       }
       window.fbq?.("track", "StartTrial");
+      posthog.capture("plan_selected", { plan: planId });
       window.location.href = data.url;
     } catch {
       setError(t("networkError"));

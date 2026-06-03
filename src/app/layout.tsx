@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { Suspense } from "react";
 import { Toaster } from "sonner";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
+import { CSPostHogProvider, PostHogPageView } from "./providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -96,10 +98,15 @@ fbq('track', 'PageView');
         )}
       </head>
       <body className="min-h-screen bg-[#0a0a0a] text-white">
-        <LanguageProvider>
-          {children}
-          <Toaster theme="dark" position="bottom-right" />
-        </LanguageProvider>
+        <CSPostHogProvider>
+          <LanguageProvider>
+            <Suspense>
+              <PostHogPageView />
+            </Suspense>
+            {children}
+            <Toaster theme="dark" position="bottom-right" />
+          </LanguageProvider>
+        </CSPostHogProvider>
       </body>
     </html>
   );
