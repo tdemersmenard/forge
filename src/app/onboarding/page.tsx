@@ -27,8 +27,8 @@ const TRANSLATIONS = {
     welcomeProof2: "7-day free trial",
     welcomeProof3: "Cancel anytime",
 
-    step1_title: "What kind of business do you run?",
-    step1_subtitle: "Your agent will introduce itself by this name when texting your leads.",
+    step1_title: "Let's set up your agent.",
+    step1_subtitle: "Tell us who your agent is and what your business does.",
     step1_agentNameLabel: "Agent name",
     step1_agentNamePlaceholder: "Max, Sophie, Alex...",
     step1_businessNameLabel: "Business name",
@@ -184,9 +184,8 @@ const TRANSLATIONS = {
     welcomeProof2: "7 jours d\u2019essai gratuit",
     welcomeProof3: "Annulez n\u2019importe quand",
 
-    step1_title: "Quel type de business avez-vous?",
-    step1_subtitle:
-      "Votre agent se pr\u00E9sentera par ce nom lorsqu\u2019il enverra des SMS \u00E0 vos leads.",
+    step1_title: "Configurons votre agent.",
+    step1_subtitle: "Dites-nous qui est votre agent et ce que fait votre business.",
     step1_agentNameLabel: "Nom de l\u2019agent",
     step1_agentNamePlaceholder: "Max, Sophie, Alex...",
     step1_businessNameLabel: "Nom de l\u2019entreprise",
