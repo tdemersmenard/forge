@@ -58,7 +58,22 @@ export async function POST(request: Request) {
     mode: "subscription",
     payment_method_types: ["card"],
     line_items: [{ price: priceId, quantity: 1 }],
-    subscription_data: { trial_period_days: 7 },
+    subscription_data: {
+      trial_period_days: 7,
+      trial_settings: {
+        end_behavior: {
+          missing_payment_method: "cancel",
+        },
+      },
+    },
+    billing_address_collection: "auto",
+    consent_collection: { terms_of_service: "none" },
+    custom_text: {
+      submit: { message: "No charge for 7 days. Cancel anytime." },
+    },
+    after_expiration: {
+      recovery: { enabled: true, allow_promotion_codes: true },
+    },
     success_url: `${getAppUrl()}/dashboard?checkout_success=true&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${getAppUrl()}/onboarding/plan`,
     allow_promotion_codes: true,

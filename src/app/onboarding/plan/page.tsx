@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PLANS } from "@/lib/plans";
 import type { PlanId } from "@/lib/plans";
@@ -13,6 +13,13 @@ declare global {
     fbq: any;
   }
 }
+
+const TESTIMONIALS = [
+  {
+    text: "I signed up at 11pm on a Tuesday. By Wednesday morning, my agent had already closed two pool maintenance contracts.",
+    author: "Mike T., HVAC Florida",
+  },
+];
 
 function getRecommendedPlan(contractValue: string | null): PlanId {
   if (!contractValue) return "growth";
@@ -29,6 +36,7 @@ export default function PlanPage() {
   const [agentName, setAgentName] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [recommendedPlan, setRecommendedPlan] = useState<PlanId>("growth");
+  const checkoutStartedRef = useRef(false);
 
   // Handle Stripe success redirect back to this page (legacy fallback)
   useEffect(() => {
@@ -39,6 +47,16 @@ export default function PlanPage() {
 
   useEffect(() => {
     window.fbq?.("track", "InitiateCheckout");
+    posthog.capture("plan_page_viewed");
+
+    // Fire checkout_abandoned if they leave within 30s without starting checkout
+    const timer = setTimeout(() => {
+      if (!checkoutStartedRef.current) {
+        posthog.capture("checkout_abandoned", { seconds_on_page: 30 });
+      }
+    }, 30000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -62,6 +80,7 @@ export default function PlanPage() {
   }, []);
 
   async function selectPlan(planId: PlanId) {
+    posthog.capture("plan_selected", { plan: planId });
     setCheckoutLoading(planId);
     setError(null);
     try {
@@ -76,14 +95,27 @@ export default function PlanPage() {
         setCheckoutLoading(null);
         return;
       }
+      checkoutStartedRef.current = true;
+      posthog.capture("checkout_started", { plan: planId });
       window.fbq?.("track", "StartTrial");
-      posthog.capture("plan_selected", { plan: planId });
       window.location.href = data.url;
     } catch {
       setError(t("networkError"));
       setCheckoutLoading(null);
     }
   }
+
+  const checkIcon = (dark = false) => (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
+      <path
+        d="M2.5 7l3 3 6-6"
+        stroke={dark ? "#0a0a0a" : "currentColor"}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-[#0a0a0a] px-4 py-12">
@@ -93,18 +125,37 @@ export default function PlanPage() {
       </div>
 
       {/* Hero */}
-      <div className="mb-12 max-w-xl text-center">
+      <div className="mb-10 max-w-xl text-center">
         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/40">
           {t("trialBadge")}
         </p>
         <h1 className="mb-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-          {agentName
-            ? t("readyNamed", { name: agentName })
-            : t("ready")}
+          {agentName ? t("readyNamed", { name: agentName }) : t("ready")}
         </h1>
-        <p className="text-base text-white/50">
-          {t("subtitle")}
+        <p className="text-base text-white/50">{t("subtitle")}</p>
+      </div>
+
+      {/* ── Reassurance section ── */}
+      <div className="mb-10 w-full max-w-3xl">
+        <p className="mb-5 text-center text-xl font-semibold text-white">
+          {t("noChargeTitle")}
         </p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {([
+            { icon: "🔒", titleKey: "reassure1Title", descKey: "reassure1Desc" },
+            { icon: "⚡", titleKey: "reassure2Title", descKey: "reassure2Desc" },
+            { icon: "📧", titleKey: "reassure3Title", descKey: "reassure3Desc" },
+          ] as const).map(({ icon, titleKey, descKey }) => (
+            <div
+              key={titleKey}
+              className="flex flex-col gap-1.5 rounded-xl border border-white/[0.07] bg-white/[0.03] px-5 py-4"
+            >
+              <span className="text-xl">{icon}</span>
+              <p className="text-sm font-semibold text-white">{t(titleKey)}</p>
+              <p className="text-xs leading-relaxed text-white/45">{t(descKey)}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Error */}
@@ -137,36 +188,15 @@ export default function PlanPage() {
                     {plan.badge}
                   </div>
                 )}
-                <h2 className="text-lg font-semibold text-[#0a0a0a]">
-                  {plan.name}
-                </h2>
+                <h2 className="text-lg font-semibold text-[#0a0a0a]">{plan.name}</h2>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-[#0a0a0a]">
-                    ${plan.price}
-                  </span>
+                  <span className="text-3xl font-bold text-[#0a0a0a]">${plan.price}</span>
                   <span className="text-sm text-[#0a0a0a]/50">{t("perMonth")}</span>
                 </div>
                 <ul className="mb-6 mt-5 space-y-2.5">
                   {plan.features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex items-center gap-2 text-sm text-[#0a0a0a]/70"
-                    >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        className="shrink-0"
-                      >
-                        <path
-                          d="M2.5 7l3 3 6-6"
-                          stroke="#0a0a0a"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+                    <li key={f} className="flex items-center gap-2 text-sm text-[#0a0a0a]/70">
+                      {checkIcon(true)}
                       {f}
                     </li>
                   ))}
@@ -195,32 +225,13 @@ export default function PlanPage() {
               )}
               <h2 className="text-lg font-semibold text-white">{plan.name}</h2>
               <div className="mt-2 flex items-baseline gap-1">
-                <span className="text-3xl font-bold text-white">
-                  ${plan.price}
-                </span>
+                <span className="text-3xl font-bold text-white">${plan.price}</span>
                 <span className="text-sm text-white/40">{t("perMonth")}</span>
               </div>
               <ul className="mb-6 mt-5 space-y-2.5">
                 {plan.features.map((f) => (
-                  <li
-                    key={f}
-                    className="flex items-center gap-2 text-sm text-white/60"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      className="shrink-0"
-                    >
-                      <path
-                        d="M2.5 7l3 3 6-6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                  <li key={f} className="flex items-center gap-2 text-sm text-white/60">
+                    {checkIcon()}
                     {f}
                   </li>
                 ))}
@@ -239,21 +250,31 @@ export default function PlanPage() {
       </div>
 
       {/* Trust row */}
-      <div className="mb-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+      <div className="mb-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {[
           { icon: "🔒", key: "trustSsl" },
           { icon: "💳", key: "trustNoCard" },
           { icon: "✕", key: "trustCancel" },
         ].map((item) => (
-          <span
-            key={item.key}
-            className="flex items-center gap-1.5 text-xs text-white/30"
-          >
+          <span key={item.key} className="flex items-center gap-1.5 text-xs text-white/30">
             <span>{item.icon}</span>
             {t(item.key)}
           </span>
         ))}
       </div>
+
+      {/* Testimonial */}
+      {TESTIMONIALS.map((testimonial) => (
+        <div
+          key={testimonial.author}
+          className="mb-10 w-full max-w-xl rounded-xl border border-white/[0.06] bg-white/[0.02] px-6 py-5 text-center"
+        >
+          <p className="text-sm leading-relaxed text-white/60">
+            &ldquo;{testimonial.text}&rdquo;
+          </p>
+          <p className="mt-3 text-xs font-medium text-white/30">— {testimonial.author}</p>
+        </div>
+      ))}
 
       {/* Skip */}
       <button

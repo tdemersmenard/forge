@@ -268,7 +268,14 @@
     "trustNoCard": "No credit card stored until trial ends",
     "trustCancel": "Cancel anytime in 2 clicks",
     "checkoutFailed": "Failed to start checkout. Please try again.",
-    "networkError": "Network error — please try again."
+    "networkError": "Network error — please try again.",
+    "noChargeTitle": "You won't be charged today.",
+    "reassure1Title": "No charge for 7 days",
+    "reassure1Desc": "We use your card to prevent fraud only.",
+    "reassure2Title": "Cancel in 2 clicks",
+    "reassure2Desc": "Cancel anytime from your dashboard.",
+    "reassure3Title": "Reminder before billing",
+    "reassure3Desc": "We'll email you 2 days before your trial ends."
   },
   "sidebar": {
     "overview": "Overview",

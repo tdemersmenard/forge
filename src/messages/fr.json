@@ -268,7 +268,14 @@
     "trustNoCard": "Aucune carte de crédit avant la fin de l'essai",
     "trustCancel": "Annulez à tout moment en 2 clics",
     "checkoutFailed": "Échec du paiement — réessayez.",
-    "networkError": "Erreur réseau — veuillez réessayer."
+    "networkError": "Erreur réseau — veuillez réessayer.",
+    "noChargeTitle": "Vous ne serez pas facturé aujourd'hui.",
+    "reassure1Title": "Aucun frais pendant 7 jours",
+    "reassure1Desc": "Votre carte sert uniquement à prévenir la fraude.",
+    "reassure2Title": "Annulez en 2 clics",
+    "reassure2Desc": "Annulez à tout moment depuis votre tableau de bord.",
+    "reassure3Title": "Rappel avant facturation",
+    "reassure3Desc": "Email 2 jours avant la fin de votre essai."
   },
   "sidebar": {
     "overview": "Aperçu",
