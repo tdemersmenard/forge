@@ -265,85 +265,88 @@ export function LpClient({ adId, h1, subtitle, video }: Props) {
   return (
     <div className="overflow-x-hidden min-h-screen bg-[#0a0a0a] text-white">
       {/* ── Header ── */}
-      <header className="flex h-14 items-center justify-between border-b border-white/[0.06] px-4 md:h-16 md:px-8">
-        <img src="/logo.svg" alt="Forgee" height="24" />
-        <div className="flex items-center gap-3">
-          <a
-            href="/login"
-            className="text-xs font-medium text-white/60 transition-colors hover:text-white"
-          >
-            Sign in
-          </a>
-          <a
-            href={`/onboarding?from=lp_${adId}`}
-            onClick={() => posthog.capture("lp_cta_clicked", { adId, position: "nav" })}
-            className="hidden rounded-lg bg-white px-4 py-2 text-xs font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 md:block"
-          >
-            Get started free
-          </a>
+      <header className="border-b border-zinc-900">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <div className="flex items-center gap-3">
+            <img src="/logo.svg" alt="" className="h-7 w-7 object-contain" />
+            <span className="text-lg font-semibold text-white">forgee</span>
+          </div>
         </div>
       </header>
 
       {/* ── Hero ── */}
-      <section className="px-4 pb-10 pt-8 text-center md:px-8 md:pb-14 md:pt-12">
-        <h1 className="mb-4 text-3xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-          {h1}
-        </h1>
-        <p className="mx-auto mb-8 max-w-md text-base leading-relaxed text-white/55 md:text-lg">
-          {subtitle}
-        </p>
+      <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+            {h1}
+          </h1>
+          <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white/55 md:text-lg">
+            {subtitle}
+          </p>
 
-        {/* Social proof pills */}
-        <div className="mb-8 flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-5 sm:gap-y-2">
-          {["Live in 15 minutes", "7-day free trial — no charge", "Cancel in 2 clicks"].map(
-            (item) => (
-              <span key={item} className="flex items-center gap-1.5 text-sm text-white/50">
-                <span className="font-semibold text-emerald-400">✓</span>
-                {item}
-              </span>
-            )
-          )}
-        </div>
+          {/* Social proof */}
+          <div className="mb-8 flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-2">
+            {["Live in 15 minutes", "7-day free trial — no charge", "Cancel in 2 clicks"].map(
+              (item) => (
+                <span key={item} className="flex items-center gap-1.5 text-sm text-white/50">
+                  <span className="font-semibold text-emerald-400">✓</span>
+                  {item}
+                </span>
+              )
+            )}
+          </div>
 
-        <div className="mx-auto max-w-sm">
-          <CtaButton adId={adId} />
+          <div className="mx-auto max-w-xs">
+            <CtaButton adId={adId} />
+          </div>
         </div>
       </section>
 
       {/* ── Video ── */}
-      <section className="px-4 pb-10 md:px-8">
-        <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/[0.08] bg-black shadow-2xl">
-          <video
-            ref={videoRef}
-            src={video}
-            autoPlay
-            muted
-            loop
-            playsInline
-            onPlay={handleVideoPlay}
-            className="aspect-[9/16] w-full object-cover"
-            aria-label="Product demo video"
-          />
+      <section className="pb-16">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="mx-auto" style={{ maxWidth: "320px" }}>
+            <div className="relative w-full overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl" style={{ aspectRatio: "9/16" }}>
+              <video
+                ref={videoRef}
+                src={video}
+                autoPlay
+                muted
+                loop
+                playsInline
+                onPlay={handleVideoPlay}
+                onError={(e) => { (e.currentTarget as HTMLVideoElement).style.display = "none"; }}
+                className="absolute inset-0 h-full w-full object-cover"
+                aria-label="Product demo video"
+              />
+              {/* Placeholder shown when video fails / missing */}
+              <div className="absolute inset-0 -z-10 flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
+                <span className="text-sm text-zinc-600">Video preview</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── Live demo ── */}
-      <section className="px-4 pb-12 md:px-8">
-        <div className="mx-auto max-w-[480px]">
-          <p className="mb-2 text-center text-xs font-semibold uppercase tracking-widest text-white/30">
+      <section className="pb-16">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-white/30">
             Live demo
           </p>
-          <h2 className="mb-6 text-center text-xl font-semibold text-white">
+          <h2 className="mb-8 text-xl font-semibold text-white md:text-2xl">
             Try Forgee live — type a message like a lead would:
           </h2>
-          <LpDemo adId={adId} onFirstMessage={() => {}} />
+          <div className="mx-auto max-w-[480px]">
+            <LpDemo adId={adId} onFirstMessage={() => {}} />
+          </div>
         </div>
       </section>
 
       {/* ── FAQ ── */}
-      <section className="px-4 pb-12 md:px-8">
-        <div className="mx-auto max-w-2xl">
-          <h2 className="mb-4 text-lg font-semibold text-white">Common questions</h2>
+      <section className="pb-16">
+        <div className="mx-auto max-w-3xl px-6">
+          <h2 className="mb-4 text-lg font-semibold text-white md:text-xl">Common questions</h2>
           {FAQ.map(({ q, a }) => (
             <FaqItem key={q} q={q} a={a} adId={adId} />
           ))}
@@ -351,15 +354,17 @@ export function LpClient({ adId, h1, subtitle, video }: Props) {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="px-4 pb-16 md:px-8">
-        <div className="mx-auto max-w-sm text-center">
+      <section className="pb-20">
+        <div className="mx-auto max-w-3xl px-6 text-center">
           <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-white/30">
             Start your free trial
           </p>
-          <h2 className="mb-6 text-2xl font-bold text-white">
+          <h2 className="mb-6 text-2xl font-bold text-white md:text-3xl">
             Ready to stop missing leads?
           </h2>
-          <CtaButton adId={adId} label="Build my agent — Free →" />
+          <div className="mx-auto max-w-xs">
+            <CtaButton adId={adId} label="Build my agent — Free →" />
+          </div>
           <p className="mt-3 text-xs text-white/25">No credit card charged for 7 days.</p>
         </div>
       </section>
