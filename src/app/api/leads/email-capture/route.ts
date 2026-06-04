@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -23,6 +24,12 @@ export async function POST(request: Request) {
   } catch {
     // Non-blocking — table may not exist yet, that's okay
   }
+
+  getPostHogClient().capture({
+    distinctId: email,
+    event: "email_captured",
+    properties: { $set: { email } },
+  });
 
   return Response.json({ ok: true });
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import posthog from "posthog-js";
 import type { AgentRow } from "./page";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -298,6 +299,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       setIdentitySaving(false);
       return;
     }
+    posthog.capture("agent_settings_saved", { section: "identity", sector: identityForm.sector });
     await markSaved(setIdentitySaving, setIdentitySaved);
   }
 
@@ -315,6 +317,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       setServicesSaving(false);
       return;
     }
+    posthog.capture("agent_settings_saved", { section: "services", services_count: filtered.length });
     await markSaved(setServicesSaving, setServicesSaved);
   }
 
@@ -330,6 +333,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       setQualSaving(false);
       return;
     }
+    posthog.capture("agent_settings_saved", { section: "qualification" });
     await markSaved(setQualSaving, setQualSaved);
   }
 
@@ -351,6 +355,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       setPersonalitySaving(false);
       return;
     }
+    posthog.capture("agent_settings_saved", { section: "personality", tone: personalityForm.tone, language: personalityForm.language });
     await markSaved(setPersonalitySaving, setPersonalitySaved);
   }
 
@@ -368,6 +373,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       setInstructionsSaving(false);
       return;
     }
+    posthog.capture("agent_settings_saved", { section: "instructions" });
     await markSaved(setInstructionsSaving, setInstructionsSaved);
   }
 
@@ -387,6 +393,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       setTwilioSaving(false);
       return;
     }
+    posthog.capture("agent_settings_saved", { section: "integrations_twilio" });
     setTwilioForm((p) => ({ ...p, twilio_auth_token: "" }));
     setEditingTwilioToken(false);
     await markSaved(setTwilioSaving, setTwilioSaved);
@@ -410,6 +417,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       setFbSaving(false);
       return;
     }
+    posthog.capture("agent_settings_saved", { section: "integrations_facebook" });
     setFbForm((p) => ({ ...p, facebook_access_token: "", facebook_verify_token: "" }));
     setEditingFbTokens(false);
     await markSaved(setFbSaving, setFbSaved);
@@ -424,6 +432,7 @@ export function SettingsClient({ agent, userEmail }: Props) {
       setNotifSaving(false);
       return;
     }
+    posthog.capture("agent_settings_saved", { section: "notifications", new_lead: notifForm.new_lead, deal_closed: notifForm.deal_closed });
     await markSaved(setNotifSaving, setNotifSaved);
   }
 

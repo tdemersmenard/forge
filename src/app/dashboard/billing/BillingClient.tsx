@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { PLANS } from "@/lib/plans";
 import type { PlanId } from "@/lib/plans";
+import posthog from "posthog-js";
 
 type SubscriptionData = {
   plan: string;
@@ -41,6 +42,7 @@ export function BillingClient({
   async function handleUpgrade(planId: PlanId) {
     setCheckoutLoading(planId);
     setError(null);
+    posthog.capture("checkout_initiated", { plan: planId, current_plan: currentPlan });
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -63,6 +65,7 @@ export function BillingClient({
   async function handlePortal() {
     setPortalLoading(true);
     setError(null);
+    posthog.capture("billing_portal_opened", { current_plan: currentPlan });
     try {
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = (await res.json()) as { url?: string; error?: string };

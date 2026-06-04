@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
+import posthog from "posthog-js";
 
 export default function ExitIntentPopup() {
   const t = useTranslations("exitIntent");
@@ -20,6 +21,7 @@ export default function ExitIntentPopup() {
       if (e.clientY <= 0) {
         triggered.current = true;
         setVisible(true);
+        posthog.capture("exit_intent_popup_shown");
       }
     }
 
@@ -53,6 +55,7 @@ export default function ExitIntentPopup() {
       // Fail silently
     }
 
+    posthog.capture("exit_intent_email_submitted");
     setLoading(false);
     setSubmitted(true);
     setTimeout(dismiss, 2500);

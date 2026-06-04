@@ -4,6 +4,7 @@ import type { PlanId } from "@/lib/plans";
 import { CheckoutSchema } from "@/lib/schemas/agent";
 import { originGuard } from "@/lib/security";
 import { getAppUrl } from "@/lib/env";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 const PRICE_IDS: Record<PlanId, string | undefined> = {
   starter: process.env.STRIPE_PRICE_STARTER,
@@ -73,6 +74,12 @@ export async function POST(request: Request) {
   }
 
   const session = await stripe.checkout.sessions.create(sessionParams);
+
+  getPostHogClient().capture({
+    distinctId: user.id,
+    event: "checkout_session_created",
+    properties: { plan, email: user.email },
+  });
 
   return Response.json({ url: session.url });
 }

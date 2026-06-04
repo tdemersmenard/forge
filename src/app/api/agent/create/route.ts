@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { originGuard } from "@/lib/security";
 import { AgentCreateSchema } from "@/lib/schemas/agent";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(request: Request) {
   const originBlock = originGuard(request);
@@ -50,6 +51,12 @@ export async function POST(request: Request) {
     console.error("[agent/create] db error:", error.message);
     return Response.json({ error: "Create failed" }, { status: 500 });
   }
+
+  getPostHogClient().capture({
+    distinctId: user.id,
+    event: "agent_created",
+    properties: { plan: userPlan, sector: parsed.data.sector },
+  });
 
   return Response.json({ success: true });
 }

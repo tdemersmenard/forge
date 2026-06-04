@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import posthog from "posthog-js";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export function LogoutButton() {
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
+    posthog.reset();
     router.push("/login");
   }
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import posthog from "posthog-js";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,6 +29,12 @@ export default function LoginPage() {
       setError(authError.message);
       setLoading(false);
       return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      posthog.identify(user.id, { email: user.email });
+      posthog.capture("user_logged_in", { email: user.email });
     }
 
     router.push("/dashboard");
