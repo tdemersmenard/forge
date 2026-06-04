@@ -146,7 +146,21 @@
     "createAccount": "Créer un compte",
     "creatingAccount": "Création du compte…",
     "terms": "En créant un compte, vous acceptez nos Conditions d'utilisation.",
-    "agentReadyBanner": "Votre agent est prêt — créez votre compte pour l'activer."
+    "agentReadyBanner": "Votre agent est prêt — créez votre compte pour l'activer.",
+    "saveHeading": "Votre agent {name} est prêt!",
+    "saveSubtitle": "Une dernière étape — sauvegardez votre agent dans votre compte.",
+    "recapTitle": "Voici ce que vous avez construit\u00a0:",
+    "recapAgent": "Agent",
+    "recapBusiness": "Entreprise",
+    "recapSector": "Secteur",
+    "recapServicesCount": "{count} service configuré",
+    "recapServicesCountPlural": "{count} services configurés",
+    "recapTone": "Ton",
+    "recapLanguage": "Langue",
+    "saveExplanation": "Créez votre compte pour sauvegarder votre agent. Vous pouvez revenir à tout moment pour l'activer.",
+    "saveButton": "Sauvegarder mon agent et continuer →",
+    "savingButton": "Sauvegarde…",
+    "privacyNote": "🔒 Nous ne partageons jamais votre email. Aucun spam, jamais."
   },
   "onboarding": {
     "stepOf": "Étape {step} sur {total}",

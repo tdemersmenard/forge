@@ -71,6 +71,15 @@ async function saveAgentData(data: OnboardingData): Promise<boolean> {
   }
 }
 
+const SECTOR_LABELS: Record<string, { en: string; fr: string }> = {
+  pool: { en: "Pool & Spa", fr: "Piscine & Spa" },
+  lawn: { en: "Lawn & Landscaping", fr: "Gazon & Aménagement" },
+  cleaning: { en: "Cleaning", fr: "Nettoyage" },
+  hvac: { en: "HVAC", fr: "CVC" },
+  construction: { en: "Construction & Renovation", fr: "Construction & Rénovation" },
+  other: { en: "Other", fr: "Autre" },
+};
+
 export default function SignupPage() {
   const router = useRouter();
   const t = useTranslations("signup");
@@ -80,16 +89,29 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [trackLead, setTrackLead] = useState(false);
   const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null);
+  const [lang, setLang] = useState<"en" | "fr">("en");
 
   useEffect(() => {
     const raw = localStorage.getItem("forgee_onboarding_data");
     if (raw) {
       try {
-        setOnboardingData(JSON.parse(raw) as OnboardingData);
+        const data = JSON.parse(raw) as OnboardingData;
+        setOnboardingData(data);
+        posthog.capture("signup_after_onboarding_viewed", {
+          agent_name: data.agentName,
+          sector: data.sector,
+        });
       } catch {
         // ignore malformed data
       }
     }
+
+    // Pre-fill email if captured elsewhere (exit intent, etc.)
+    const savedEmail = localStorage.getItem("forgee_lead_email");
+    if (savedEmail) setEmail(savedEmail);
+
+    const storedLang = localStorage.getItem("forgee_lang") as "en" | "fr" | null;
+    if (storedLang === "en" || storedLang === "fr") setLang(storedLang);
   }, []);
 
   useEffect(() => {
@@ -137,17 +159,135 @@ export default function SignupPage() {
     }
   }
 
+  const inputCls =
+    "h-11 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/25 transition-colors";
+
+  // ── Post-onboarding save flow ──────────────────────────────────────────────
+  if (onboardingData) {
+    const serviceCount = onboardingData.servicesList.filter((s) => s.name.trim()).length;
+    const sectorLabel = SECTOR_LABELS[onboardingData.sector]?.[lang] ?? onboardingData.sector;
+
+    const recapItems = [
+      { label: t("recapAgent"), value: onboardingData.agentName },
+      { label: t("recapBusiness"), value: onboardingData.businessName },
+      { label: t("recapSector"), value: sectorLabel },
+      {
+        label: serviceCount === 1
+          ? t("recapServicesCount", { count: serviceCount })
+          : t("recapServicesCountPlural", { count: serviceCount }),
+        value: null,
+      },
+      { label: t("recapTone"), value: onboardingData.tone },
+      { label: t("recapLanguage"), value: onboardingData.language },
+    ].filter(({ value, label }) => value || label);
+
+    return (
+      <div className="flex min-h-screen flex-col items-center bg-[#0a0a0a] px-4 py-12">
+        <div className="mb-10">
+          <img src="/logo.svg" alt="Forgee" height="28" />
+        </div>
+
+        <div className="w-full max-w-lg">
+          {/* Celebration heading */}
+          <div className="mb-8 text-center">
+            <h1 className="mb-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              {t("saveHeading", { name: onboardingData.agentName })} 🎉
+            </h1>
+            <p className="text-base text-white/50">{t("saveSubtitle")}</p>
+          </div>
+
+          {/* Recap card */}
+          <div className="mb-6 rounded-xl border border-white/[0.08] bg-white/[0.03] px-6 py-5">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/30">
+              {t("recapTitle")}
+            </p>
+            <div className="flex flex-col gap-2.5">
+              {recapItems.map(({ label, value }) => (
+                <div key={label} className="flex items-center gap-2">
+                  <span className="text-xs text-emerald-400">✓</span>
+                  <span className="text-sm text-white/70">
+                    {label}
+                    {value ? <span className="font-medium text-white">: {value}</span> : null}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Explanation */}
+          <p className="mb-6 text-center text-sm leading-relaxed text-white/40">
+            {t("saveExplanation")}
+          </p>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="email" className="text-xs font-medium text-white/50">
+                {t("emailLabel")}
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("emailPlaceholder")}
+                className={inputCls}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="password" className="text-xs font-medium text-white/50">
+                {t("passwordLabel")}
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t("passwordPlaceholder")}
+                className={inputCls}
+              />
+            </div>
+
+            {error && (
+              <p className="rounded-lg border border-red-500/20 bg-red-500/[0.08] px-3 py-2 text-xs text-red-400">
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-1 h-12 rounded-lg bg-white text-sm font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              {loading ? t("savingButton") : t("saveButton")}
+            </button>
+          </form>
+
+          {/* Privacy note */}
+          <p className="mt-4 text-center text-xs text-white/25">{t("privacyNote")}</p>
+
+          {/* Sign in link */}
+          <p className="mt-5 text-center text-xs text-white/30">
+            {t("haveAccount")}{" "}
+            <a href="/login" className="text-white/60 underline underline-offset-4 hover:text-white">
+              {t("signIn")}
+            </a>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Standard signup (no onboarding data) ──────────────────────────────────
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] px-4">
       <div className="w-full max-w-sm">
-        {/* Agent ready banner */}
-        {onboardingData && (
-          <div className="mb-6 flex items-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-4 py-3 text-sm text-emerald-400">
-            <span>✓</span>
-            <span>{t("agentReadyBanner")}</span>
-          </div>
-        )}
-
         {/* Logo */}
         <div className="mb-8">
           <img src="/logo.svg" alt="Forgee" height="28" />
@@ -212,7 +352,7 @@ export default function SignupPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-xs text-white/20 text-center">
+        <p className="mt-6 text-center text-xs text-white/20">
           {t("terms")}
         </p>
       </div>

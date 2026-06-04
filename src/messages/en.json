@@ -146,7 +146,21 @@
     "createAccount": "Create account",
     "creatingAccount": "Creating account…",
     "terms": "By creating an account you agree to our Terms of Service.",
-    "agentReadyBanner": "Your agent is ready — create your account to activate it."
+    "agentReadyBanner": "Your agent is ready — create your account to activate it.",
+    "saveHeading": "Your agent {name} is ready!",
+    "saveSubtitle": "Just one last step — save your agent to your account.",
+    "recapTitle": "Here's what you built:",
+    "recapAgent": "Agent",
+    "recapBusiness": "Business",
+    "recapSector": "Sector",
+    "recapServicesCount": "{count} service configured",
+    "recapServicesCountPlural": "{count} services configured",
+    "recapTone": "Tone",
+    "recapLanguage": "Language",
+    "saveExplanation": "Create your account to save your agent. You can return anytime to activate it and start receiving leads.",
+    "saveButton": "Save my agent and continue →",
+    "savingButton": "Saving…",
+    "privacyNote": "🔒 We never share your email. No spam, ever."
   },
   "onboarding": {
     "stepOf": "Step {step} of {total}",
