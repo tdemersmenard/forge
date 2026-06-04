@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import posthog from "posthog-js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -11,7 +11,6 @@ interface Props {
   adId: string;
   h1: string;
   subtitle: string;
-  video: string;
 }
 
 // ─── FAQ data ─────────────────────────────────────────────────────────────────
@@ -47,11 +46,6 @@ function LpDemo({ adId, onFirstMessage }: { adId: string; onFirstMessage: () => 
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasTracked, setHasTracked] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   const QUICK_REPLIES = ["Yes, I need a quote", "What's included?", "How much does it cost?"];
 
@@ -149,7 +143,6 @@ function LpDemo({ adId, onFirstMessage }: { adId: string; onFirstMessage: () => 
               </div>
             </div>
           )}
-          <div ref={bottomRef} />
         </div>
 
         {/* Quick replies */}
@@ -248,18 +241,9 @@ function CtaButton({ adId, label = "Build my agent — Free" }: { adId: string; 
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function LpClient({ adId, h1, subtitle, video }: Props) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const videoTrackedRef = useRef(false);
-
+export function LpClient({ adId, h1, subtitle }: Props) {
   useEffect(() => {
     posthog.capture("lp_viewed", { adId });
-  }, [adId]);
-
-  const handleVideoPlay = useCallback(() => {
-    if (videoTrackedRef.current) return;
-    videoTrackedRef.current = true;
-    posthog.capture("lp_video_played", { adId });
   }, [adId]);
 
   return (
@@ -313,26 +297,31 @@ export function LpClient({ adId, h1, subtitle, video }: Props) {
         </div>
       </section>
 
-      {/* ── Video ── */}
+      {/* ── Preview card ── */}
       <section className="pb-16">
         <div className="mx-auto max-w-3xl px-6">
-          <div className="mx-auto" style={{ maxWidth: "320px" }}>
-            <div className="relative w-full overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl" style={{ aspectRatio: "9/16" }}>
-              <video
-                ref={videoRef}
-                src={video}
-                autoPlay
-                muted
-                loop
-                playsInline
-                onPlay={handleVideoPlay}
-                onError={(e) => { (e.currentTarget as HTMLVideoElement).style.display = "none"; }}
-                className="absolute inset-0 h-full w-full object-cover"
-                aria-label="Product demo video"
-              />
-              {/* Placeholder shown when video fails / missing */}
-              <div className="absolute inset-0 -z-10 flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
-                <span className="text-sm text-zinc-600">Video preview</span>
+          <div className="mx-auto max-w-md">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8">
+              <div className="mb-4 flex items-center gap-3 text-sm text-zinc-400">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
+                <span>Live agent conversation</span>
+              </div>
+              <div className="space-y-3">
+                <div className="max-w-[80%] rounded-2xl rounded-bl-sm bg-zinc-800 px-4 py-3 text-sm text-white">
+                  Hey, how much for monthly pool maintenance?
+                </div>
+                <div className="ml-auto max-w-[80%] rounded-2xl rounded-br-sm bg-white px-4 py-3 text-sm text-black">
+                  Hi! Our weekly maintenance is $180/month, includes chemicals and equipment check. Would you like a free quote?
+                </div>
+                <div className="max-w-[80%] rounded-2xl rounded-bl-sm bg-zinc-800 px-4 py-3 text-sm text-white">
+                  Yes, can you come Tuesday?
+                </div>
+                <div className="ml-auto max-w-[80%] rounded-2xl rounded-br-sm bg-white px-4 py-3 text-sm text-black">
+                  Absolutely! I'll send you a confirmation by SMS. ✓
+                </div>
+              </div>
+              <div className="mt-4 border-t border-zinc-800 pt-4 text-center text-xs text-zinc-500">
+                Deal closed in 47 seconds. No human needed.
               </div>
             </div>
           </div>

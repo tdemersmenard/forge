@@ -87,7 +87,6 @@ export default async function LpPage({
       adId={adId}
       h1={config.h1}
       subtitle={config.subtitle}
-      video={config.video}
     />
   );
 }
