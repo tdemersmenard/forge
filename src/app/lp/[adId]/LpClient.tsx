@@ -268,7 +268,18 @@ export function LpClient({ adId, h1, subtitle, video }: Props) {
       <header className="border-b border-zinc-900">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <img src="/logo.svg" alt="" className="h-7 w-7 object-contain" />
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 72 72"
+              xmlns="http://www.w3.org/2000/svg"
+              className="shrink-0"
+            >
+              <rect x="12" y="12" width="48" height="48" rx="8" fill="none" stroke="#ffffff" strokeWidth="2.5" />
+              <rect x="22" y="22" width="28" height="6" rx="1.5" fill="#ffffff" />
+              <rect x="22" y="33" width="20" height="6" rx="1.5" fill="#ffffff" />
+              <rect x="22" y="33" width="6" height="22" rx="1.5" fill="#ffffff" />
+            </svg>
             <span className="text-lg font-semibold text-white">forgee</span>
           </div>
         </div>
