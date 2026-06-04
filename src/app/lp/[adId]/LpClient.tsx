@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import posthog from "posthog-js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -12,6 +12,13 @@ interface Props {
   h1: string;
   subtitle: string;
 }
+
+const INITIAL_MESSAGE: Message = {
+  role: "assistant",
+  content: "Hey! I'm Max from PoolPro 👋 Looking to get your pool cleaned or serviced?",
+};
+
+const STORAGE_KEY = "forgee_lp_demo_messages";
 
 // ─── FAQ data ─────────────────────────────────────────────────────────────────
 
@@ -34,28 +41,57 @@ const FAQ = [
   },
 ];
 
-// ─── Demo component (self-contained, no next-intl dependency) ─────────────────
+// ─── Demo component ───────────────────────────────────────────────────────────
 
-function LpDemo({ adId, onFirstMessage }: { adId: string; onFirstMessage: () => void }) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hey! I'm Max from PoolPro 👋 Looking to get your pool cleaned or serviced?",
-    },
-  ]);
+function LpDemo({ adId }: { adId: string }) {
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [hasTracked, setHasTracked] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const hasTrackedRef = useRef(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Restore conversation from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Message[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed);
+        }
+      }
+    } catch {
+      // ignore malformed data
+    }
+    setHydrated(true);
+  }, []);
+
+  // Persist conversation to localStorage whenever it changes
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch {
+      // ignore storage errors
+    }
+  }, [messages, hydrated]);
+
+  // Scroll messages container to bottom on new message
+  useEffect(() => {
+    const el = messagesContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, loading]);
 
   const QUICK_REPLIES = ["Yes, I need a quote", "What's included?", "How much does it cost?"];
 
   async function send(text: string) {
     if (!text.trim() || loading) return;
 
-    if (!hasTracked) {
+    if (!hasTrackedRef.current) {
+      hasTrackedRef.current = true;
       posthog.capture("lp_demo_used", { adId });
-      onFirstMessage();
-      setHasTracked(true);
     }
 
     const userMsg: Message = { role: "user", content: text.trim() };
@@ -86,20 +122,17 @@ function LpDemo({ adId, onFirstMessage }: { adId: string; onFirstMessage: () => 
 
   return (
     <div className="mx-auto w-full max-w-[480px]">
-      {/* Phone frame */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.10] bg-[#0f0f0f] shadow-2xl sm:rounded-[2rem]">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-2xl">
         {/* Status bar */}
-        <div className="flex items-center justify-between bg-[#0f0f0f] px-6 pt-3 pb-1">
+        <div className="flex items-center justify-between px-6 pt-3 pb-1">
           <span className="text-[11px] font-semibold text-white">9:41</span>
-          <div className="flex items-center gap-1">
-            <div className="h-2 w-4 rounded-sm border border-white/40">
-              <div className="h-full w-3/4 rounded-sm bg-white/60" />
-            </div>
+          <div className="h-2 w-4 rounded-sm border border-white/40">
+            <div className="h-full w-3/4 rounded-sm bg-white/60" />
           </div>
         </div>
 
         {/* Agent header */}
-        <div className="flex items-center gap-3 border-b border-white/[0.06] bg-[#0f0f0f] px-4 py-3">
+        <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white">
             M
           </div>
@@ -113,17 +146,15 @@ function LpDemo({ adId, onFirstMessage }: { adId: string; onFirstMessage: () => 
         </div>
 
         {/* Messages */}
-        <div className="flex h-64 flex-col gap-3 overflow-y-auto px-4 py-4 sm:h-72">
+        <div
+          ref={messagesContainerRef}
+          className="flex h-64 flex-col gap-3 overflow-y-auto px-4 py-4 sm:h-72"
+        >
           {messages.map((m, i) => (
-            <div
-              key={i}
-              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-            >
+            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
                 className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed ${
-                  m.role === "user"
-                    ? "bg-white text-[#0a0a0a]"
-                    : "bg-white/[0.08] text-white"
+                  m.role === "user" ? "bg-white text-[#0a0a0a]" : "bg-white/[0.08] text-white"
                 }`}
               >
                 {m.content}
@@ -143,9 +174,10 @@ function LpDemo({ adId, onFirstMessage }: { adId: string; onFirstMessage: () => 
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick replies */}
+        {/* Quick replies — only shown while conversation is fresh */}
         {messages.length <= 2 && (
           <div className="flex flex-wrap gap-1.5 px-4 pb-2">
             {QUICK_REPLIES.map((r) => (
@@ -168,7 +200,7 @@ function LpDemo({ adId, onFirstMessage }: { adId: string; onFirstMessage: () => 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send(input)}
-            placeholder="Type a message like a lead would…"
+            placeholder="Hey, how much for monthly pool maintenance?"
             className="flex-1 bg-transparent text-sm text-white placeholder:text-white/25 outline-none"
           />
           <button
@@ -178,12 +210,7 @@ function LpDemo({ adId, onFirstMessage }: { adId: string; onFirstMessage: () => 
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white disabled:opacity-30"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M12 7L2 2l2.5 5L2 12l10-5z"
-                fill="#0a0a0a"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <path d="M12 7L2 2l2.5 5L2 12l10-5z" fill="#0a0a0a" />
             </svg>
           </button>
         </div>
@@ -297,37 +324,6 @@ export function LpClient({ adId, h1, subtitle }: Props) {
         </div>
       </section>
 
-      {/* ── Preview card ── */}
-      <section className="pb-16">
-        <div className="mx-auto max-w-3xl px-6">
-          <div className="mx-auto max-w-md">
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8">
-              <div className="mb-4 flex items-center gap-3 text-sm text-zinc-400">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                <span>Live agent conversation</span>
-              </div>
-              <div className="space-y-3">
-                <div className="max-w-[80%] rounded-2xl rounded-bl-sm bg-zinc-800 px-4 py-3 text-sm text-white">
-                  Hey, how much for monthly pool maintenance?
-                </div>
-                <div className="ml-auto max-w-[80%] rounded-2xl rounded-br-sm bg-white px-4 py-3 text-sm text-black">
-                  Hi! Our weekly maintenance is $180/month, includes chemicals and equipment check. Would you like a free quote?
-                </div>
-                <div className="max-w-[80%] rounded-2xl rounded-bl-sm bg-zinc-800 px-4 py-3 text-sm text-white">
-                  Yes, can you come Tuesday?
-                </div>
-                <div className="ml-auto max-w-[80%] rounded-2xl rounded-br-sm bg-white px-4 py-3 text-sm text-black">
-                  Absolutely! I'll send you a confirmation by SMS. ✓
-                </div>
-              </div>
-              <div className="mt-4 border-t border-zinc-800 pt-4 text-center text-xs text-zinc-500">
-                Deal closed in 47 seconds. No human needed.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── Live demo ── */}
       <section className="pb-16">
         <div className="mx-auto max-w-3xl px-6 text-center">
@@ -337,9 +333,7 @@ export function LpClient({ adId, h1, subtitle }: Props) {
           <h2 className="mb-8 text-xl font-semibold text-white md:text-2xl">
             Try Forgee live — type a message like a lead would:
           </h2>
-          <div className="mx-auto max-w-[480px]">
-            <LpDemo adId={adId} onFirstMessage={() => {}} />
-          </div>
+          <LpDemo adId={adId} />
         </div>
       </section>
 
