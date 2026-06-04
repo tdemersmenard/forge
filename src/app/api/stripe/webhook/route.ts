@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
 import { PLANS } from "@/lib/plans";
 import Stripe from "stripe";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 async function trackMetaPurchase(plan: string) {
   const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
@@ -108,7 +109,8 @@ export async function POST(request: Request) {
         break;
       }
 
-      let planStatus = "active";
+      // Default to 'trialing' — all new checkouts include a trial period
+      let planStatus = "trialing";
       try {
         const sub = await stripe.subscriptions.retrieve(subscriptionId);
         planStatus = sub.status;
@@ -130,6 +132,12 @@ export async function POST(request: Request) {
         console.error("[webhook] supabase update error:", updateError);
       } else {
         await trackMetaPurchase(plan);
+        const planData = PLANS.find((p) => p.id === plan);
+        getPostHogClient().capture({
+          distinctId: userId,
+          event: "subscription_activated",
+          properties: { plan, plan_status: planStatus, revenue: planData?.price ?? 0 },
+        });
       }
       break;
     }
@@ -150,7 +158,21 @@ export async function POST(request: Request) {
         .from("agents")
         .update({ plan_status: "canceled" })
         .eq("stripe_subscription_id", sub.id);
-      if (error) console.error("[webhook] update error:", error);
+      if (!error) {
+        const { data: agentRow } = await supabaseAdmin
+          .from("agents")
+          .select("user_id")
+          .eq("stripe_subscription_id", sub.id)
+          .single();
+        if (agentRow?.user_id) {
+          getPostHogClient().capture({
+            distinctId: agentRow.user_id as string,
+            event: "subscription_canceled",
+          });
+        }
+      } else {
+        console.error("[webhook] update error:", error);
+      }
       break;
     }
 

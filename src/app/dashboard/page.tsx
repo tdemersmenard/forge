@@ -43,6 +43,7 @@ export default async function DashboardPage({
   const agentIds = (agents ?? []).map((a: AgentRow) => a.id);
   const firstAgent = (agents ?? [])[0] as AgentRow | undefined;
   const agentPlan = firstAgent?.plan ?? null;
+  const agentPlanStatus = firstAgent?.plan_status ?? null;
 
   // Trial banner: only fetch from Stripe if trialing + subscription exists
   let trialDaysRemaining: number | null = null;
@@ -87,6 +88,7 @@ export default async function DashboardPage({
         showSuccess={showSuccess}
         checkoutSuccess={checkoutSuccess}
         plan={agentPlan}
+        planStatus={agentPlanStatus}
         trialDaysRemaining={trialDaysRemaining}
       />
       <RealtimeOverview

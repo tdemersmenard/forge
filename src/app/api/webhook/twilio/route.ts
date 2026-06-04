@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   const { data: agents, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, agent_name, business_name, sector, services, services_list, tone, language, bilingual, business_hours, phone, twilio_account_sid, twilio_auth_token, qualification_questions, disqualification_criteria, service_area, promotions, never_say, escalation_criteria, notifications_prefs"
+      "id, user_id, agent_name, business_name, sector, services, services_list, tone, language, bilingual, business_hours, phone, plan_status, twilio_account_sid, twilio_auth_token, qualification_questions, disqualification_criteria, service_area, promotions, never_say, escalation_criteria, notifications_prefs"
     )
     .eq("phone", to)
     .limit(1);
@@ -80,6 +80,7 @@ export async function POST(request: Request) {
     bilingual: boolean | null;
     business_hours: BusinessHours | null;
     phone: string;
+    plan_status: string | null;
     twilio_account_sid: string | null;
     twilio_auth_token: string | null;
     qualification_questions: string[] | null;
@@ -90,6 +91,26 @@ export async function POST(request: Request) {
     escalation_criteria: string | null;
     notifications_prefs: { new_lead?: boolean; deal_closed?: boolean } | null;
   };
+
+  // 2b. Check subscription status — only trialing/active may use the agent
+  if (agent.plan_status === "inactive" || agent.plan_status === "canceled") {
+    if (agent.twilio_account_sid && agent.twilio_auth_token) {
+      try {
+        const client = twilio(agent.twilio_account_sid, agent.twilio_auth_token);
+        await client.messages.create({
+          body: "Service inactive. Please activate your subscription at forgee.app/dashboard/billing",
+          from: to,
+          to: from,
+        });
+      } catch (err) {
+        console.error("Twilio inactive reply error:", err);
+      }
+    }
+    return new Response("<Response/>", {
+      status: 200,
+      headers: { "Content-Type": "text/xml" },
+    });
+  }
 
   // 2. Fetch last 10 messages from this contact for conversation context
   const { data: history } = await supabase

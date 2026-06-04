@@ -39,6 +39,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname, searchParams } = request.nextUrl;
+  const isWelcomeBack = pathname === "/dashboard/welcome-back";
   const isDashboard =
     pathname === "/dashboard" || pathname.startsWith("/dashboard/");
   const isSuccessCallback =
@@ -81,9 +82,9 @@ export async function proxy(request: NextRequest) {
       return redirectTo("/onboarding", request);
     }
 
-    // Agent exists but no subscription → plan selection
-    if (!agent.stripe_subscription_id) {
-      return redirectTo("/onboarding/plan", request);
+    // Agent exists but no subscription → welcome-back page (unless already there)
+    if (!agent.stripe_subscription_id && !isWelcomeBack) {
+      return redirectTo("/dashboard/welcome-back", request);
     }
   }
 

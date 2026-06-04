@@ -16,10 +16,11 @@ interface Props {
   showSuccess: boolean;
   checkoutSuccess?: boolean;
   plan?: string | null;
+  planStatus?: string | null;
   trialDaysRemaining?: number | null;
 }
 
-export function DashboardOverviewHeader({ email, showSuccess, checkoutSuccess, plan, trialDaysRemaining }: Props) {
+export function DashboardOverviewHeader({ email, showSuccess, checkoutSuccess, plan, planStatus, trialDaysRemaining }: Props) {
   const t = useTranslations("dashboard");
 
   useEffect(() => {
@@ -37,6 +38,25 @@ export function DashboardOverviewHeader({ email, showSuccess, checkoutSuccess, p
 
   return (
     <>
+      {planStatus === "inactive" && !checkoutSuccess && (
+        <div className="mb-6 flex items-center justify-between rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-5 py-4">
+          <div>
+            <p className="text-sm font-semibold text-amber-400">
+              ⚠️ Your agent is built but NOT active.
+            </p>
+            <p className="mt-0.5 text-xs text-amber-400/70">
+              Activate your free trial to start receiving leads.
+            </p>
+          </div>
+          <a
+            href="/dashboard/billing"
+            className="ml-4 shrink-0 rounded-md bg-amber-400 px-4 py-2 text-xs font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90"
+          >
+            Activate now →
+          </a>
+        </div>
+      )}
+
       {(showSuccess || checkoutSuccess) && (
         <div className="mb-6 flex items-start gap-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-5 py-4">
           <span className="mt-0.5 text-lg leading-none">🎉</span>
