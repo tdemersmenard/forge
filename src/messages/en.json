@@ -160,7 +160,10 @@
     "saveExplanation": "Create your account to save your agent. You can return anytime to activate it and start receiving leads.",
     "saveButton": "Save my agent and continue →",
     "savingButton": "Saving…",
-    "privacyNote": "🔒 We never share your email. No spam, ever."
+    "privacyNote": "🔒 We never share your email. No spam, ever.",
+    "continueWithGoogle": "Continue with Google",
+    "orDivider": "or",
+    "progressLabel": "90% complete — save your agent to activate it"
   },
   "onboarding": {
     "stepOf": "Step {step} of {total}",
@@ -268,10 +271,10 @@
   },
   "plan": {
     "chooseYourPlan": "Choose your plan",
-    "trialBadge": "Start your 7-day free trial",
+    "trialBadge": "Start your 14-day free trial",
     "readyNamed": "{name} is ready to deploy.",
     "ready": "Your agent is ready to deploy.",
-    "subtitle": "Choose a plan to activate it. 7-day free trial. Cancel anytime.",
+    "subtitle": "Choose a plan to activate it. 14-day free trial. Cancel anytime.",
     "recommendedFor": "✦ Recommended for {name}",
     "skipForNow": "Skip for now — explore the dashboard first",
     "perMonth": "/mo",
@@ -284,12 +287,17 @@
     "checkoutFailed": "Failed to start checkout. Please try again.",
     "networkError": "Network error — please try again.",
     "noChargeTitle": "You won't be charged today.",
-    "reassure1Title": "No charge for 7 days",
+    "reassure1Title": "No charge for 14 days",
     "reassure1Desc": "We use your card to prevent fraud only.",
     "reassure2Title": "Cancel in 2 clicks",
     "reassure2Desc": "Cancel anytime from your dashboard.",
     "reassure3Title": "Reminder before billing",
-    "reassure3Desc": "We'll email you 2 days before your trial ends."
+    "reassure3Desc": "We'll email you 2 days before your trial ends.",
+    "urgencyBanner": "🔒 Founder pricing in USD — locked for life if you sign up before July 15, 2026.",
+    "countdownLabel": "{days} days left at founder pricing",
+    "priceIncreaseNote": "Starter $97 → $147 · Growth $297 → $397 · Agency $697 → $997 on July 15. Lock today's price forever.",
+    "guaranteeTitle": "30-Day Money-Back Guarantee",
+    "guaranteeDesc": "If your agent doesn't close at least one deal in your first 30 days, we'll refund your full subscription. No questions asked."
   },
   "sidebar": {
     "overview": "Overview",
@@ -486,15 +494,15 @@
     "costDiy": "Your time"
   },
   "exitIntent": {
-    "badge": "Founder offer — limited spots",
-    "heading": "Don't leave without your 20% discount",
-    "desc": "We're offering founding members 20% off their first 3 months. Leave your email and we'll hold your spot.",
+    "badge": "Wait — your agent is built. Don't lose it.",
+    "heading": "Save your agent + get 30% off",
+    "desc": "We'll save your agent and email you a link to come back anytime. Plus 30% off your first 3 months — for real.",
     "emailPlaceholder": "your@email.com",
-    "cta": "Claim my 20% discount",
-    "decline": "No thanks, I'll pay full price",
+    "cta": "Save my agent and get 30% off",
+    "decline": "No thanks, I'll lose my progress",
     "saving": "Saving…",
-    "successTitle": "You're in.",
-    "successDesc": "Check your inbox for your exclusive discount."
+    "successTitle": "Done — check your inbox.",
+    "successDesc": "Your agent is saved. Your 30% discount is on its way."
   },
   "settings": {
     "title": "Settings",

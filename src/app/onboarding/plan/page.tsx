@@ -28,6 +28,13 @@ function getRecommendedPlan(contractValue: string | null): PlanId {
   return "growth";
 }
 
+const DEADLINE = new Date("2026-07-15T00:00:00");
+
+function getDaysLeft(): number {
+  const diff = DEADLINE.getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
 export default function PlanPage() {
   const router = useRouter();
   const t = useTranslations("plan");
@@ -37,6 +44,7 @@ export default function PlanPage() {
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [recommendedPlan, setRecommendedPlan] = useState<PlanId>("growth");
   const checkoutStartedRef = useRef(false);
+  const daysLeft = getDaysLeft();
 
   // Handle Stripe success redirect back to this page (legacy fallback)
   useEffect(() => {
@@ -118,14 +126,21 @@ export default function PlanPage() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-[#0a0a0a] px-4 py-12">
+    <div className="flex min-h-screen flex-col items-center bg-[#0a0a0a]">
+      {/* ── Urgency banner ── */}
+      <div className="w-full border-b border-amber-500/20 bg-amber-500/[0.06] px-4 py-2.5 text-center text-xs font-medium text-amber-300">
+        {t("urgencyBanner")}{" "}
+        <span className="font-semibold text-amber-400">{t("countdownLabel", { days: daysLeft })}</span>
+      </div>
+
+      <div className="flex w-full flex-col items-center px-4 py-12">
       {/* Logo */}
       <div className="mb-10">
         <img src="/logo.svg" alt="Forgee" height="28" />
       </div>
 
       {/* Hero */}
-      <div className="mb-10 max-w-xl text-center">
+      <div className="mb-6 max-w-xl text-center">
         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/40">
           {t("trialBadge")}
         </p>
@@ -133,6 +148,11 @@ export default function PlanPage() {
           {agentName ? t("readyNamed", { name: agentName }) : t("ready")}
         </h1>
         <p className="text-base text-white/50">{t("subtitle")}</p>
+      </div>
+
+      {/* Price increase note */}
+      <div className="mb-8 max-w-2xl rounded-xl border border-amber-500/20 bg-amber-500/[0.05] px-5 py-3 text-center text-xs text-amber-300/80">
+        {t("priceIncreaseNote")}
       </div>
 
       {/* ── Reassurance section ── */}
@@ -276,6 +296,21 @@ export default function PlanPage() {
         </div>
       ))}
 
+      {/* Guarantee */}
+      <div className="mb-8 w-full max-w-xl rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] px-6 py-5">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/20">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6l2.5 2.5L10 3" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div>
+            <p className="mb-1 text-sm font-semibold text-white">{t("guaranteeTitle")}</p>
+            <p className="text-xs leading-relaxed text-white/50">{t("guaranteeDesc")}</p>
+          </div>
+        </div>
+      </div>
+
       {/* Skip */}
       <button
         type="button"
@@ -284,6 +319,7 @@ export default function PlanPage() {
       >
         {t("skipForNow")}
       </button>
+      </div>
     </div>
   );
 }

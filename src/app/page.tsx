@@ -12,6 +12,7 @@ import FAQ from "./components/FAQ";
 import CTASection from "./components/CTASection";
 import Footer from "./components/Footer";
 import ExitIntentPopup from "./components/ExitIntentPopup";
+import FounderStory from "./components/FounderStory";
 
 export default function Home() {
   return (
@@ -21,6 +22,7 @@ export default function Home() {
       <main>
         <Hero />
         <StatsBar />
+        <FounderStory />
         <DashboardPreview />
         <HowItWorks />
         <div id="demo">

@@ -268,24 +268,41 @@ function CtaButton({ adId, label = "Build my agent — Free" }: { adId: string; 
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+const DEADLINE = new Date("2026-07-15T00:00:00");
+
+function getDaysUntilDeadline(): number {
+  const now = new Date();
+  const diff = DEADLINE.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
 export function LpClient({ adId, h1, subtitle }: Props) {
+  const [spotsLeft, setSpotsLeft] = useState<number>(47);
+  const daysUntilDeadline = getDaysUntilDeadline();
+
   useEffect(() => {
     posthog.capture("lp_viewed", { adId });
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d: { count?: number }) => {
+        if (typeof d.count === "number") setSpotsLeft(Math.min(d.count, 99));
+      })
+      .catch(() => {});
   }, [adId]);
 
   return (
     <div className="overflow-x-hidden min-h-screen bg-[#0a0a0a] text-white">
+      {/* ── Urgency banner ── */}
+      <div className="border-b border-amber-500/20 bg-amber-500/[0.06] px-4 py-2.5 text-center text-xs font-medium text-amber-300">
+        🔒 Founder pricing in USD — locked for life if you sign up before July 15, 2026.{" "}
+        <span className="text-amber-400 font-semibold">{daysUntilDeadline} days left.</span>
+      </div>
+
       {/* ── Header ── */}
       <header className="border-b border-zinc-900">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 72 72"
-              xmlns="http://www.w3.org/2000/svg"
-              className="shrink-0"
-            >
+            <svg width="32" height="32" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
               <rect x="12" y="12" width="48" height="48" rx="8" fill="none" stroke="#ffffff" strokeWidth="2.5" />
               <rect x="22" y="22" width="28" height="6" rx="1.5" fill="#ffffff" />
               <rect x="22" y="33" width="20" height="6" rx="1.5" fill="#ffffff" />
@@ -299,16 +316,27 @@ export function LpClient({ adId, h1, subtitle }: Props) {
       {/* ── Hero ── */}
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
+          {/* Beta badge */}
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.06] px-3 py-1">
+            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+            <span className="text-xs font-medium text-emerald-400">
+              Private beta · {spotsLeft} of 100 spots filled
+            </span>
+          </div>
+
           <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
             {h1}
           </h1>
-          <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white/55 md:text-lg">
+          <p className="mx-auto mb-2 max-w-xl text-base leading-relaxed text-white/55 md:text-lg">
             {subtitle}
+          </p>
+          <p className="mx-auto mb-8 max-w-xl text-sm text-white/35">
+            Now in private beta. Be among the first 100 service businesses to deploy.
           </p>
 
           {/* Social proof */}
           <div className="mb-8 flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-2">
-            {["Live in 15 minutes", "7-day free trial — no charge", "Cancel in 2 clicks"].map(
+            {["Live in 15 minutes", "14-day free trial — no charge", "Cancel in 2 clicks"].map(
               (item) => (
                 <span key={item} className="flex items-center gap-1.5 text-sm text-white/50">
                   <span className="font-semibold text-emerald-400">✓</span>
@@ -347,19 +375,80 @@ export function LpClient({ adId, h1, subtitle }: Props) {
         </div>
       </section>
 
+      {/* ── Founder story ── */}
+      <section className="pb-16">
+        <div className="mx-auto max-w-2xl px-6">
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 text-center">
+            <p className="mb-5 text-xs font-semibold uppercase tracking-widest text-white/30">
+              Built by a founder, for founders
+            </p>
+            {/* Avatar */}
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/10 text-xl font-bold text-white">
+              T
+            </div>
+            <p className="mb-1 text-sm font-semibold text-white">Thomas Demers Ménard</p>
+            <p className="mb-5 text-xs text-white/40">Founder of Forgee · Owner, Entretien Piscine Granby</p>
+            <blockquote className="mb-6 text-sm leading-relaxed text-white/60 italic">
+              "I run a pool maintenance business in Quebec. I was losing leads every night because I couldn't respond fast enough. So I built CHLORE — my own AI agent — and it changed everything. Now I'm sharing it with every service business that needs it. This is Forgee."
+            </blockquote>
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.06] px-3 py-1 text-xs font-medium text-emerald-400">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6l2.5 2.5L10 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Verified business owner
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Real conversation from CHLORE ── */}
+      <section className="pb-16">
+        <div className="mx-auto max-w-2xl px-6">
+          <p className="mb-2 text-center text-xs font-semibold uppercase tracking-widest text-white/30">
+            Real conversation from CHLORE — built on Forgee
+          </p>
+          <p className="mb-6 text-center text-sm text-white/40">
+            Closed $1,800 contract in 19 minutes. Zero human touch.
+          </p>
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0f0f0f] p-6">
+            <div className="space-y-3">
+              {[
+                { role: "lead", text: "Hey, how much for weekly pool maintenance?" },
+                { role: "agent", text: "Hi! I'm CHLORE from Entretien Piscine Granby 👋 Weekly maintenance starts at $180/month and includes chemicals + equipment check. What size is your pool?" },
+                { role: "lead", text: "It's a 20,000L in-ground, Granby area" },
+                { role: "agent", text: "Perfect — that's our standard size. I can lock you in at $180/month for the full season (May–Oct). Want me to send you the contract right now?" },
+                { role: "lead", text: "Yes please" },
+                { role: "agent", text: "Sent! Check your email — it's a 2-minute e-sign. We'll confirm your first visit date once it's signed. 🎉" },
+              ].map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === "lead" ? "justify-start" : "justify-end"}`}>
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${msg.role === "lead" ? "bg-white/[0.08] text-white" : "bg-white text-[#0a0a0a]"}`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 border-t border-white/[0.06] pt-4 text-center text-xs text-zinc-500">
+              Contract signed 19 min later · $1,800 season deal · No human involved
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── Bottom CTA ── */}
       <section className="pb-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-white/30">
             Start your free trial
           </p>
-          <h2 className="mb-6 text-2xl font-bold text-white md:text-3xl">
+          <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">
             Ready to stop missing leads?
           </h2>
+          <p className="mb-6 text-sm text-white/40">
+            14-day free trial · No credit card charged today · Cancel in 2 clicks
+          </p>
           <div className="mx-auto max-w-xs">
             <CtaButton adId={adId} label="Build my agent — Free →" />
           </div>
-          <p className="mt-3 text-xs text-white/25">No credit card charged for 7 days.</p>
         </div>
       </section>
     </div>

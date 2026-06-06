@@ -160,7 +160,10 @@
     "saveExplanation": "Créez votre compte pour sauvegarder votre agent. Vous pouvez revenir à tout moment pour l'activer.",
     "saveButton": "Sauvegarder mon agent et continuer →",
     "savingButton": "Sauvegarde…",
-    "privacyNote": "🔒 Nous ne partageons jamais votre email. Aucun spam, jamais."
+    "privacyNote": "🔒 Nous ne partageons jamais votre email. Aucun spam, jamais.",
+    "continueWithGoogle": "Continuer avec Google",
+    "orDivider": "ou",
+    "progressLabel": "90% complété — sauvegardez votre agent pour l'activer"
   },
   "onboarding": {
     "stepOf": "Étape {step} sur {total}",
@@ -268,10 +271,10 @@
   },
   "plan": {
     "chooseYourPlan": "Choisissez votre forfait",
-    "trialBadge": "Commencez votre essai gratuit de 7 jours",
+    "trialBadge": "Commencez votre essai gratuit de 14 jours",
     "readyNamed": "{name} est prêt à déployer.",
     "ready": "Votre agent est prêt à déployer.",
-    "subtitle": "Choisissez un forfait pour l'activer. 7 jours d'essai. Annulez à tout moment.",
+    "subtitle": "Choisissez un forfait pour l'activer. 14 jours d'essai. Annulez à tout moment.",
     "recommendedFor": "✦ Recommandé pour {name}",
     "skipForNow": "Passer pour l'instant — explorer le tableau de bord",
     "perMonth": "/mois",
@@ -284,12 +287,17 @@
     "checkoutFailed": "Échec du paiement — réessayez.",
     "networkError": "Erreur réseau — veuillez réessayer.",
     "noChargeTitle": "Vous ne serez pas facturé aujourd'hui.",
-    "reassure1Title": "Aucun frais pendant 7 jours",
+    "reassure1Title": "Aucun frais pendant 14 jours",
     "reassure1Desc": "Votre carte sert uniquement à prévenir la fraude.",
     "reassure2Title": "Annulez en 2 clics",
     "reassure2Desc": "Annulez à tout moment depuis votre tableau de bord.",
     "reassure3Title": "Rappel avant facturation",
-    "reassure3Desc": "Email 2 jours avant la fin de votre essai."
+    "reassure3Desc": "Email 2 jours avant la fin de votre essai.",
+    "urgencyBanner": "🔒 Prix fondateur en USD — verrouillé à vie si vous vous inscrivez avant le 15 juillet 2026.",
+    "countdownLabel": "{days} jours restants au prix fondateur",
+    "priceIncreaseNote": "Starter 97$ → 147$ · Growth 297$ → 397$ · Agency 697$ → 997$ le 15 juillet. Bloquez le prix d'aujourd'hui pour toujours.",
+    "guaranteeTitle": "Garantie satisfait ou remboursé 30 jours",
+    "guaranteeDesc": "Si votre agent ne conclut pas au moins une affaire dans vos 30 premiers jours, nous remboursons votre abonnement complet. Sans questions."
   },
   "sidebar": {
     "overview": "Aperçu",
@@ -481,20 +489,20 @@
     "feat7": "Configuration en 15 minutes",
     "feat8": "S'améliore avec le temps",
     "costLabel": "Coût mensuel",
-    "costForgee": "À partir de 97$/mois",
+    "costForgee": "À partir de $97 USD/mois",
     "costReceptionist": "3 000$ – 6 000$",
     "costDiy": "Ton temps"
   },
   "exitIntent": {
-    "badge": "Offre fondateur — places limitées",
-    "heading": "Attends — avant de partir",
-    "desc": "Obtiens 20% de rabais sur tes 3 premiers mois. Disponible pour les 24 prochaines heures.",
+    "badge": "Attends — ton agent est prêt. Ne le perds pas.",
+    "heading": "Sauvegarde ton agent + 30% de rabais",
+    "desc": "On va sauvegarder ton agent et t'envoyer un lien pour revenir n'importe quand. Plus 30% de rabais sur tes 3 premiers mois — pour vrai.",
     "emailPlaceholder": "ton@email.com",
-    "cta": "Réclamer mon rabais",
-    "decline": "Non merci",
+    "cta": "Sauvegarder mon agent + 30% de rabais",
+    "decline": "Non merci, je perds ma progression",
     "saving": "En cours…",
-    "successTitle": "C'est dans la poche.",
-    "successDesc": "Vérifie ton courriel pour ton rabais exclusif."
+    "successTitle": "C'est fait — vérifie ton courriel.",
+    "successDesc": "Ton agent est sauvegardé. Ton rabais de 30% est en route."
   },
   "settings": {
     "title": "Paramètres",
