@@ -26,8 +26,10 @@ const TRANSLATIONS = {
     welcomeHeading: "Let's build your AI agent.",
     welcomeSubtitle: "In 5 minutes, you'll have an AI agent that responds to your leads 24/7 — qualifies, quotes, and closes. No code, no setup.",
     welcomeProof1: "Live in 15 minutes",
-    welcomeProof2: "7-day free trial",
+    welcomeProof2: "60 days free — no charge until day 61",
     welcomeProof3: "Cancel anytime",
+    trialBadge: "🎁 60 days free included",
+    trialReminderBanner: "You're building your agent for a 60-day free trial.",
 
     sectorStep_title: "What kind of business do you run?",
     sectorStep_subtitle: "Just one click. We'll customize everything else around this.",
@@ -177,6 +179,15 @@ const TRANSLATIONS = {
       ],
       other: ["What are you looking for?", "What city are you in?", "What is your budget?"],
     },
+
+    step1_micro: "✨ Already 47% done — your agent is forming.",
+    step2_micro: "✨ Tell your agent who they are.",
+    step3_micro: "✨ You're investing 5 minutes to save 20 hours per week.",
+    step4_micro: "✨ Your agent is learning how you qualify leads.",
+    step5_micro: "✨ Almost there — your agent is being calibrated.",
+    step6_micro: "✨ Last details before deployment.",
+    step7_micro: "✨ Connect your phone number to bring your agent to life.",
+    step8_micro: (name: string) => `✨ Your agent ${name} is alive. Now save your work.`,
   },
 
   fr: {
@@ -190,8 +201,10 @@ const TRANSLATIONS = {
     welcomeHeading: "Construisons votre agent IA.",
     welcomeSubtitle: "En 5 minutes, vous aurez un agent IA qui r\u00E9pond \u00E0 vos leads 24/7 \u2014 qualifie, soumissionne et conclut. Aucun code, aucune configuration.",
     welcomeProof1: "En ligne en 15 minutes",
-    welcomeProof2: "7 jours d\u2019essai gratuit",
-    welcomeProof3: "Annulez n\u2019importe quand",
+    welcomeProof2: "60 jours gratuits — aucun frais avant le jour 61",
+    welcomeProof3: "Annulez à tout moment",
+    trialBadge: "🎁 60 jours gratuits inclus",
+    trialReminderBanner: "Vous construisez votre agent pour un essai gratuit de 60 jours.",
 
     sectorStep_title: "Quel type de business avez-vous?",
     sectorStep_subtitle: "Un seul clic. On personnalise tout le reste autour de \u00E7a.",
@@ -346,6 +359,15 @@ const TRANSLATIONS = {
         "Quel est votre budget?",
       ],
     },
+
+    step1_micro: "✨ Déjà 47% complété — votre agent prend forme.",
+    step2_micro: "✨ Dites à votre agent qui il est.",
+    step3_micro: "✨ Vous investissez 5 minutes pour économiser 20 heures par semaine.",
+    step4_micro: "✨ Votre agent apprend comment vous qualifiez les leads.",
+    step5_micro: "✨ Presque là — votre agent est en cours de calibration.",
+    step6_micro: "✨ Derniers détails avant le déploiement.",
+    step7_micro: "✨ Connectez votre numéro pour donner vie à votre agent.",
+    step8_micro: (name: string) => `✨ Votre agent ${name} est en vie. Sauvegardez maintenant.`,
   },
 };
 
@@ -736,6 +758,11 @@ export default function OnboardingPage() {
         />
       </div>
 
+      {/* ── Trial reminder banner ── */}
+      <div className="border-b border-amber-500/15 bg-amber-500/[0.04] px-4 py-2 text-center">
+        <p className="text-xs font-medium text-amber-400/80">{text.trialReminderBanner}</p>
+      </div>
+
       {/* ── Step celebration card ── */}
       <AnimatePresence>
         {celebratingStep !== null && (
@@ -841,8 +868,13 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-8">
               {/* Welcome header — cold traffic / ad arrivals */}
               <div className="pb-2">
-                <div className="mb-5 inline-flex items-center rounded-full border border-white/[0.10] bg-white/[0.04] px-3.5 py-1">
-                  <span className="text-xs font-medium text-white/60">{text.welcomeBadge}</span>
+                <div className="mb-3 inline-flex items-center rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-1.5">
+                  <span className="text-xs font-bold uppercase tracking-wide text-amber-400">{text.trialBadge}</span>
+                </div>
+                <div className="mb-5 flex items-center gap-2">
+                  <div className="inline-flex items-center rounded-full border border-white/[0.10] bg-white/[0.04] px-3.5 py-1">
+                    <span className="text-xs font-medium text-white/60">{text.welcomeBadge}</span>
+                  </div>
                 </div>
                 <h1 className="mb-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                   {text.welcomeHeading}
@@ -867,6 +899,7 @@ export default function OnboardingPage() {
                   {text.sectorStep_title}
                 </h2>
                 <p className="mt-1.5 text-sm text-white/50">{text.sectorStep_subtitle}</p>
+                <p className="mt-2 text-sm italic text-zinc-500">{text.step1_micro}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -903,6 +936,7 @@ export default function OnboardingPage() {
                   {text.step1_title}
                 </h1>
                 <p className="mt-2 text-base text-white/50">{text.step1_subtitle}</p>
+                <p className="mt-2 text-sm italic text-zinc-500">{text.step2_micro}</p>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
@@ -946,6 +980,7 @@ export default function OnboardingPage() {
                   {text.step2_title}
                 </h1>
                 <p className="mt-2 text-base text-white/50">{text.step2_subtitle}</p>
+                <p className="mt-2 text-sm italic text-zinc-500">{text.step3_micro}</p>
               </div>
               <div className="flex flex-col gap-3">
                 {form.servicesList.map((svc) => (
@@ -1043,6 +1078,7 @@ export default function OnboardingPage() {
                   {text.step3_title}
                 </h1>
                 <p className="mt-2 text-base text-white/50">{text.step3_subtitle}</p>
+                <p className="mt-2 text-sm italic text-zinc-500">{text.step4_micro}</p>
               </div>
               <div className="flex flex-col gap-3">
                 {form.qualificationQuestions.map((q, i) => (
@@ -1103,6 +1139,7 @@ export default function OnboardingPage() {
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
                   {text.step4_title}
                 </h1>
+                <p className="mt-2 text-sm italic text-zinc-500">{text.step5_micro}</p>
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {TONES.map((tone) => (
@@ -1213,6 +1250,7 @@ export default function OnboardingPage() {
                   {text.step5_title}
                 </h1>
                 <p className="mt-2 text-base text-white/50">{text.step5_subtitle}</p>
+                <p className="mt-2 text-sm italic text-zinc-500">{text.step6_micro}</p>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
@@ -1277,6 +1315,7 @@ export default function OnboardingPage() {
                   {text.step6_title}
                 </h1>
                 <p className="mt-2 text-base text-white/50">{text.step6_subtitle}</p>
+                <p className="mt-2 text-sm italic text-zinc-500">{text.step7_micro}</p>
               </div>
 
               {/* Twilio callout */}
@@ -1426,6 +1465,9 @@ export default function OnboardingPage() {
                 <h1 className="text-3xl font-semibold tracking-tight text-white">
                   {text.step7_title}
                 </h1>
+                <p className="mt-2 text-sm italic text-zinc-500">
+                  {text.step8_micro(form.agentName || "your agent")}
+                </p>
               </div>
               <div className="flex w-full max-w-sm flex-col gap-4">
                 {deployLabels.map((label, i) => (

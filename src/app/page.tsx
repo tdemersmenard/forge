@@ -21,6 +21,12 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        {/* 60-day free trial accent banner */}
+        <div className="border-y border-amber-500/20 bg-amber-500/[0.06] py-2.5 text-center">
+          <p className="text-xs font-semibold text-amber-400">
+            60 days free. No charge until day 61. Cancel in 2 clicks anytime.
+          </p>
+        </div>
         <StatsBar />
         <FounderStory />
         <DashboardPreview />

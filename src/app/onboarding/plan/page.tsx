@@ -43,6 +43,7 @@ export default function PlanPage() {
   const [agentName, setAgentName] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [recommendedPlan, setRecommendedPlan] = useState<PlanId>("growth");
+  const [spotsLeft, setSpotsLeft] = useState<number>(12);
   const checkoutStartedRef = useRef(false);
   const daysLeft = getDaysLeft();
 
@@ -52,6 +53,15 @@ export default function PlanPage() {
     if (params.get("success") !== "true") return;
     router.replace("/dashboard?checkout_success=true");
   }, [router]);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d: { count?: number }) => {
+        if (typeof d.count === "number") setSpotsLeft(d.count);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     window.fbq?.("track", "InitiateCheckout");
@@ -127,32 +137,54 @@ export default function PlanPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-[#0a0a0a]">
-      {/* ── Urgency banner ── */}
-      <div className="w-full border-b border-amber-500/20 bg-amber-500/[0.06] px-4 py-2.5 text-center text-xs font-medium text-amber-300">
-        {t("urgencyBanner")}{" "}
-        <span className="font-semibold text-amber-400">{t("countdownLabel", { days: daysLeft })}</span>
-      </div>
-
       <div className="flex w-full flex-col items-center px-4 py-12">
       {/* Logo */}
-      <div className="mb-10">
+      <div className="mb-8">
         <img src="/logo.svg" alt="Forgee" height="28" />
+      </div>
+
+      {/* ── 60-day hero banner ── */}
+      <div className="mb-8 w-full max-w-2xl rounded-2xl border border-amber-500/40 bg-amber-500/10 px-8 py-7 text-center">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-amber-400/70">Limited time offer</p>
+        <p className="mb-2 text-4xl font-bold tracking-tight text-amber-400 sm:text-5xl">{t("heroBanner")}</p>
+        <p className="text-sm text-amber-300/70">{t("heroBannerSub")}</p>
       </div>
 
       {/* Hero */}
       <div className="mb-6 max-w-xl text-center">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/40">
-          {t("trialBadge")}
-        </p>
-        <h1 className="mb-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+        <h1 className="mb-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
           {agentName ? t("readyNamed", { name: agentName }) : t("ready")}
         </h1>
         <p className="text-base text-white/50">{t("subtitle")}</p>
       </div>
 
-      {/* Price increase note */}
-      <div className="mb-8 max-w-2xl rounded-xl border border-amber-500/20 bg-amber-500/[0.05] px-5 py-3 text-center text-xs text-amber-300/80">
-        {t("priceIncreaseNote")}
+      {/* ── Founder pricing card ── */}
+      <div className="mx-auto mb-10 w-full max-w-2xl rounded-xl border border-amber-500/30 bg-amber-500/5 p-6">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-2xl">🔒</span>
+          <span className="text-sm font-semibold uppercase tracking-wide text-amber-400">
+            Founder pricing — Locked until July 15 · {daysLeft} days left
+          </span>
+        </div>
+        <p className="mb-4 text-sm text-zinc-300">
+          Sign up before July 15, 2026 to lock today&apos;s pricing forever.
+        </p>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          {[
+            { label: "Starter", current: "$97", future: "$147" },
+            { label: "Growth", current: "$297", future: "$397" },
+            { label: "Agency", current: "$697", future: "$997" },
+          ].map(({ label, current, future }) => (
+            <div key={label}>
+              <div className="mb-1 text-xs text-zinc-500">{label}</div>
+              <div className="text-sm">
+                <span className="font-semibold text-white">{current}</span>
+                <span className="text-zinc-500"> → </span>
+                <span className="text-zinc-500 line-through">{future}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Reassurance section ── */}
@@ -209,9 +241,12 @@ export default function PlanPage() {
                   </div>
                 )}
                 <h2 className="text-lg font-semibold text-[#0a0a0a]">{plan.name}</h2>
-                <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-[#0a0a0a]">${plan.price}</span>
-                  <span className="text-sm text-[#0a0a0a]/50">{t("perMonth")}</span>
+                <div className="mt-2">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-bold text-[#0a0a0a]">$0</span>
+                    <span className="text-sm text-[#0a0a0a]/50">for 60 days</span>
+                  </div>
+                  <p className="mt-0.5 text-sm text-[#0a0a0a]/40">Then ${plan.price}{t("perMonth")}</p>
                 </div>
                 <ul className="mb-6 mt-5 space-y-2.5">
                   {plan.features.map((f) => (
@@ -244,9 +279,12 @@ export default function PlanPage() {
                 </div>
               )}
               <h2 className="text-lg font-semibold text-white">{plan.name}</h2>
-              <div className="mt-2 flex items-baseline gap-1">
-                <span className="text-3xl font-bold text-white">${plan.price}</span>
-                <span className="text-sm text-white/40">{t("perMonth")}</span>
+              <div className="mt-2">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-bold text-white">$0</span>
+                  <span className="text-sm text-white/40">for 60 days</span>
+                </div>
+                <p className="mt-0.5 text-sm text-white/30">Then ${plan.price}{t("perMonth")}</p>
               </div>
               <ul className="mb-6 mt-5 space-y-2.5">
                 {plan.features.map((f) => (
@@ -267,6 +305,30 @@ export default function PlanPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* Billing disclosure */}
+      <div className="mb-8 w-full max-w-2xl rounded-xl border border-white/[0.07] bg-white/[0.02] px-6 py-5">
+        <p className="mb-4 text-sm font-semibold text-white">{t("billingTitle")}</p>
+        <ol className="flex flex-col gap-2.5">
+          {([t("billing1"), t("billing2"), t("billing3"), t("billing4"), t("billing5")] as string[]).map((step, i) => (
+            <li key={i} className="flex items-start gap-3">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/10 text-[10px] font-semibold text-white/40">
+                {i + 1}
+              </span>
+              <span className="text-sm text-white/55">{step}</span>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-5 text-center text-sm font-semibold text-white/80">{t("billingNote")}</p>
+      </div>
+
+      {/* Spots urgency */}
+      <div className="mb-8 w-full max-w-2xl rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-center">
+        <p className="text-xs text-white/40">
+          ⏰ This offer ends when we reach 100 users. Currently:{" "}
+          <span className="font-semibold text-white/70">{t("spotsLabel", { spots: spotsLeft })}</span>
+        </p>
       </div>
 
       {/* Trust row */}

@@ -58,8 +58,9 @@ export async function POST(request: Request) {
     mode: "subscription",
     payment_method_types: ["card"],
     line_items: [{ price: priceId, quantity: 1 }],
+    payment_method_collection: "always",
     subscription_data: {
-      trial_period_days: 14,
+      trial_period_days: 60,
       trial_settings: {
         end_behavior: {
           missing_payment_method: "cancel",
@@ -69,7 +70,10 @@ export async function POST(request: Request) {
     billing_address_collection: "auto",
     consent_collection: { terms_of_service: "none" },
     custom_text: {
-      submit: { message: "No charge for 14 days. Cancel anytime." },
+      submit: {
+        message:
+          "Free for 60 days. Your card will only be charged on day 61 if you do not cancel. We will email you multiple times before any charge.",
+      },
     },
     after_expiration: {
       recovery: { enabled: true, allow_promotion_codes: true },

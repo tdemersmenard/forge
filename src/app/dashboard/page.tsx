@@ -45,8 +45,10 @@ export default async function DashboardPage({
   const agentPlan = firstAgent?.plan ?? null;
   const agentPlanStatus = firstAgent?.plan_status ?? null;
 
-  // Trial banner: only fetch from Stripe if trialing + subscription exists
+  // Trial banner: fetch from Stripe if trialing + subscription exists
   let trialDaysRemaining: number | null = null;
+  let trialEndDate: string | null = null;
+  let trialDayNumber: number | null = null;
   if (
     firstAgent?.plan_status === "trialing" &&
     firstAgent?.stripe_subscription_id
@@ -60,9 +62,15 @@ export default async function DashboardPage({
         const days = Math.ceil(
           (sub.trial_end * 1000 - Date.now()) / 86_400_000
         );
-        // Only show banner when 3 days or fewer remain
-        if (days >= 0 && days <= 3) {
+        if (days >= 0) {
           trialDaysRemaining = days;
+          trialEndDate = new Date(sub.trial_end * 1000).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+          });
+          // trial_start isn't directly on sub, compute from trial_end - 60 days
+          const trialStart = sub.trial_end * 1000 - 60 * 86_400_000;
+          trialDayNumber = Math.min(60, Math.ceil((Date.now() - trialStart) / 86_400_000));
         }
       }
     } catch {
@@ -90,6 +98,8 @@ export default async function DashboardPage({
         plan={agentPlan}
         planStatus={agentPlanStatus}
         trialDaysRemaining={trialDaysRemaining}
+        trialEndDate={trialEndDate}
+        trialDayNumber={trialDayNumber}
       />
       <RealtimeOverview
         agentIds={agentIds}

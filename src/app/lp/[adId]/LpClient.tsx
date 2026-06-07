@@ -32,8 +32,8 @@ const FAQ = [
     a: "None needed. If you can fill out a form, you can deploy an agent. The only slightly technical step is connecting a phone number — we walk you through it step by step in under 3 minutes.",
   },
   {
-    q: "What happens after the 7-day trial?",
-    a: "You'll get a reminder email 2 days before your trial ends. If you keep going, you're billed monthly. Nothing happens automatically without warning.",
+    q: "What happens after the 60-day trial?",
+    a: "We'll email you on day 53, 57, and 59 before your trial ends. If you keep going, you're billed monthly. Nothing happens automatically without warning.",
   },
   {
     q: "Can I cancel anytime?",
@@ -254,7 +254,7 @@ function FaqItem({ q, a, adId }: { q: string; a: string; adId: string }) {
 
 // ─── CTA button ───────────────────────────────────────────────────────────────
 
-function CtaButton({ adId, label = "Build my agent — Free" }: { adId: string; label?: string }) {
+function CtaButton({ adId, label = "Claim my 60 days free →" }: { adId: string; label?: string }) {
   return (
     <a
       href={`/onboarding?from=lp_${adId}`}
@@ -292,12 +292,6 @@ export function LpClient({ adId, h1, subtitle }: Props) {
 
   return (
     <div className="overflow-x-hidden min-h-screen bg-[#0a0a0a] text-white">
-      {/* ── Urgency banner ── */}
-      <div className="border-b border-amber-500/20 bg-amber-500/[0.06] px-4 py-2.5 text-center text-xs font-medium text-amber-300">
-        🔒 Founder pricing in USD — locked for life if you sign up before July 15, 2026.{" "}
-        <span className="text-amber-400 font-semibold">{daysUntilDeadline} days left.</span>
-      </div>
-
       {/* ── Header ── */}
       <header className="border-b border-zinc-900">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -316,27 +310,23 @@ export function LpClient({ adId, h1, subtitle }: Props) {
       {/* ── Hero ── */}
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
-          {/* Beta badge */}
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.06] px-3 py-1">
-            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-            <span className="text-xs font-medium text-emerald-400">
-              Private beta · {spotsLeft} of 100 spots filled
+          {/* Limited-time badge */}
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-1.5">
+            <span className="text-xs font-bold uppercase tracking-wide text-amber-400">
+              🎁 Limited time — 60 days free
             </span>
           </div>
 
           <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
             {h1}
           </h1>
-          <p className="mx-auto mb-2 max-w-xl text-base leading-relaxed text-white/55 md:text-lg">
+          <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white/55 md:text-lg">
             {subtitle}
-          </p>
-          <p className="mx-auto mb-8 max-w-xl text-sm text-white/35">
-            Now in private beta. Be among the first 100 service businesses to deploy.
           </p>
 
           {/* Social proof */}
           <div className="mb-8 flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-2">
-            {["Live in 15 minutes", "14-day free trial — no charge", "Cancel in 2 clicks"].map(
+            {["Live in 15 minutes", "60 days completely free", "Cancel in 2 clicks"].map(
               (item) => (
                 <span key={item} className="flex items-center gap-1.5 text-sm text-white/50">
                   <span className="font-semibold text-emerald-400">✓</span>
@@ -348,6 +338,40 @@ export function LpClient({ adId, h1, subtitle }: Props) {
 
           <div className="mx-auto max-w-xs">
             <CtaButton adId={adId} />
+          </div>
+
+          {/* Private beta pill */}
+          <p className="mt-4 text-xs text-white/30">
+            Private beta · {spotsLeft} of 100 spots filled
+          </p>
+
+          {/* ── Founder pricing card ── */}
+          <div className="mx-auto mt-10 max-w-2xl rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 text-left">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="text-2xl">🔒</span>
+              <span className="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Founder pricing — Locked until July 15 · {daysUntilDeadline} days left
+              </span>
+            </div>
+            <p className="mb-4 text-sm text-zinc-300">
+              Sign up before July 15, 2026 to lock today&apos;s pricing forever.
+            </p>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {[
+                { label: "Starter", current: "$97", future: "$147" },
+                { label: "Growth", current: "$297", future: "$397" },
+                { label: "Agency", current: "$697", future: "$997" },
+              ].map(({ label, current, future }) => (
+                <div key={label}>
+                  <div className="mb-1 text-xs text-zinc-500">{label}</div>
+                  <div className="text-sm">
+                    <span className="font-semibold text-white">{current}</span>
+                    <span className="text-zinc-500"> → </span>
+                    <span className="text-zinc-500 line-through">{future}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -438,16 +462,16 @@ export function LpClient({ adId, h1, subtitle }: Props) {
       <section className="pb-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-white/30">
-            Start your free trial
+            Start your 60-day free trial
           </p>
           <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">
             Ready to stop missing leads?
           </h2>
           <p className="mb-6 text-sm text-white/40">
-            14-day free trial · No credit card charged today · Cancel in 2 clicks
+            60-day free trial · No charge until day 61 · Cancel in 2 clicks
           </p>
           <div className="mx-auto max-w-xs">
-            <CtaButton adId={adId} label="Build my agent — Free →" />
+            <CtaButton adId={adId} label="Claim my 60 days free →" />
           </div>
         </div>
       </section>

@@ -18,9 +18,11 @@ interface Props {
   plan?: string | null;
   planStatus?: string | null;
   trialDaysRemaining?: number | null;
+  trialEndDate?: string | null;
+  trialDayNumber?: number | null;
 }
 
-export function DashboardOverviewHeader({ email, showSuccess, checkoutSuccess, plan, planStatus, trialDaysRemaining }: Props) {
+export function DashboardOverviewHeader({ email, showSuccess, checkoutSuccess, plan, planStatus, trialDaysRemaining, trialEndDate, trialDayNumber }: Props) {
   const t = useTranslations("dashboard");
 
   useEffect(() => {
@@ -72,24 +74,46 @@ export function DashboardOverviewHeader({ email, showSuccess, checkoutSuccess, p
       )}
 
       {trialDaysRemaining !== null && trialDaysRemaining !== undefined && (
-        <div className="mb-6 flex items-center justify-between rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-5 py-4">
-          <p className="text-sm text-amber-400">
-            <span className="font-semibold">
-              {trialDaysRemaining === 0
-                ? "Your free trial ends today"
-                : trialDaysRemaining === 1
-                ? "Your free trial ends in 1 day"
-                : `Your free trial ends in ${trialDaysRemaining} days`}
-            </span>
-            {" — activate your plan to keep your agent running."}
-          </p>
-          <a
-            href="/dashboard/billing"
-            className="ml-4 shrink-0 rounded-md bg-amber-400 px-4 py-2 text-xs font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90"
-          >
-            Activate now →
-          </a>
-        </div>
+        trialDaysRemaining <= 7 ? (
+          // Urgent banner (orange) — ≤7 days left
+          <div className="mb-6 flex flex-col gap-3 rounded-xl border border-orange-500/30 bg-orange-500/[0.08] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-orange-400">
+                {trialDaysRemaining === 0
+                  ? "⏰ Your free trial ends today."
+                  : trialDaysRemaining === 1
+                  ? `⏰ Your free trial ends tomorrow${trialEndDate ? ` (${trialEndDate})` : ""}.`
+                  : `⏰ Your free trial ends in ${trialDaysRemaining} days${trialEndDate ? ` on ${trialEndDate}` : ""}.`}
+              </p>
+              <p className="mt-0.5 text-xs text-orange-400/70">
+                After that, your plan starts billing. Cancel anytime in 2 clicks.
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+              <a
+                href="/dashboard/billing"
+                className="rounded-md bg-orange-400 px-4 py-2 text-xs font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90"
+              >
+                Keep my agent →
+              </a>
+              <a href="/dashboard/billing" className="text-xs text-orange-400/60 underline hover:text-orange-400">
+                Cancel
+              </a>
+            </div>
+          </div>
+        ) : (
+          // Subtle banner — full trial period
+          <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] px-5 py-3.5">
+            <p className="text-sm text-emerald-400/80">
+              <span className="font-semibold text-emerald-400">
+                🎁 Free trial{trialDayNumber !== null ? ` — Day ${trialDayNumber} of 60` : ""}.
+              </span>
+              {" "}
+              {trialDaysRemaining} days remaining.
+              {trialEndDate ? ` No charge until ${trialEndDate}.` : ""}
+            </p>
+          </div>
+        )
       )}
 
       <div className="mb-8">

@@ -52,9 +52,8 @@ export default function Hero() {
         animate="show"
       >
         {/* Badge */}
-        <motion.div variants={itemVariants} className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-          <span className="text-xs font-medium text-white/70">{t("badge")}</span>
+        <motion.div variants={itemVariants} className="mb-7 inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-1.5">
+          <span className="text-xs font-bold uppercase tracking-wide text-amber-400">{t("badge")}</span>
         </motion.div>
 
         {/* Headline */}
@@ -82,7 +81,7 @@ export default function Hero() {
         >
           <Link
             href="/onboarding"
-            className="inline-flex h-11 items-center justify-center rounded-md bg-white px-6 text-sm font-medium text-[#0a0a0a] transition-opacity hover:opacity-90"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-white px-7 text-sm font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90"
           >
             {t("startFree")}
           </Link>
