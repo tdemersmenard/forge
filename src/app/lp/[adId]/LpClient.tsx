@@ -268,17 +268,8 @@ function CtaButton({ adId, label = "Claim my 60 days free →" }: { adId: string
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-const DEADLINE = new Date("2026-07-15T00:00:00");
-
-function getDaysUntilDeadline(): number {
-  const now = new Date();
-  const diff = DEADLINE.getTime() - now.getTime();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-}
-
 export function LpClient({ adId, h1, subtitle }: Props) {
   const [spotsLeft, setSpotsLeft] = useState<number>(47);
-  const daysUntilDeadline = getDaysUntilDeadline();
 
   useEffect(() => {
     posthog.capture("lp_viewed", { adId });
@@ -340,39 +331,9 @@ export function LpClient({ adId, h1, subtitle }: Props) {
             <CtaButton adId={adId} />
           </div>
 
-          {/* Private beta pill */}
           <p className="mt-4 text-xs text-white/30">
-            Private beta · {spotsLeft} of 100 spots filled
+            {spotsLeft} of 100 spots filled · No charge for 60 days
           </p>
-
-          {/* ── Founder pricing card ── */}
-          <div className="mx-auto mt-10 max-w-2xl rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 text-left">
-            <div className="mb-3 flex items-center gap-2">
-              <span className="text-2xl">🔒</span>
-              <span className="text-sm font-semibold uppercase tracking-wide text-amber-400">
-                Founder pricing — Locked until July 15 · {daysUntilDeadline} days left
-              </span>
-            </div>
-            <p className="mb-4 text-sm text-zinc-300">
-              Sign up before July 15, 2026 to lock today&apos;s pricing forever.
-            </p>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              {[
-                { label: "Starter", current: "$97", future: "$147" },
-                { label: "Growth", current: "$297", future: "$397" },
-                { label: "Agency", current: "$697", future: "$997" },
-              ].map(({ label, current, future }) => (
-                <div key={label}>
-                  <div className="mb-1 text-xs text-zinc-500">{label}</div>
-                  <div className="text-sm">
-                    <span className="font-semibold text-white">{current}</span>
-                    <span className="text-zinc-500"> → </span>
-                    <span className="text-zinc-500 line-through">{future}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
